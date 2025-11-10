@@ -18,14 +18,53 @@ async function validarLogin(usuario, senha){
 }
 
 async function buscarMateriais() {
-    const { data, err} = await supabase
-    .from('Materiais Almoxarifado')
-    .select('*')
+    try {
+        let todosMateriais = [];
+        let pagina = 0;
+        const limite = 1000; // Supabase max por página
+        let temMaisDados = true;
 
-    return data
+        console.log('🔄 Buscando materiais com paginação...');
+
+        while (temMaisDados) {
+            const inicio = pagina * limite;
+            
+            const { data, error, count } = await supabase
+                .from('Materiais Almoxarifado')
+                .select('*', { 
+                    count: 'exact',
+                    head: false 
+                })
+                .range(inicio, inicio + limite - 1);
+
+            if (error) {
+                console.error('❌ Erro Supabase:', error);
+                throw error;
+            }
+
+            if (data && data.length > 0) {
+                todosMateriais = todosMateriais.concat(data);
+                console.log(`📦 Página ${pagina + 1}: ${data.length} registros`);
+                
+                // Se veio menos que o limite, é a última página
+                if (data.length < limite) {
+                    temMaisDados = false;
+                } else {
+                    pagina++;
+                }
+            } else {
+                temMaisDados = false;
+            }
+        }
+
+        console.log(`✅ Total de materiais carregados: ${todosMateriais.length}`);
+        return todosMateriais;
+
+    } catch (error) {
+        console.error('❌ Erro ao buscar materiais:', error);
+        return [];
+    }
 }
-
-
 async function enviarOrcamento(solicitante, cidade, dataexe, datasolic, materiais, projeto, obs, tensao, equipe, tipo, listaNomes) {
     try {
         const { data, error } = await supabase

@@ -56,6 +56,8 @@ app.get('/listarMateriais', (req, res) => {
     console.log("✅ Materiais enviados!");
 
     buscarMateriais().then(data => {
+        console.log(data.length);
+        
         res.json(data)
     })
 })
