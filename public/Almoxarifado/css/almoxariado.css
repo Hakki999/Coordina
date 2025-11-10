@@ -585,3 +585,19 @@
     color: rgba(255, 255, 255, 0.5);
     font-style: italic;
 }
+.tableRowOrcados{
+    display: flex;
+}
+
+.materialChangeInput{
+    background-color: transparent;
+    border: none;
+    color: var(--fontColor);
+    width: 100%;
+    height: 100%;
+    
+}
+
+.materialChangeInput:focus{
+    outline: none;
+}

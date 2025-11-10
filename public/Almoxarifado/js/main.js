@@ -68,11 +68,12 @@ function renderSolicitacoes() {
     definirMateriais(materiais)
 }
 
+
 function renderListaMateriais(m) {
     let tr = []
     m.forEach(mate => {
         tr.push(`
-                <tr>
+                <tr class="tableRowOrcados">
                     <td>${mate.item}</td>
                     <td>${mate.qtd}</td>
                 </tr>
@@ -93,6 +94,26 @@ function renderListaMateriais(m) {
     `
 
     document.querySelector('.listMaterials').innerHTML = contM;
+
+    let tableRowOrcados = document.querySelectorAll('.tableRowOrcados');
+
+    tableRowOrcados.forEach(row => {
+        row.addEventListener('dblclick', evt => {
+
+            const editCell = `
+                <input type="text" class="materialChangeInput" value="${evt.target.innerHTML}" placeholder="Digite o material desenjado..." />
+            `
+            
+            evt.target.innerHTML= editCell;
+            const materialChangeInput = evt.target.querySelector('.materialChangeInput');
+            materialChangeInput.focus();
+            materialChangeInput.addEventListener('blur', evtBlur => {
+                evt.target.innerHTML = evtBlur.target.value;
+
+            })
+        })
+    })
+
 }
 
 function openFormMaterials() {
@@ -222,6 +243,11 @@ function sendForm() {
 
     document.querySelectorAll('.mat').forEach((x, i) => {
         listaNomes.push(x.value)
+    });
+
+    const materialChangeInput = evt.target.querySelectorAll('.materialChangeInput');
+    materialChangeInput.forEach((input, index) => {
+        orcados[index].item = input.value;
     });
 
     fetch('/enviarOrcamento', {
@@ -785,3 +811,4 @@ function initMobileMenu() {
 
 // Inicializar quando o DOM carregar
 document.addEventListener('DOMContentLoaded', initMobileMenu);
+
