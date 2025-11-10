@@ -15,36 +15,34 @@
     border: 1px solid color-mix(in srgb, var(--fontColor) 10%, transparent);
 }
 
-#listamateriais table{
+#listamateriais table {
     width: 100%;
     height: 100%;
-}
-
-/* HEADER PRINCIPAL */
-#listamateriais thead {
-    width: 100%;
     display: flex;
     flex-direction: column;
+    border-collapse: collapse;
+}
+
+/* HEADER FIXO */
+#listamateriais thead {
+    display: block;
+    flex-shrink: 0;
     background: linear-gradient(135deg, 
         color-mix(in srgb, var(--primaryColor) 95%, transparent) 0%, 
         color-mix(in srgb, var(--primaryColor) 85%, transparent) 100%);
     border-bottom: 1px solid color-mix(in srgb, var(--fontColor) 20%, transparent);
-    flex-shrink: 0;
 }
 
 /* Linha de cabeçalho - Títulos das colunas */
 #listamateriais thead tr:first-child {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
     height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 20px;
-
     background: var(--primaryColor);
 }
 
 #listamateriais thead tr:first-child th {
-    flex: 1;
     color: var(--fontColor);
     font-weight: 700;
     font-size: 0.85rem;
@@ -55,20 +53,23 @@
     overflow: hidden;
     text-overflow: ellipsis;
     padding: 0 10px;
+    border-right: 1px solid color-mix(in srgb, var(--fontColor) 10%, transparent);
+}
+
+#listamateriais thead tr:first-child th:last-child {
+    border-right: none;
 }
 
 /* Linha de dados do projeto */
 #listamateriais thead tr:nth-child(2) {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
     height: 45px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 20px;
     background: color-mix(in srgb, var(--primaryColor) 90%, transparent);
 }
 
 #listamateriais thead tr:nth-child(2) th {
-    flex: 1;
     color: var(--fontColor);
     font-weight: 600;
     font-size: 0.9rem;
@@ -77,25 +78,24 @@
     overflow: hidden;
     text-overflow: ellipsis;
     padding: 0 10px;
+    border-right: 1px solid color-mix(in srgb, var(--fontColor) 8%, transparent);
 }
 
 /* CORPO DA TABELA COM SCROLL */
 #listamateriais tbody {
+    display: block;
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    display: flex;
-    flex-direction: column;
     background: color-mix(in srgb, var(--primaryColor) 98%, transparent);
 }
 
 /* Header dos materiais - sticky */
 #listamateriais tbody tr:first-child {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
     height: 45px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 20px;
     background: linear-gradient(135deg, 
         color-mix(in srgb, var(--secundaryColor) 30%, transparent) 0%, 
         color-mix(in srgb, var(--secundaryColor) 15%, transparent) 100%);
@@ -103,11 +103,9 @@
     position: sticky;
     top: 0;
     z-index: 10;
-    flex-shrink: 0;
 }
 
 #listamateriais tbody tr:first-child th {
-    flex: 1;
     color: var(--fontColor);
     font-weight: 700;
     font-size: 0.8rem;
@@ -118,15 +116,19 @@
     overflow: hidden;
     text-overflow: ellipsis;
     padding: 0 10px;
+    border-right: 1px solid color-mix(in srgb, var(--fontColor) 5%, transparent);
+}
+
+#listamateriais tbody tr:first-child th:last-child {
+    border-right: none;
 }
 
 /* Linhas dos materiais */
 #listamateriais tbody tr:not(:first-child) {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
     height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 20px;
     transition: all 0.3s ease;
     border-bottom: 1px solid color-mix(in srgb, var(--fontColor) 5%, transparent);
     background: transparent;
@@ -148,7 +150,6 @@
 
 /* Células dos materiais */
 #listamateriais td {
-    flex: 1;
     color: var(--fontColor);
     font-size: 0.9rem;
     text-align: center;
@@ -157,37 +158,44 @@
     text-overflow: ellipsis;
     padding: 0 10px;
     transition: all 0.3s ease;
+    border-right: 1px solid color-mix(in srgb, var(--fontColor) 3%, transparent);
 }
 
-/* LARGURAS ESPECÍFICAS DAS COLUNAS */
+#listamateriais td:last-child {
+    border-right: none;
+}
+
+/* LARGURAS ESPECÍFICAS DAS COLUNAS USANDO TABLE-LAYOUT */
 
 /* Para o cabeçalho principal (8 colunas) */
 #listamateriais thead tr:first-child th:nth-child(1),
-#listamateriais thead tr:nth-child(2) th:nth-child(1) { flex: 1.4; } /* Solicitante */
+#listamateriais thead tr:nth-child(2) th:nth-child(1),
+#listamateriais thead tr:first-child th:nth-child(1),
+#listamateriais thead tr:nth-child(2) th:nth-child(1) { width: 14%; } /* Solicitante */
 #listamateriais thead tr:first-child th:nth-child(2),
-#listamateriais thead tr:nth-child(2) th:nth-child(2) { flex: 1.6; } /* Projeto */
+#listamateriais thead tr:nth-child(2) th:nth-child(2) { width: 16%; } /* Projeto */
 #listamateriais thead tr:first-child th:nth-child(3),
-#listamateriais thead tr:nth-child(2) th:nth-child(3) { flex: 1.2; } /* Cidade */
+#listamateriais thead tr:nth-child(2) th:nth-child(3) { width: 12%; } /* Cidade */
 #listamateriais thead tr:first-child th:nth-child(4),
-#listamateriais thead tr:nth-child(2) th:nth-child(4) { flex: 0.8; }  /* Tensão */
+#listamateriais thead tr:nth-child(2) th:nth-child(4) { width: 8%; }  /* Tensão */
 #listamateriais thead tr:first-child th:nth-child(5),
-#listamateriais thead tr:nth-child(2) th:nth-child(5) { flex: 1.0; } /* Equipe */
+#listamateriais thead tr:nth-child(2) th:nth-child(5) { width: 10%; } /* Equipe */
 #listamateriais thead tr:first-child th:nth-child(6),
-#listamateriais thead tr:nth-child(2) th:nth-child(6) { flex: 1.0; } /* Data Solicitação */
+#listamateriais thead tr:nth-child(2) th:nth-child(6) { width: 10%; } /* Data Solicitação */
 #listamateriais thead tr:first-child th:nth-child(7),
-#listamateriais thead tr:nth-child(2) th:nth-child(7) { flex: 1.0; } /* Data Execução */
+#listamateriais thead tr:nth-child(2) th:nth-child(7) { width: 10%; } /* Data Execução */
 #listamateriais thead tr:first-child th:nth-child(8),
-#listamateriais thead tr:nth-child(2) th:nth-child(8) { flex: 2.0; } /* Obs. */
+#listamateriais thead tr:nth-child(2) th:nth-child(8) { width: 20%; } /* Obs. */
 
 /* Para a seção de materiais (4 colunas) */
 #listamateriais tbody tr:first-child th:nth-child(1),
-#listamateriais td:nth-child(1) { flex: 5.0; } /* Material */
+#listamateriais td:nth-child(1) { width: 50%; } /* Material */
 #listamateriais tbody tr:first-child th:nth-child(2),
-#listamateriais td:nth-child(2) { flex: 1.6; } /* Orçado */
+#listamateriais td:nth-child(2) { width: 16%; } /* Orçado */
 #listamateriais tbody tr:first-child th:nth-child(3),
-#listamateriais td:nth-child(3) { flex: 1.6; } /* Liberado */
+#listamateriais td:nth-child(3) { width: 16%; } /* Liberado */
 #listamateriais tbody tr:first-child th:nth-child(4),
-#listamateriais td:nth-child(4) { flex: 1.8; } /* Devolvido */
+#listamateriais td:nth-child(4) { width: 18%; } /* Devolvido */
 
 /* DESTAQUES NUMÉRICOS */
 #listamateriais td:nth-child(2),
@@ -197,8 +205,7 @@
     font-family: 'Courier New', monospace;
     background: color-mix(in srgb, var(--fontColor) 2%, transparent);
     border-radius: 6px;
-    margin: 0 5px;
-    padding: 6px 10px;
+    margin: 4px 2px;
 }
 
 #listamateriais td:nth-child(3) {
@@ -287,11 +294,6 @@
         height: 95%;
         top: 2.5%;
         right: 2.5%;
-    }
-    
-    #listamateriais thead tr,
-    #listamateriais tbody tr {
-        padding: 0 15px;
     }
     
     #listamateriais th,

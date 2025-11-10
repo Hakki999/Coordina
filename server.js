@@ -67,7 +67,7 @@ app.post('/enviarOrcamento', (req, res) => {
     enviarOrcamento(
         req.body.solicitante,
         req.body.cidade,
-        req.body.dataexe,
+        req.body.dataExe,
         req.body.datasolic,
         req.body.materiais,
         req.body.projeto,

@@ -448,3 +448,310 @@ document.querySelectorAll('.tableRowRecebidos').forEach(row => {
     });
 });
 }
+
+
+// 🔧 FUNÇÃO DE FILTRO - Adicione esta função ao seu main.js
+function aplicarFiltros() {
+    const filtroSolicitante = document.getElementById('filtroSolicitante').value.toLowerCase();
+    const filtroEquipe = document.getElementById('filtroEquipe').value.toLowerCase();
+    const filtroProjeto = document.getElementById('filtroProjeto').value.toLowerCase();
+    const filtroData = document.getElementById('filtroData').value;
+    const filtroTensao = document.getElementById('filtroTensao').value;
+    const filtroTipo = document.getElementById('filtroTipo').value;
+
+    fetch('/solicitacoesRecentes', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            valor: 100 // Busca muitas solicitações para filtrar localmente
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Erro HTTP: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        const dadosCompletos = data.data || data;
+        
+        // Aplicar filtros localmente
+        const dadosFiltrados = dadosCompletos.filter(item => {
+            // Filtro por Solicitante
+            if (filtroSolicitante && !item.Solicitante?.toLowerCase().includes(filtroSolicitante)) {
+                return false;
+            }
+            
+            // Filtro por Equipe
+            if (filtroEquipe && !item.equipe?.toLowerCase().includes(filtroEquipe)) {
+                return false;
+            }
+            
+            // Filtro por Projeto
+            if (filtroProjeto && !item.Projeto?.toLowerCase().includes(filtroProjeto)) {
+                return false;
+            }
+            
+            // Filtro por Data
+            if (filtroData && item.DataExe !== filtroData) {
+                return false;
+            }
+            
+            // Filtro por Tensão
+            if (filtroTensao && item.Tensao !== filtroTensao) {
+                return false;
+            }
+            
+            // Filtro por Tipo
+            if (filtroTipo && item.tipo !== filtroTipo) {
+                return false;
+            }
+            
+            return true;
+        });
+        
+        console.log(`🎯 ${dadosFiltrados.length} solicitações após filtro`);
+        renderizarTabela(dadosFiltrados);
+    })
+    .catch(error => {
+        console.error('❌ Erro ao buscar solicitações:', error);
+    });
+}
+
+// 🔧 FUNÇÃO PARA LIMPAR FILTROS
+function limparFiltros() {
+    document.getElementById('filtroSolicitante').value = '';
+    document.getElementById('filtroEquipe').value = '';
+    document.getElementById('filtroProjeto').value = '';
+    document.getElementById('filtroData').value = '';
+    document.getElementById('filtroTensao').value = '';
+    document.getElementById('filtroTipo').value = '';
+    
+    // Recarregar dados sem filtro
+    renderRecebidos();
+}
+
+// 🔧 ATUALIZE A FUNÇÃO renderRecebidos para incluir os filtros
+function renderRecebidos(filtro = "/solicitacoesRecentes", valor = 100) {
+    fetch(filtro, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            valor: valor
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Erro HTTP: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('📦 Dados recebidos:', data);
+        renderizarTabelaComFiltros(data.data || data);
+    })
+    .catch(error => {
+        console.error('❌ Erro ao buscar solicitações:', error);
+    });
+}
+
+// 🔧 NOVA FUNÇÃO PARA RENDERIZAR COM FILTROS
+function renderizarTabelaComFiltros(dados) {
+    console.log('🎨 Renderizando tabela com filtros:', dados);
+
+    // Gerar opções únicas para os selects
+    const solicitantesUnicos = [...new Set(dados.map(item => item.Solicitante).filter(Boolean))];
+    const equipesUnicas = [...new Set(dados.map(item => item.equipe).filter(Boolean))];
+    const projetosUnicos = [...new Set(dados.map(item => item.Projeto).filter(Boolean))];
+    const tensoesUnicas = [...new Set(dados.map(item => item.Tensao).filter(Boolean))];
+    const tiposUnicos = [...new Set(dados.map(item => item.tipo).filter(Boolean))];
+
+    let tabelaBody = "";
+    dados.forEach(item => {
+        tabelaBody += `
+            <tr class="tableRowRecebidos" id="row-${item.id}">
+                <td>${item.Solicitante || 'N/A'}</td>
+                <td>${item.equipe || 'N/A'}</td>
+                <td>${item.Projeto || 'N/A'}</td>
+                <td>${item.Tensao || 'N/A'}</td>
+                <td>${item.Cidade || 'N/A'}</td>
+                <td>${formatarData(item.DataExe) || 'N/A'}</td>
+                <td>${item.tipo || 'N/A'}</td>
+                <td>${item.obs || 'N/A'}</td>
+            </tr>
+        `;
+    });
+
+    const htmlRecebidos = `
+        <div class="filtro">
+            <div class="filtro-container">
+                <div class="filtro-grupo">
+                    <label class="filtro-label">Solicitante</label>
+                    <select id="filtroSolicitante" class="filtro-select">
+                        <option value="">Todos</option>
+                        ${solicitantesUnicos.map(s => `<option value="${s}">${s}</option>`).join('')}
+                    </select>
+                </div>
+                
+                <div class="filtro-grupo">
+                    <label class="filtro-label">Equipe</label>
+                    <select id="filtroEquipe" class="filtro-select">
+                        <option value="">Todas</option>
+                        ${equipesUnicas.map(e => `<option value="${e}">${e}</option>`).join('')}
+                    </select>
+                </div>
+                
+                <div class="filtro-grupo">
+                    <label class="filtro-label">Projeto</label>
+                    <select id="filtroProjeto" class="filtro-select">
+                        <option value="">Todos</option>
+                        ${projetosUnicos.map(p => `<option value="${p}">${p}</option>`).join('')}
+                    </select>
+                </div>
+                
+                <div class="filtro-grupo">
+                    <label class="filtro-label">Tensão</label>
+                    <select id="filtroTensao" class="filtro-select">
+                        <option value="">Todas</option>
+                        ${tensoesUnicas.map(t => `<option value="${t}">${t}</option>`).join('')}
+                    </select>
+                </div>
+                
+                <div class="filtro-grupo">
+                    <label class="filtro-label">Tipo</label>
+                    <select id="filtroTipo" class="filtro-select">
+                        <option value="">Todos</option>
+                        ${tiposUnicos.map(t => `<option value="${t}">${t}</option>`).join('')}
+                    </select>
+                </div>
+                
+                <div class="filtro-grupo">
+                    <label class="filtro-label">Data Execução</label>
+                    <input type="date" id="filtroData" class="filtro-input">
+                </div>
+                
+                <div class="filtro-botoes">
+                    <button class="btn-filtro" onclick="limparFiltros()">Limpar</button>
+                    <button class="btn-filtro primario" onclick="aplicarFiltros()">Filtrar</button>
+                </div>
+            </div>
+        </div>
+        <table id="tabelaResposta">
+            <thead>
+                <tr>
+                    <th>Solicitante</th>
+                    <th>Equipe</th>
+                    <th>Projeto</th>
+                    <th>Tensão</th>
+                    <th>Cidade</th>
+                    <th>Data Exe.</th>
+                    <th>Tipo</th>
+                    <th>Obs.</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${tabelaBody}
+            </tbody>
+        </table>
+    `;
+    
+    displayMain.style.flexDirection = "column";
+    displayMain.innerHTML = htmlRecebidos;
+
+    // Adicionar event listeners para filtro automático ao mudar selects
+    document.querySelectorAll('.filtro-select, .filtro-input').forEach(element => {
+        element.addEventListener('change', aplicarFiltros);
+    });
+
+    // Configurar duplo clique nas linhas
+    configurarDuploClique(dados);
+}
+
+// 🔧 FUNÇÃO AUXILIAR PARA FORMATAR DATA
+function formatarData(dataString) {
+    if (!dataString) return 'N/A';
+    try {
+        const data = new Date(dataString);
+        return data.toLocaleDateString('pt-BR');
+    } catch {
+        return dataString;
+    }
+}
+
+// 🔧 FUNÇÃO SEPARADA PARA CONFIGURAR DUPLO CLIQUE
+function configurarDuploClique(dados) {
+    const listamateriais = document.getElementById("listamateriais");
+    
+    document.querySelectorAll('.tableRowRecebidos').forEach(row => {
+        row.addEventListener('dblclick', evt => {
+            const rowId = row.id.split('-')[1];
+            const itemData = dados.find(d => d.id == rowId);
+            
+            if (!itemData) {
+                console.error('❌ Dados não encontrados para o ID:', rowId);
+                return;
+            }
+
+            // Preencher dados na modal
+            document.getElementById("lmSolicitante").innerText = itemData.Solicitante || 'N/A';
+            document.getElementById("lmProjeto").innerText = itemData.Projeto || 'N/A';
+            document.getElementById("lmCidade").innerText = itemData.Cidade || 'N/A';
+            document.getElementById("lmTensao").innerText = itemData.Tensao || 'N/A';
+            document.getElementById("lmEquipe").innerText = itemData.equipe || 'N/A';
+            document.getElementById("lmDataSol").innerText = formatarData(itemData.DataSol) || 'N/A';
+            document.getElementById("lmDataExe").innerText = formatarData(itemData.DataExe) || 'N/A';
+            document.getElementById("lmObs").innerText = itemData.obs || 'N/A';
+
+            const materialListBody = document.querySelector('#listamateriais tbody');
+            if (!materialListBody) {
+                console.error('❌ Elemento materialListBody não encontrado');
+                return;
+            }
+
+            let materialListBodyContent = "";
+            const materiais = itemData.Materiais;
+            
+            if (materiais && Array.isArray(materiais)) {
+                materiais.forEach(mate => {
+                    materialListBodyContent += `
+                        <tr>
+                            <td>${mate.item || 'N/A'}</td>
+                            <td>${mate.orcado || mate.qtd || '0'}</td>
+                            <td>${mate.liberado || '0'}</td>
+                            <td>${mate.devolvido || '0'}</td>
+                        </tr>
+                    `;
+                });
+            } else {
+                materialListBodyContent = `
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: #999;">
+                            Nenhum material encontrado
+                        </td>
+                    </tr>
+                `;
+            }
+
+            materialListBody.innerHTML = `
+                <tr>
+                    <th>Material</th>
+                    <th>Orçado</th>
+                    <th>Liberado</th>
+                    <th>Devolvido</th>
+                </tr>
+                ${materialListBodyContent}
+            `;
+            
+            listamateriais.style.display = "block";
+        });
+    });
+}
+
+// 🔧 ATUALIZE A FUNÇÃO renderizarTabela EXISTENTE
+function renderizarTabela(dados) {
+    renderizarTabelaComFiltros(dados);
+}
