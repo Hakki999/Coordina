@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="./Almoxarifado/css/style.css">
+    <link rel="stylesheet" href="./Almoxarifado/css/almoxariado.css">
+    <link rel="stylesheet" href="./Almoxarifado/css/recebido.css">
+    <link rel="stylesheet" href="./Almoxarifado/css/listamateriais.css">
+    <link rel="shortcut icon" href="../src/logoIcon.png" type="image/x-icon">
+
+    <title>Coordina</title>
+</head>
+
+<body>
+    <nav id="navBar">
+        <div id="thead">
+            <img src="../src/logoIcon.png" alt="Coordina">
+        </div>
+        <ul class="menu">
+            <ul>
+                <li class="optionNav openOption">Almoxarifado
+                    <ul>
+                        <li class="menuSelect menuSelected" onclick="renderSolicitacoes()">Solicitação</li>
+                        <li class="menuSelect" onclick="renderRecebidos()">Recebidos</li>
+                        <li class="menuSelect">Config</li>
+                    </ul>
+                </li>
+                <li class="optionNav closeOption">Controle
+                    <ul>
+                        <li class="menuSelect">Programado x Executado </li>
+                        <li class="menuSelect">GPM x Asbuilt</li>
+                        <li class="menuSelect">Asbuilt x Recebido</li>
+                    </ul>
+                </li>
+                <li class="optionNav closeOption">Relatório de erros
+                    <ul>
+                        <li class="menuSelect">Materiais x Programado</li>
+                        <li class="menuSelect">Final</li>
+                    </ul>
+                </li>
+                <li class="optionNav closeOption">Relatório de alerta
+                    <ul>
+                        <li class="menuSelect">Abaixo da meta</li>
+                        <li class="menuSelect">Acima da meta</li>
+                    </ul>
+                </li>
+            </ul>
+        </ul>
+    </nav>
+
+    <main id="displayMain">
+
+    </main>
+
+    <form id="formMaterials" style="display: none;" action="" method="post">
+        <div class="form-overlay disableDisplay"></div>
+
+        <div class="form-header">
+            <h2>Cadastro de Materiais</h2>
+        </div>
+
+        <div class="form-body">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="projeto">Projeto</label>
+                    <input type="text" id="projeto" class="form-input" required placeholder="Digite o nome do projeto">
+                </div>
+                <div class="form-group">
+                    <label for="cidade">Cidade</label>
+                    <input type="text" id="cidade" class="form-input" required placeholder="Nome da cidade">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="tensaoRede">Tensão da Rede</label>
+                    <select id="tensaoRede" class="form-select" required>
+                        <option value="">Selecione a tensão</option>
+                        <option value="13.8">13.8 kV</option>
+                        <option value="34.5">34.5 kV</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="equipe">Equipe</label>
+                    <input type="text" id="equipe" class="form-input" required placeholder="Nome da equipe">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="tipoServ">Tipo de Serviço</label>
+                    <select id="tipoServ" class="form-select" required>
+                        <option value="">Selecione o tipo</option>
+                        <option value="Emergência">Emergência</option>
+                        <option value="Manutenção">Manutenção</option>
+                        <option value="Obras">Obras</option>
+                        <option value="Reposição">Reposição</option>
+                        <option value="Leve">Leve</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="dataexe">Data de Execução</label>
+                    <input type="date" id="dataexe" class="form-input" required>
+                </div>
+            </div>
+
+            <div class="form-group full-width">
+                <label for="Obs">Observações</label>
+                <textarea id="Obs" class="form-textarea" placeholder="Adicione observações relevantes..."
+                    rows="4"></textarea>
+            </div>
+        </div>
+
+        <button type="button" class="closeFather unSubmit">
+        </button>
+
+        <div class="form-footer">
+            <button type="submit" class="button-submit unSubmit">
+                <span class="button-text">Enviar Solicitação</span>
+                <span class="button-icon">→</span>
+            </button>
+        </div>
+    </form>
+
+    <div id="listamateriais">
+        <table>
+            <thead>
+                <tr>
+                    <th>Solicitante</th>
+                    <th>Projeto</th>
+                    <th>Cidade</th>
+                    <th>Tensão</th>
+                    <th>Equipe</th>
+                    <th>Data Solicitação</th>
+                    <th>Data Execução</th>
+                    <th>Obs.</th>
+                </tr>
+                <tr>
+                    <th>José Miguel</th>
+                    <th>Projeto X</th>
+                    <th>São Paulo</th>
+                    <th>13.8 kV</th>
+                    <th>firo001m</th>
+                    <th>21/12/20025</th>
+                    <th>21/12/20025</th>
+                    <th>Urgente</th>
+                </tr>
+            <tbody>
+                <tr>
+                    <th>Material</th>
+                    <th>Orçado</th>
+                    <th>Liberado</th>
+                    <th>Devolvido</th>
+                </tr>
+
+                <tr>
+                    <td>Material 1</td>
+                    <td>100</td>
+                    <td>80</td>
+                    <td>5</td>
+                </tr>
+
+            </tbody>
+            </thead>
+        </table>
+    </div>
+
+    <script src="./Almoxarifado/js/autoCompleteInput.js"></script>
+    <script src="./Almoxarifado/js/main.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="./login/css/style.css">
+    <link rel="shortcut icon" href="../src/logoIcon.png" type="image/x-icon">
+
+    <title>Coordina - Login</title>
+</head>
+
+<body>
+
+    <form id="formLogin" action="/login" method="post">
+        <div class="form-overlay disableDisplay"></div>
+
+        <div class="form-header">
+            <div class="logo-container">
+                <img src="../src/logoIcon.png" alt="Coordina" class="logo">
+            </div>
+            <h2>Bem-vindo ao Coordina</h2>
+            <p class="subtitle">Faça login para acessar o sistema</p>
+        </div>
+
+        <div class="form-body">
+            <div class="form-group full-width">
+                <label for="usuario">Usuário</label>
+                <input type="text" id="usuario" class="form-input" placeholder="Digite seu usuário" value="José Miguel" required>
+            </div>
+
+            <div class="form-group full-width">
+                <label for="senha">Senha</label>
+                <input type="password" id="senha" class="form-input" placeholder="Digite sua senha" value="Equatorial!2025" required>
+            </div>
+        </div>
+
+        <div class="form-footer">
+            <button type="submit" class="button-submit">
+                <span class="button-text">Entrar</span>
+                <span class="button-icon">→</span>
+            </button>
+        </div>
+    </form>
+
+    <script src="./login/js/main.js"></script>
+    <script src="./login/js/sendRequest.js"></script>
+</body>
+
+</html>
