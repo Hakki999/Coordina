@@ -372,21 +372,79 @@ function renderizarTabela(dados) {
     displayMain.innerHTML = htmlRecebidos;
 
     const listamateriais = document.getElementById("listamateriais");
+    const materialListBody = document.getElementById("materialListBody");
 
-    document.querySelectorAll('.tableRowRecebidos').forEach(row => {
-        row.addEventListener('dblclick', evt => {
-            
-            listamateriais.style.display = "block";
+document.querySelectorAll('.tableRowRecebidos').forEach(row => {
+    row.addEventListener('dblclick', evt => {
+        
+        listamateriais.style.display = "block";
 
-            document.getElementById("lmSolicitante").innerText = dados.find(d => d.id == row.id.split('-')[1]).Solicitante;
-            document.getElementById("lmProjeto").innerText = dados.find(d => d.id == row.id.split('-')[1]).Projeto;
-            document.getElementById("lmCidade").innerText = dados.find(d => d.id == row.id.split('-')[1]).Cidade;
-            document.getElementById("lmTensao").innerText = dados.find(d => d.id == row.id.split('-')[1]).Tensao;
-            document.getElementById("lmEquipe").innerText = dados.find(d => d.id == row.id.split('-')[1]).equipe;
-            document.getElementById("lmDataSol").innerText = dados.find(d => d.id == row.id.split('-')[1]).DataSol;
-            document.getElementById("lmDataExe").innerText = dados.find(d => d.id == row.id.split('-')[1]).DataExe;
-            document.getElementById("lmObs").innerText = dados.find(d => d.id == row.id.split('-')[1]).obs;
-            
-        })
+        // 🔧 CORREÇÃO: Use o ID correto da linha
+        const rowId = row.id.split('-')[1];
+        const itemData = dados.find(d => d.id == rowId);
+        
+        // 🔧 CORREÇÃO: Verifique se os dados existem
+        if (!itemData) {
+            console.error('❌ Dados não encontrados para o ID:', rowId);
+            return;
+        }
+
+        // 🔧 CORREÇÃO: Preencha os dados com verificações de segurança
+        document.getElementById("lmSolicitante").innerText = itemData.Solicitante || 'N/A';
+        document.getElementById("lmProjeto").innerText = itemData.Projeto || 'N/A';
+        document.getElementById("lmCidade").innerText = itemData.Cidade || 'N/A';
+        document.getElementById("lmTensao").innerText = itemData.Tensao || 'N/A';
+        document.getElementById("lmEquipe").innerText = itemData.equipe || 'N/A';
+        document.getElementById("lmDataSol").innerText = itemData.DataSol || 'N/A';
+        document.getElementById("lmDataExe").innerText = itemData.DataExe || 'N/A';
+        document.getElementById("lmObs").innerText = itemData.obs || 'N/A';
+
+        // 🔧 CORREÇÃO: Obtenha a referência correta para o tbody
+        const materialListBody = document.querySelector('#listamateriais tbody');
+        if (!materialListBody) {
+            console.error('❌ Elemento materialListBody não encontrado');
+            return;
+        }
+
+        let materialListBodyContent = "";
+        
+        // 🔧 CORREÇÃO: Verifique se Materiais existe e é um array
+        const materiais = itemData.Materiais;
+        console.log('📦 Materiais encontrados:', materiais);
+        
+        if (materiais && Array.isArray(materiais)) {
+            materiais.forEach(mate => {
+                // 🔧 CORREÇÃO: Adicione todas as colunas necessárias
+                materialListBodyContent += `
+                    <tr>
+                        <td>${mate.item || 'N/A'}</td>
+                        <td>${mate.orcado || mate.qtd || '0'}</td> <!-- Orçado -->
+                        <td>${mate.liberado || '0'}</td> <!-- Liberado -->
+                        <td>${mate.devolvido || '0'}</td> <!-- Devolvido -->
+                    </tr>
+                `;
+            });
+        } else {
+            console.warn('⚠️ Nenhum material encontrado ou formato inválido');
+            materialListBodyContent = `
+                <tr>
+                    <td colspan="4" style="text-align: center; color: #999;">
+                        Nenhum material encontrado
+                    </td>
+                </tr>
+            `;
+        }
+
+        // 🔧 CORREÇÃO: Atualize o innerHTML do tbody
+        materialListBody.innerHTML = `
+            <tr>
+                <th>Material</th>
+                <th>Orçado</th>
+                <th>Liberado</th>
+                <th>Devolvido</th>
+            </tr>
+            ${materialListBodyContent}
+        `;
     });
+});
 }
