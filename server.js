@@ -41,14 +41,14 @@ app.post('/login', (req, res) => {
                 httpOnly: true,
                 secure: false,
                 sameSite: 'strict',
-                maxAge: 10 * 60 * 1000 // 10 minutos
+                maxAge: 30 * 60 * 1000 // 10 minutos
             }).json({
                 resp: "wellcome",
                 nome: payload.nome,
                 redirect: '/controle_almoxarifado'
             })
         } else {
-
+            res.json({ resp: "user not found" })
         }
     })
 })

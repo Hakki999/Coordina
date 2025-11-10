@@ -17,6 +17,8 @@ function sendRequest(uri, value, methodP = 'POST') {
             
             // CORREÇÃO: Redirecionar a janela, não fazer fetch
             window.location.href = data.redirect;
+        }else{
+            alert('Usuário não encontrado!');
         }
     })
     .catch(err => {

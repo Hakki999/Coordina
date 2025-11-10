@@ -12,7 +12,7 @@ function autenticarToken(req, res, next) {
     const finalToken = token || tokenFromHeader;
     
     if (!finalToken) {
-        return res.status(401).json({ erro: 'Token ausente' });
+        return res.status(401).redirect('/').json({ erro: 'Token ausente' });
     }
 
     jwt.verify(finalToken, process.env.JWT_SECRET, (err, user) => {

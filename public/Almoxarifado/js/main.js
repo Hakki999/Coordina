@@ -252,6 +252,16 @@ function setupTableRowEvents() {
         row.addEventListener('dblclick', handleTableRowDoubleClick);
     });
 }
+/**
+ * Configura eventos de edição nas linhas da liberado e devolvido
+ */
+
+function setupTableRowEventsLibDev(){
+    let tableRowOrcados = document.querySelectorAll('.modlibdev');
+    tableRowOrcados.forEach(row => {
+        row.addEventListener('click', handleTableRowDoubleClick);
+    });
+}
 
 /**
  * Manipula duplo clique para edição de linha
@@ -751,6 +761,8 @@ function preencherModalDetalhes(itemData) {
     }
 
     materialListBody.innerHTML = buildMaterialDetailsTable(itemData.Materiais);
+
+    setupTableRowEventsLibDev();
 }
 
 /**
@@ -764,8 +776,8 @@ function buildMaterialDetailsTable(materiais) {
             <tr>
                 <td>${mate.item || 'N/A'}</td>
                 <td>${mate.orcado || mate.qtd || '0'}</td>
-                <td>${mate.liberado || '0'}</td>
-                <td>${mate.devolvido || '0'}</td>
+                <td class="modlibdev">${mate.liberado || '0'}</td>
+                <td class="modlibdev>${mate.devolvido || '0'}</td>
             </tr>
         `).join('');
     } else {
