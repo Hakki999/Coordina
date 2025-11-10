@@ -114,8 +114,7 @@
             </div>
         </div>
 
-        <button type="button" class="closeFather unSubmit">
-        </button>
+        <button type="button" class="closeFather unSubmit"></button>
 
         <div class="form-footer">
             <button type="submit" class="button-submit unSubmit">
@@ -125,7 +124,7 @@
         </div>
     </form>
 
-    <div id="listamateriais">
+    <div id="listamateriais" style="display: none;">
         <table>
             <thead>
                 <tr>
@@ -139,14 +138,14 @@
                     <th>Obs.</th>
                 </tr>
                 <tr>
-                    <th>José Miguel</th>
-                    <th>Projeto X</th>
-                    <th>São Paulo</th>
-                    <th>13.8 kV</th>
-                    <th>firo001m</th>
-                    <th>21/12/20025</th>
-                    <th>21/12/20025</th>
-                    <th>Urgente</th>
+                    <th id="lmSolicitante">José Miguel</th>
+                    <th id="lmProjeto">Projeto X</th>
+                    <th id="lmCidade">São Paulo</th>
+                    <th id="lmTensao">13.8 kV</th>
+                    <th id="lmEquipe">firo001m</th>
+                    <th id="lmDataSol">21/12/20025</th>
+                    <th id="lmDataExe">21/12/20025</th>
+                    <th id="lmObs">Urgente</th>
                 </tr>
             <tbody>
                 <tr>
@@ -166,6 +165,8 @@
             </tbody>
             </thead>
         </table>
+
+         <button type="button" class="closeFather unSubmit"></button>
     </div>
 
     <script src="./Almoxarifado/js/autoCompleteInput.js"></script>

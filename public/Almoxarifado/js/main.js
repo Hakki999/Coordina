@@ -298,7 +298,7 @@ function renderizarTabela(dados) {
 
     dados.forEach(item => {
         tabelaBody += `
-            <tr class="tableRowRecebidos">
+            <tr class="tableRowRecebidos" id="row-${item.id}">
                 <td>${item.Solicitante}</td>
                 <td>${item.equipe}</td>
                 <td>${item.Projeto}</td>
@@ -369,11 +369,24 @@ function renderizarTabela(dados) {
         </table>
     `
     displayMain.style.flexDirection = "column"
-    displayMain.innerHTML = htmlRecebidos
+    displayMain.innerHTML = htmlRecebidos;
+
+    const listamateriais = document.getElementById("listamateriais");
 
     document.querySelectorAll('.tableRowRecebidos').forEach(row => {
         row.addEventListener('dblclick', evt => {
-            alert('Funcionalidade de detalhes em desenvolvimento.')
+            
+            listamateriais.style.display = "block";
+
+            document.getElementById("lmSolicitante").innerText = dados.find(d => d.id == row.id.split('-')[1]).Solicitante;
+            document.getElementById("lmProjeto").innerText = dados.find(d => d.id == row.id.split('-')[1]).Projeto;
+            document.getElementById("lmCidade").innerText = dados.find(d => d.id == row.id.split('-')[1]).Cidade;
+            document.getElementById("lmTensao").innerText = dados.find(d => d.id == row.id.split('-')[1]).Tensao;
+            document.getElementById("lmEquipe").innerText = dados.find(d => d.id == row.id.split('-')[1]).equipe;
+            document.getElementById("lmDataSol").innerText = dados.find(d => d.id == row.id.split('-')[1]).DataSol;
+            document.getElementById("lmDataExe").innerText = dados.find(d => d.id == row.id.split('-')[1]).DataExe;
+            document.getElementById("lmObs").innerText = dados.find(d => d.id == row.id.split('-')[1]).obs;
+            
         })
     });
 }

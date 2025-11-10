@@ -1,40 +1,302 @@
-#listamateriais{
+#listamateriais {
     width: 90%;
     height: 90%;
-
     position: fixed;
     top: 5%;
     right: 5%;
     z-index: 99999;
-
     display: flex;
     flex-direction: column;
-
     background-color: var(--primaryColor);
-    box-shadow: 0px 0px 10px color-mix(in srgb, var(--emphasisColor) 50%, transparent);
-    border-radius: 10px;
+    box-shadow: 0px 0px 20px color-mix(in srgb, var(--emphasisColor) 30%, transparent);
+    border-radius: 15px;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    border: 1px solid color-mix(in srgb, var(--fontColor) 10%, transparent);
 }
 
-#listamateriais thead{
+#listamateriais table{
     width: 100%;
-    height: 50px;
+    height: 100%;
+}
 
+/* HEADER PRINCIPAL */
+#listamateriais thead {
+    width: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
-
-    border-bottom: 1px solid color-mix(in srgb, var(--fontColor) 50%, transparent);
+    background: linear-gradient(135deg, 
+        color-mix(in srgb, var(--primaryColor) 95%, transparent) 0%, 
+        color-mix(in srgb, var(--primaryColor) 85%, transparent) 100%);
+    border-bottom: 1px solid color-mix(in srgb, var(--fontColor) 20%, transparent);
+    flex-shrink: 0;
 }
 
-#listamateriais thead tr{
+/* Linha de cabeçalho - Títulos das colunas */
+#listamateriais thead tr:first-child {
     height: 50px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding: 0 20px;
 
+    background: var(--primaryColor);
+}
+
+#listamateriais thead tr:first-child th {
+    flex: 1;
+    color: var(--fontColor);
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 10px;
+}
+
+/* Linha de dados do projeto */
+#listamateriais thead tr:nth-child(2) {
+    height: 45px;
     display: flex;
-    justify-content: space-around;
     align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    background: color-mix(in srgb, var(--primaryColor) 90%, transparent);
+}
 
-    border-bottom: 1px solid color-mix(in srgb, var(--fontColor) 50%, transparent);
+#listamateriais thead tr:nth-child(2) th {
+    flex: 1;
+    color: var(--fontColor);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 10px;
+}
+
+/* CORPO DA TABELA COM SCROLL */
+#listamateriais tbody {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    background: color-mix(in srgb, var(--primaryColor) 98%, transparent);
+}
+
+/* Header dos materiais - sticky */
+#listamateriais tbody tr:first-child {
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    background: linear-gradient(135deg, 
+        color-mix(in srgb, var(--secundaryColor) 30%, transparent) 0%, 
+        color-mix(in srgb, var(--secundaryColor) 15%, transparent) 100%);
+    border-bottom: 2px solid color-mix(in srgb, var(--secundaryColor) 30%, transparent);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    flex-shrink: 0;
+}
+
+#listamateriais tbody tr:first-child th {
+    flex: 1;
+    color: var(--fontColor);
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 10px;
+}
+
+/* Linhas dos materiais */
+#listamateriais tbody tr:not(:first-child) {
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid color-mix(in srgb, var(--fontColor) 5%, transparent);
+    background: transparent;
+}
+
+#listamateriais tbody tr:not(:first-child):hover {
+    background: color-mix(in srgb, var(--secundaryColor) 8%, transparent);
+    transform: translateX(5px);
+    border-left: 3px solid var(--secundaryColor);
+}
+
+#listamateriais tbody tr:nth-child(even):not(:first-child) {
+    background: color-mix(in srgb, var(--fontColor) 3%, transparent);
+}
+
+#listamateriais tbody tr:nth-child(even):not(:first-child):hover {
+    background: color-mix(in srgb, var(--secundaryColor) 12%, transparent);
+}
+
+/* Células dos materiais */
+#listamateriais td {
+    flex: 1;
+    color: var(--fontColor);
+    font-size: 0.9rem;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 10px;
+    transition: all 0.3s ease;
+}
+
+/* LARGURAS ESPECÍFICAS DAS COLUNAS */
+
+/* Para o cabeçalho principal (8 colunas) */
+#listamateriais thead tr:first-child th:nth-child(1),
+#listamateriais thead tr:nth-child(2) th:nth-child(1) { flex: 1.4; } /* Solicitante */
+#listamateriais thead tr:first-child th:nth-child(2),
+#listamateriais thead tr:nth-child(2) th:nth-child(2) { flex: 1.6; } /* Projeto */
+#listamateriais thead tr:first-child th:nth-child(3),
+#listamateriais thead tr:nth-child(2) th:nth-child(3) { flex: 1.2; } /* Cidade */
+#listamateriais thead tr:first-child th:nth-child(4),
+#listamateriais thead tr:nth-child(2) th:nth-child(4) { flex: 0.8; }  /* Tensão */
+#listamateriais thead tr:first-child th:nth-child(5),
+#listamateriais thead tr:nth-child(2) th:nth-child(5) { flex: 1.0; } /* Equipe */
+#listamateriais thead tr:first-child th:nth-child(6),
+#listamateriais thead tr:nth-child(2) th:nth-child(6) { flex: 1.0; } /* Data Solicitação */
+#listamateriais thead tr:first-child th:nth-child(7),
+#listamateriais thead tr:nth-child(2) th:nth-child(7) { flex: 1.0; } /* Data Execução */
+#listamateriais thead tr:first-child th:nth-child(8),
+#listamateriais thead tr:nth-child(2) th:nth-child(8) { flex: 2.0; } /* Obs. */
+
+/* Para a seção de materiais (4 colunas) */
+#listamateriais tbody tr:first-child th:nth-child(1),
+#listamateriais td:nth-child(1) { flex: 5.0; } /* Material */
+#listamateriais tbody tr:first-child th:nth-child(2),
+#listamateriais td:nth-child(2) { flex: 1.6; } /* Orçado */
+#listamateriais tbody tr:first-child th:nth-child(3),
+#listamateriais td:nth-child(3) { flex: 1.6; } /* Liberado */
+#listamateriais tbody tr:first-child th:nth-child(4),
+#listamateriais td:nth-child(4) { flex: 1.8; } /* Devolvido */
+
+/* DESTAQUES NUMÉRICOS */
+#listamateriais td:nth-child(2),
+#listamateriais td:nth-child(3),
+#listamateriais td:nth-child(4) {
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+    background: color-mix(in srgb, var(--fontColor) 2%, transparent);
+    border-radius: 6px;
+    margin: 0 5px;
+    padding: 6px 10px;
+}
+
+#listamateriais td:nth-child(3) {
+    color: color-mix(in srgb, var(--secundaryColor) 80%, white);
+    background: color-mix(in srgb, var(--secundaryColor) 8%, transparent);
+}
+
+#listamateriais td:nth-child(4) {
+    color: color-mix(in srgb, #4CAF50 80%, white);
+    background: color-mix(in srgb, #4CAF50 8%, transparent);
+}
+
+/* STATUS DA OBSERVAÇÃO */
+#listamateriais thead tr:nth-child(2) th:last-child {
+    color: color-mix(in srgb, #FF9800 90%, white);
+    font-weight: 700;
+    position: relative;
+}
+
+#listamateriais thead tr:nth-child(2) th:last-child::before {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    background: #FF9800;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+/* SCROLLBAR PERSONALIZADA */
+#listamateriais tbody::-webkit-scrollbar {
+    width: 8px;
+}
+
+#listamateriais tbody::-webkit-scrollbar-track {
+    background: color-mix(in srgb, var(--fontColor) 5%, transparent);
+    border-radius: 4px;
+}
+
+#listamateriais tbody::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--fontColor) 20%, transparent);
+    border-radius: 4px;
+}
+
+#listamateriais tbody::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--secundaryColor) 40%, transparent);
+}
+
+/* BOTÃO DE FECHAR */
+#listamateriais .fechar {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    width: 30px;
+    height: 30px;
+    background: color-mix(in srgb, var(--emphasisColor) 20%, transparent);
+    border: none;
+    border-radius: 50%;
+    color: var(--fontColor);
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 100;
+}
+
+#listamateriais .fechar:hover {
+    background: var(--emphasisColor);
+    transform: rotate(90deg);
+}
+
+/* RESPONSIVIDADE */
+@media (max-width: 1400px) {
+    #listamateriais {
+        width: 95%;
+        height: 95%;
+        top: 2.5%;
+        right: 2.5%;
+    }
+    
+    #listamateriais thead tr,
+    #listamateriais tbody tr {
+        padding: 0 15px;
+    }
+    
+    #listamateriais th,
+    #listamateriais td {
+        font-size: 0.8rem;
+        padding: 0 8px;
+    }
 }
