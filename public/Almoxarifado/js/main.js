@@ -125,7 +125,7 @@ async function listarMateriais() {
     try {
         console.log('🔍 Fazendo requisição...')
 
-        const response = await fetch('http://localhost:8080/listarMateriais')
+        const response = await fetch('/listarMateriais')
         console.log('📨 Response object:', response) // Isso é o que você está vendo
 
         // ⚠️ ESTA É A PARTE IMPORTANTE ⚠️
