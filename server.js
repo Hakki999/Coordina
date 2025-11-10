@@ -32,7 +32,6 @@ app.post('/login', (req, res) => {
 
     let data = validarLogin(payload.nome, payload.senha)
     data.then(resp => {
-        console.log(resp[0]);
 
         if (resp[0]) {
             const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '10m' })
