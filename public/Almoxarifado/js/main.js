@@ -755,3 +755,33 @@ function configurarDuploClique(dados) {
 function renderizarTabela(dados) {
     renderizarTabelaComFiltros(dados);
 }
+
+// Adicione este código ao seu main.js
+function initMobileMenu() {
+    const navBar = document.getElementById('navBar');
+    const menu = document.querySelector('.menu');
+    
+    // Criar botão hamburger
+    const hamburger = document.createElement('button');
+    hamburger.className = 'mobile-menu-toggle';
+    hamburger.innerHTML = '☰';
+    hamburger.addEventListener('click', toggleMobileMenu);
+    
+    navBar.insertBefore(hamburger, navBar.firstChild);
+    
+    function toggleMobileMenu() {
+        menu.classList.toggle('mobile-open');
+        hamburger.innerHTML = menu.classList.contains('mobile-open') ? '✕' : '☰';
+    }
+    
+    // Fechar menu ao clicar em um item
+    document.querySelectorAll('.menuSelect').forEach(item => {
+        item.addEventListener('click', () => {
+            menu.classList.remove('mobile-open');
+            hamburger.innerHTML = '☰';
+        });
+    });
+}
+
+// Inicializar quando o DOM carregar
+document.addEventListener('DOMContentLoaded', initMobileMenu);

@@ -287,18 +287,430 @@
     transform: rotate(90deg);
 }
 
-/* RESPONSIVIDADE */
-@media (max-width: 1400px) {
-    #listamateriais {
-        width: 95%;
-        height: 95%;
-        top: 2.5%;
-        right: 2.5%;
+/* ===== RESPONSIVIDADE GERAL ===== */
+
+/* MOBILE - Telas menores que 768px */
+@media (max-width: 768px) {
+    /* ===== NAVBAR ===== */
+    #navBar {
+        width: 100%;
+        height: auto;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+        background: var(--primaryColor);
+        border-bottom: 1px solid color-mix(in srgb, var(--fontColor) 20%, transparent);
     }
     
-    #listamateriais th,
-    #listamateriais td {
+    #navBar #thead {
+        padding: 10px;
+        text-align: center;
+        border-bottom: 1px solid color-mix(in srgb, var(--fontColor) 10%, transparent);
+    }
+    
+    #navBar #thead img {
+        height: 30px;
+        width: auto;
+    }
+    
+    .menu {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+    
+    .menu.mobile-open {
+        max-height: 500px;
+    }
+    
+    .menu > ul > li {
+        border-bottom: 1px solid color-mix(in srgb, var(--fontColor) 10%, transparent);
+    }
+    
+    .menu > ul > li > ul {
+        background: color-mix(in srgb, var(--primaryColor) 95%, transparent);
+        padding-left: 15px;
+    }
+    
+    .optionNav {
+        padding: 12px 15px;
+        font-size: 0.9rem;
+    }
+    
+    .menuSelect {
+        padding: 10px 15px;
+        font-size: 0.85rem;
+    }
+    
+    /* Hamburger menu */
+    .mobile-menu-toggle {
+        display: block;
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: none;
+        border: none;
+        color: var(--fontColor);
+        font-size: 1.5rem;
+        cursor: pointer;
+        z-index: 1001;
+    }
+
+    /* ===== ABA RECEBIDOS ===== */
+    .filtro {
+        width: 100% !important;
+        height: auto !important;
+        position: relative !important;
+        left: 0 !important;
+        top: 0 !important;
+        padding: 15px 10px !important;
+        flex-direction: column;
+    }
+    
+    .filtro-container {
+        flex-direction: column;
+        gap: 10px !important;
+    }
+    
+    .filtro-grupo {
+        min-width: 100% !important;
+        margin-bottom: 8px;
+    }
+    
+    .filtro-label {
+        font-size: 0.75rem;
+        margin-bottom: 4px;
+    }
+    
+    .filtro-select,
+    .filtro-input {
+        min-width: 100% !important;
         font-size: 0.8rem;
-        padding: 0 8px;
+        padding: 8px 10px !important;
+    }
+    
+    .filtro-botoes {
+        margin-left: 0 !important;
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        width: 100%;
+        margin-top: 10px;
+    }
+    
+    .btn-filtro {
+        flex: 1;
+        padding: 10px 15px;
+        font-size: 0.8rem;
+    }
+    
+    /* Tabela de recebidos */
+    #tabelaResposta {
+        width: 100% !important;
+        position: relative !important;
+        left: 0 !important;
+        top: 0 !important;
+        margin: 10px 0 !important;
+        font-size: 0.75rem;
+    }
+    
+    #tabelaResposta thead th {
+        padding: 8px 4px !important;
+        font-size: 0.7rem;
+        height: 35px;
+    }
+    
+    #tabelaResposta td {
+        padding: 6px 4px !important;
+        font-size: 0.7rem;
+        height: 32px;
+    }
+    
+    /* Ajuste de larguras das colunas para mobile */
+    #tabelaResposta thead th:nth-child(1),
+    #tabelaResposta td:nth-child(1) { width: 12%; } /* Solicitante */
+    #tabelaResposta thead th:nth-child(2),
+    #tabelaResposta td:nth-child(2) { width: 10%; } /* Equipe */
+    #tabelaResposta thead th:nth-child(3),
+    #tabelaResposta td:nth-child(3) { width: 15%; } /* Projeto */
+    #tabelaResposta thead th:nth-child(4),
+    #tabelaResposta td:nth-child(4) { width: 8%; }  /* Tensão */
+    #tabelaResposta thead th:nth-child(5),
+    #tabelaResposta td:nth-child(5) { width: 10%; } /* Cidade */
+    #tabelaResposta thead th:nth-child(6),
+    #tabelaResposta td:nth-child(6) { width: 10%; } /* Data Exe. */
+    #tabelaResposta thead th:nth-child(7),
+    #tabelaResposta td:nth-child(7) { width: 10%; } /* Tipo */
+    #tabelaResposta thead th:nth-child(8),
+    #tabelaResposta td:nth-child(8) { width: 25%; } /* Obs. */
+    
+    /* Scrollbar mais fina */
+    #tabelaResposta tbody::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    /* ===== DISPLAY MAIN ===== */
+    #displayMain {
+        padding: 0 !important;
+        margin-top: 60px; /* Compensa a navbar fixa */
+        width: 100%;
+    }
+    
+    /* Garantir que o conteúdo ocupe toda a largura */
+    #displayMain > * {
+        width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    /* ===== USABILIDADE TOUCH ===== */
+    .tableRowRecebidos {
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    .tableRowRecebidos:active {
+        background: color-mix(in srgb, var(--secundaryColor) 15%, transparent) !important;
+    }
+    
+    /* Aumentar área de toque para linhas */
+    #tabelaResposta tbody tr {
+        min-height: 44px;
+    }
+    
+    /* Feedback visual para toque */
+    .btn-filtro:active {
+        transform: scale(0.95);
+        transition: transform 0.1s ease;
+    }
+    
+    .filtro-select:focus,
+    .filtro-input:focus {
+        border-width: 2px;
+    }
+
+    /* ===== SCROLL HORIZONTAL ===== */
+    #tabelaResposta {
+        overflow-x: auto;
+        display: block;
+        white-space: nowrap;
+    }
+    
+    #tabelaResposta thead,
+    #tabelaResposta tbody {
+        display: table;
+        width: 100%;
+    }
+    
+    /* Garantir que a tabela tenha scroll horizontal quando necessário */
+    .filtro + table {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    /* ===== ACESSIBILIDADE ===== */
+    .filtro-select,
+    .filtro-input,
+    .btn-filtro {
+        min-height: 44px; /* Altura mínima para toque */
+    }
+}
+
+/* MOBILE MUITO PEQUENO - Telas menores que 480px */
+@media (max-width: 480px) {
+    /* ===== NAVBAR ===== */
+    #navBar #thead img {
+        height: 25px;
+    }
+    
+    .optionNav {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+    }
+    
+    .menuSelect {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+    }
+    
+    .mobile-menu-toggle {
+        top: 12px;
+        right: 12px;
+        font-size: 1.3rem;
+    }
+
+    /* ===== ABA RECEBIDOS ===== */
+    .filtro {
+        padding: 12px 8px !important;
+    }
+    
+    .filtro-grupo {
+        margin-bottom: 6px;
+    }
+    
+    .filtro-label {
+        font-size: 0.7rem;
+    }
+    
+    .filtro-select,
+    .filtro-input {
+        font-size: 0.75rem;
+        padding: 6px 8px !important;
+    }
+    
+    .btn-filtro {
+        padding: 8px 12px;
+        font-size: 0.75rem;
+    }
+    
+    /* Ocultar colunas menos importantes em telas muito pequenas */
+    #tabelaResposta thead th:nth-child(2), /* Equipe */
+    #tabelaResposta td:nth-child(2),
+    #tabelaResposta thead th:nth-child(4), /* Tensão */
+    #tabelaResposta td:nth-child(4),
+    #tabelaResposta thead th:nth-child(7), /* Tipo */
+    #tabelaResposta td:nth-child(7) {
+        display: none;
+    }
+    
+    /* Ajustar larguras das colunas visíveis */
+    #tabelaResposta thead th:nth-child(1),
+    #tabelaResposta td:nth-child(1) { width: 20%; } /* Solicitante */
+    #tabelaResposta thead th:nth-child(3),
+    #tabelaResposta td:nth-child(3) { width: 25%; } /* Projeto */
+    #tabelaResposta thead th:nth-child(5),
+    #tabelaResposta td:nth-child(5) { width: 15%; } /* Cidade */
+    #tabelaResposta thead th:nth-child(6),
+    #tabelaResposta td:nth-child(6) { width: 15%; } /* Data Exe. */
+    #tabelaResposta thead th:nth-child(8),
+    #tabelaResposta td:nth-child(8) { width: 25%; } /* Obs. */
+    
+    #tabelaResposta thead th {
+        padding: 6px 2px !important;
+        font-size: 0.65rem;
+        height: 30px;
+    }
+    
+    #tabelaResposta td {
+        padding: 5px 2px !important;
+        font-size: 0.65rem;
+        height: 28px;
+    }
+
+    /* ===== ACESSIBILIDADE ===== */
+    /* Aumentar contraste em modo claro/escuro */
+    @media (prefers-color-scheme: light) {
+        #tabelaResposta {
+            background: rgba(255, 255, 255, 0.95);
+        }
+    }
+    
+    @media (prefers-color-scheme: dark) {
+        #tabelaResposta {
+            background: rgba(0, 0, 0, 0.95);
+        }
+    }
+}
+
+/* TABLET - Telas entre 769px e 1024px */
+@media (min-width: 769px) and (max-width: 1024px) {
+    /* ===== ABA RECEBIDOS ===== */
+    .filtro {
+        width: calc(100% - 300px) !important;
+        left: 300px !important;
+        padding: 15px 20px !important;
+    }
+    
+    .filtro-container {
+        gap: 15px !important;
+        flex-wrap: wrap;
+    }
+    
+    .filtro-grupo {
+        min-width: calc(50% - 10px) !important;
+    }
+    
+    .filtro-botoes {
+        width: 100%;
+        justify-content: center;
+        margin-top: 10px;
+    }
+    
+    #tabelaResposta {
+        width: calc(100% - 300px) !important;
+        left: 300px !important;
+    }
+    
+    #tabelaResposta thead th {
+        font-size: 0.8rem;
+        padding: 10px 6px !important;
+    }
+    
+    #tabelaResposta td {
+        font-size: 0.75rem;
+        padding: 8px 6px !important;
+    }
+}
+
+/* ORIENTAÇÃO LANDSCAPE EM MOBILE */
+@media (max-width: 768px) and (orientation: landscape) {
+    /* ===== NAVBAR ===== */
+    .menu {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    
+    .menu.mobile-open {
+        max-height: 300px;
+    }
+
+    /* ===== DISPLAY MAIN ===== */
+    #displayMain {
+        width: 100%;
+        height: 100%;
+        left: 0px;
+        top: 0px;
+        margin: 0px;
+    }
+
+    #tabelaResposta {
+        width: 100% !important;
+    }
+
+    /* ===== ABA RECEBIDOS ===== */
+    .filtro {
+        height: auto !important;
+        padding: 10px !important;
+    }
+    
+    .filtro-container {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px !important;
+    }
+    
+    .filtro-grupo {
+        min-width: calc(33.333% - 10px) !important;
+        margin-bottom: 0;
+    }
+    
+    .filtro-botoes {
+        width: 100%;
+        margin-top: 8px;
+    }
+    
+    #tabelaResposta {
+        max-height: 60vh;
+    }
+    
+    #tabelaResposta thead th {
+        height: 30px;
+        font-size: 0.65rem;
+    }
+    
+    #tabelaResposta td {
+        height: 28px;
+        font-size: 0.65rem;
     }
 }
