@@ -3,7 +3,7 @@ const express = require('express')
 const bodyParser = require('body-parser');
 const { jwt, autenticarToken } = require('./js/midwares/JWT_mid');
 const cookieParser = require('cookie-parser');
-const { validarLogin, buscarMateriais, enviarOrcamento, solicitacoesRecentes, filtroSolicitacoes, changeLibDev } = require("./js/db/connect");
+const { validarLogin, buscarMateriais, enviarOrcamento, solicitacoesRecentes, filtroSolicitacoes, changeLibDev, getAcess } = require("./js/db/connect");
 const e = require('express');
 
 // ------------------------------- Configuração --------------------------------------
