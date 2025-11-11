@@ -230,5 +230,21 @@ function getAcess(perfil){
     }
 }
 
+async function buscarEquipes() {
+    try {
+        const { data, error } = await supabase
+            .from('Equipes')
+            .select('*');
+        if (error) {
+            console.error('Erro ao buscar equipes:', error);
+            throw error;
+        }
+        return data;
+    } catch (error) {
+        console.error('Erro na função buscarEquipes:', error);
+        return [];
+    }
+}
+
 
 module.exports = { validarLogin, buscarMateriais, enviarOrcamento, solicitacoesRecentes, filtroSolicitacoes, changeLibDev, getAcess}
