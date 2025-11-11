@@ -84,7 +84,7 @@ app.get('/listarMateriais', (req, res) => {
     })
 })
 //(solicitante, cidade, dataexe, datasolic, materiais, projeto)
-app.post('/enviarOrcamento', (req, res) => {
+app.post('/enviarOrcamento', autenticarToken, (req, res) => {
     console.log("✅ Orçamento recebido!");
 
     enviarOrcamento(
@@ -112,7 +112,7 @@ app.post('/enviarOrcamento', (req, res) => {
 }
 )
 
-app.post('/solicitacoesRecentes', (req, res) => {
+app.post('/solicitacoesRecentes', autenticarToken, (req, res) => {
     console.log("✅ Solicitações recentes enviadas!");
     
     const qtd = req.body.valor;
@@ -134,7 +134,7 @@ app.post('/solicitacoesRecentes', (req, res) => {
         });
 });
 
-app.post('/filtroSolicitacoes', (req, res) => {
+app.post('/filtroSolicitacoes', autenticarToken, (req, res) => {
     console.log("✅ Filtro de solicitações aplicado!");
     const campo = req.body.campo;
     const valor = req.body.valor;
@@ -144,7 +144,7 @@ app.post('/filtroSolicitacoes', (req, res) => {
     )
 });
 
-app.post('/changeLibDev', (req, res) => {
+app.post('/changeLibDev', autenticarToken, (req, res) => {
     console.log(req.body);
     
     changeLibDev(req.body.dataTemp, req.body.id).then(data => {

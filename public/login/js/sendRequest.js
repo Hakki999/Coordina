@@ -5,7 +5,7 @@ function sendRequest(uri, value, methodP = 'POST') {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(value),
-        credentials: 'include' // Isso é importante para enviar cookies
+        credentials: 'include' 
     })
     .then(res => res.json())
     .then(data => {
@@ -14,7 +14,7 @@ function sendRequest(uri, value, methodP = 'POST') {
         if(data.success){
             localStorage.setItem('nome', data.nome)
             localStorage.setItem('redirect', data.redirect)
-            localStorage.setItem('acesso', data.acesso)
+            localStorage.setItem('acesso', JSON.stringify(data.acesso))
             
             // CORREÇÃO: Redirecionar a janela, não fazer fetch
             window.location.href = data.redirect;

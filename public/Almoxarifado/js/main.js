@@ -1,7 +1,5 @@
-const acess = {
-    editlibdev: true,
-    imprimir: true
-}
+const acess = JSON.parse(localStorage.getItem('acesso'));
+console.log(acess);
 
 // =============================================
 // VARIÁVEIS GLOBAIS E INICIALIZAÇÃO
@@ -412,7 +410,8 @@ function submitBudgetData(formData) {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
+        credentials: 'include'
     })
     .then(handleBudgetResponse)
     .catch(handleBudgetError);
@@ -462,7 +461,8 @@ async function changeLiberadoDevolvido(evt) {
         body: JSON.stringify({
             dataTemp: dataTemp,
             id: document.querySelector("#listamateriais").getAttribute('data-id')
-        })
+        }),
+        credentials: 'include'
     });
 }
 
@@ -521,7 +521,8 @@ async function fetchSolicitacoes(endpoint, valor) {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ valor: valor })
+        body: JSON.stringify({ valor: valor }),
+        credentials: 'include'
     });
     
     if (!response.ok) {
@@ -696,7 +697,8 @@ function aplicarFiltros() {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ valor: 100 })
+        body: JSON.stringify({ valor: 100 }),
+        credentials: 'include'
     })
     .then(response => {
         if (!response.ok) {
