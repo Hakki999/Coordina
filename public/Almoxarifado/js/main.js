@@ -191,7 +191,9 @@ function updateOrcadosList(materiaisData) {
                 const quantidade = document.querySelectorAll(".inputqtd")[index].value;
                 orcados.push({
                     item: m.item,
-                    qtd: m.qtd * quantidade
+                    qtd: m.qtd * quantidade,
+                    lib: 0,
+                    dev: 0
                 });
             }
         });
@@ -256,6 +258,21 @@ function setupTableRowEvents() {
  * Configura eventos de edição nas linhas da liberado e devolvido
  */
 
+//--------------------------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------
+
+function setupTableRowEventsLibDev() {
+    let tableRowOrcados = document.querySelectorAll('.modlibdev');
+
+    tableRowOrcados.forEach(row => {
+        row.addEventListener('click', handleTableRowDoubleClick);
+        row.addEventListener('change', changeLiberadoDevolvido);
+    });
+}
 
 /**
  * Manipula duplo clique para edição de linha
@@ -306,7 +323,9 @@ function agruparItensSeguro(itens) {
             } else {
                 mapa.set(nome, {
                     item: nome,
-                    qtd: quantidade.toString()
+                    qtd: quantidade.toString(),
+                    lib: 0,
+                    dev: 0
                 });
             }
         });
@@ -417,6 +436,63 @@ function handleBudgetResponse(response) {
 function handleBudgetError(error) {
     console.error(error);
     alert("Erro ao enviar o orçamento. Tente novamente mais tarde.");
+}
+/** Atualiza os valores de liberado e devolvido no backend */
+
+async function changeLiberadoDevolvido(evt) {
+    // Força uma atualização síncrona dos valores antes de processar
+    await forceValueUpdate();
+    
+    let dataTemp = [];
+    document.querySelectorAll('.changeLibDevAlmox').forEach(row => {
+        // Para inputs, pega o value diretamente
+        const children = row.children;
+        dataTemp.push({
+            item: getValue(children[0]),
+            qtd: getValue(children[1]),
+            lib: getValue(children[2]),
+            dev: getValue(children[3])
+        });
+    });
+
+    fetch('/changeLibDev', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            dataTemp: dataTemp,
+            id: document.querySelector("#listamateriais").getAttribute('data-id')
+        })
+    });
+}
+
+// Função auxiliar para pegar valores de inputs ou textContent
+function getValue(element) {
+    if (!element) return '';
+    
+    // Se for input, select ou textarea, pega o value
+    if (element.tagName === 'INPUT' || 
+        element.tagName === 'SELECT' || 
+        element.tagName === 'TEXTAREA') {
+        return element.value || '';
+    }
+    
+    // Se não, pega o textContent
+    return element.textContent?.trim() || '';
+}
+
+// Força a atualização dos valores dos inputs
+function forceValueUpdate() {
+    return new Promise(resolve => {
+        // Dispara eventos de input para forçar atualização
+        document.querySelectorAll('input, select, textarea').forEach(input => {
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+        
+        // Pequeno delay para garantir processamento
+        setTimeout(resolve, 50);
+    });
 }
 
 // =============================================
@@ -729,6 +805,9 @@ function configurarDuploClique(dados) {
 
             preencherModalDetalhes(itemData);
             listamateriais.style.display = "block";
+            listamateriais.setAttribute('data-id', rowId);
+
+            setupTableRowEventsLibDev();
         });
     });
 }
@@ -764,12 +843,14 @@ function buildMaterialDetailsTable(materiais) {
     let materialListBodyContent = "";
 
     if (materiais && Array.isArray(materiais)) {
+        console.log(materiais);
+        
         materialListBodyContent = materiais.map(mate => `
-            <tr>
+            <tr class="changeLibDevAlmox" >
                 <td>${mate.item || 'N/A'}</td>
                 <td>${mate.orcado || mate.qtd || '0'}</td>
-                <td class="modlibdev">${mate.liberado || '0'}</td>
-                <td>${mate.devolvido || '0'}</td>
+                <td class="modlibdev">${mate.lib || '0'}</td>
+                <td class="modlibdev">${mate.dev || '0'}</td>
             </tr>
         `).join('');
     } else {

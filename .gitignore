@@ -3,3 +3,9 @@ node_modules/
 
 # Ignorar arquivos de ambiente
 .env
+
+# Tela de login com senha e usuário teste
+./public/login/index.html
+
+# Ignorar arquivos de bug
+bugs.txt

@@ -11,18 +11,19 @@ function sendRequest(uri, value, methodP = 'POST') {
     .then(data => {
         console.log('Resposta do servidor:', data);
 
-        if(data.resp == "wellcome"){
+        if(data.success){
             localStorage.setItem('nome', data.nome)
             localStorage.setItem('redirect', data.redirect)
             
             // CORREÇÃO: Redirecionar a janela, não fazer fetch
             window.location.href = data.redirect;
         }else{
-            alert('Usuário não encontrado!');
+            alert('Falha no login: ' + data.message);
         }
     })
     .catch(err => {
         console.error('Erro na requisição:', err);
+        alert('Erro na requisição: ' + err.message);
         return err;
     });
 }

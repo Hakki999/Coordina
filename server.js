@@ -3,7 +3,7 @@ const express = require('express')
 const bodyParser = require('body-parser');
 const { jwt, autenticarToken } = require('./js/midwares/JWT_mid');
 const cookieParser = require('cookie-parser');
-const { validarLogin, buscarMateriais, enviarOrcamento, solicitacoesRecentes, filtroSolicitacoes } = require("./js/db/connect");
+const { validarLogin, buscarMateriais, enviarOrcamento, solicitacoesRecentes, filtroSolicitacoes, changeLibDev } = require("./js/db/connect");
 const e = require('express');
 
 // ------------------------------- Configuração --------------------------------------
@@ -27,30 +27,51 @@ app.get('/controle_almoxarifado', autenticarToken, (req, res) => {
 
 // ------------------------------- Solicitações ---------------------------------------
 
-app.post('/login', (req, res) => {
-    const payload = { nome: req.body.user, senha: req.body.password };
+app.post('/login', async (req, res) => {
+    try {
+        const { user, password } = req.body;
 
-    let data = validarLogin(payload.nome, payload.senha)
-    data.then(resp => {
-
-        if (resp[0]) {
-            const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '10m' })
-
-            res.cookie('token', token, {
-                httpOnly: true,
-                secure: false,
-                sameSite: 'strict',
-                maxAge: 30 * 60 * 1000 // 10 minutos
-            }).json({
-                resp: "wellcome",
-                nome: payload.nome,
-                redirect: '/controle_almoxarifado'
-            })
-        } else {
-            res.json({ resp: "user not found" })
+        if (!user || !password) {
+            return res.status(400).json({ error: "Dados incompletos" });
         }
-    })
-})
+
+        const resultado = (await validarLogin(user, password));
+
+        console.log(resultado);
+        
+
+        if (!resultado.success) {
+            return res.status(401).json({ error: "Credenciais inválidas" });
+        }
+
+        const token = jwt.sign(
+            { userId: resultado.data.user.id }, 
+            process.env.JWT_SECRET, 
+            { expiresIn: '30m' }
+        );
+
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 30 * 60 * 1000
+        }).json({
+            success: true,
+            message: "Login bem-sucedido",
+            nome: resultado.data.user,
+            redirect: '/controle_almoxarifado'
+        });
+
+    } catch (error) {
+        console.error('Erro no login:', error);
+        res.status(500).json({
+            success: false,
+            message: "Erro ao logar",
+            nome: "none",
+            redirect: '/'
+        });
+    }
+});
 
 app.get('/listarMateriais', (req, res) => {
     console.log("✅ Materiais enviados!");
@@ -120,6 +141,16 @@ app.post('/filtroSolicitacoes', (req, res) => {
         res.json(data)
     }
     )
+});
+
+app.post('/changeLibDev', (req, res) => {
+    console.log(req.body);
+    
+    changeLibDev(req.body.dataTemp, req.body.id).then(data => {
+        console.log('🔃Atualização realizada com sucesso🔃 id:'+req.body.id);
+        
+        res.json({ status: 'Atualização realizada com sucesso!' })
+    })
 });
 
 // ------------------------------- Abertura do Servidor -------------------------------

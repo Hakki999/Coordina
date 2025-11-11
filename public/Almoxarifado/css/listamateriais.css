@@ -287,6 +287,10 @@
     transform: rotate(90deg);
 }
 
+.mobile-menu-toggle{
+    display: none;
+}
+
 /* ===== RESPONSIVIDADE GERAL ===== */
 
 /* MOBILE - Telas menores que 768px */

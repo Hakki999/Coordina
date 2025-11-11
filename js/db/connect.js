@@ -1,20 +1,57 @@
-const { createClient } = require('@supabase/supabase-js')
+const { createClient } = require('@supabase/supabase-js');
+const { appendFileSync } = require('fs');
+require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
+
 
 const supabase = createClient(
-  "https://mqhigeybfslznjkuqygo.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xaGlnZXliZnNsem5qa3VxeWdvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MDE1NjA5MiwiZXhwIjoyMDc1NzMyMDkyfQ.soQefPJx0z6KBxElZzD_oMNxMne5iDpsP4xPCjRIJCM" // ← Esta é a chave importante!
+  process.env.DATABASE_URL,
+    process.env.DATABASE_KEY
 )
 
 
-async function validarLogin(usuario, senha){
-  const { data, err } = await supabase
-    .from('Usuarios')
-    .select('*')
-    .eq('user', usuario)
-    .eq('password', senha)
-    .limit(1)
-    
-    return data;
+async function validarLogin(usuario, senha) {
+  try {
+    // Verifica se as variáveis de ambiente estão carregadas
+    if (!process.env.DATABASE_KEY) {
+      throw new Error('Chave do banco de dados não configurada.');
+    }
+
+    // Realiza a consulta
+    const { data, error } = await supabase
+      .from('Usuarios')
+      .select('*')
+      .eq('user', usuario)
+      .eq('password', senha)
+      .limit(1);
+
+    // Se houver erro na consulta
+    if (error) {
+      throw error;
+    }
+
+    // Verifica se encontrou algum usuário
+    if (data && data.length > 0) {
+      return {
+        success: true,
+        data: data[0], // Retorna o primeiro usuário encontrado
+        error: null
+      };
+    } else {
+      return {
+        success: false,
+        data: null,
+        error: 'Usuário ou senha inválidos.'
+      };
+    }
+  } catch (error) {
+    // Captura qualquer erro que ocorrer na tentativa de login
+    console.error('Erro ao validar login:', error.message);
+    return {
+      success: false,
+      data: null,
+      error: 'Erro interno do servidor. Tente novamente mais tarde.'
+    };
+  }
 }
 
 async function buscarMateriais() {
@@ -141,4 +178,36 @@ async function filtroSolicitacoes(campo, valor) {
     return data;
 }
 
-module.exports = { validarLogin, buscarMateriais, enviarOrcamento, solicitacoesRecentes, filtroSolicitacoes }
+async function changeLibDev(dataTemp, id) {
+    try {
+        if (!dataTemp || !id) {
+            throw new Error('Dados e ID são obrigatórios');
+        }
+
+        const { data, error } = await supabase
+            .from('Materiais Solicitados')
+            .update({ 
+                Materiais: dataTemp,
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', id)
+            .select();
+
+        if (error) throw error;
+        if (!data?.length) throw new Error('Registro não encontrado');
+
+        console.log('Atualizado:', data[0]);
+        return { success: true, data: data[0] };
+
+    } catch (error) {
+        console.error('Erro no changeLibDev:', error);
+        return { 
+            success: false, 
+            message: error.message,
+            data: null 
+        };
+    }
+}
+
+
+module.exports = { validarLogin, buscarMateriais, enviarOrcamento, solicitacoesRecentes, filtroSolicitacoes, changeLibDev}
