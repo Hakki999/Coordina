@@ -210,24 +210,29 @@ async function changeLibDev(dataTemp, id) {
 }
 
 function getAcess(perfil){
-    if(perfil==="Programacão"){
-        return {
-            editlibdev: false,
-            imprimir: false
-        }
-    }
-    if (perfil==="Almoxarifado"){
-        return {
-            editlibdev: true,
-            imprimir: true
-        }
-    }
-    if (perfil==="Alpha"){
-        return {
-            editlibdev: true,
-            imprimir: true
-        }
-    }
+    // if(perfil=="Programação"){
+    //     return {
+    //         editlibdev: false,
+    //         imprimir: false
+    //     }
+    // }
+    // if (perfil=="Almoxarifado"){
+    //     return {
+    //         editlibdev: true,
+    //         imprimir: true
+    //     }
+    // }
+    // if (perfil=="Alpha"){
+    //     return {
+    //         editlibdev: true,
+    //         imprimir: true
+    //     }
+    // }
+
+    return {
+             editlibdev: true,
+             imprimir: true
+         }
 }
 
 async function buscarEquipes() {
