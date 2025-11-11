@@ -14,6 +14,7 @@ function sendRequest(uri, value, methodP = 'POST') {
         if(data.success){
             localStorage.setItem('nome', data.nome)
             localStorage.setItem('redirect', data.redirect)
+            localStorage.setItem('acesso', data.acesso)
             
             // CORREÇÃO: Redirecionar a janela, não fazer fetch
             window.location.href = data.redirect;

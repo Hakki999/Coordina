@@ -1,3 +1,8 @@
+const acess = {
+    editlibdev: true,
+    imprimir: true
+}
+
 // =============================================
 // VARIÁVEIS GLOBAIS E INICIALIZAÇÃO
 // =============================================
@@ -258,19 +263,13 @@ function setupTableRowEvents() {
  * Configura eventos de edição nas linhas da liberado e devolvido
  */
 
-//--------------------------------------------------------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------------------------------------------------------
 
 function setupTableRowEventsLibDev() {
     let tableRowOrcados = document.querySelectorAll('.modlibdev');
 
     tableRowOrcados.forEach(row => {
-        row.addEventListener('click', handleTableRowDoubleClick);
-        row.addEventListener('change', changeLiberadoDevolvido);
+        if (acess.editlibdev)row.addEventListener('click', handleTableRowDoubleClick);
+        if (acess.editlibdev)row.addEventListener('change', changeLiberadoDevolvido);
     });
 }
 
@@ -972,5 +971,5 @@ document.getElementById("formMaterials").addEventListener("submit", function(evt
 
 // Configurar evento de PDF na lista de materiais
 document.getElementById("listamateriais").addEventListener("dblclick", function(evt) {
-    gerarPDFListaMateriais();
+    if(acess.imprimir)gerarPDFListaMateriais();
 });

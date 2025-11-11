@@ -59,7 +59,8 @@ app.post('/login', async (req, res) => {
             success: true,
             message: "Login bem-sucedido",
             nome: resultado.data.user,
-            redirect: '/controle_almoxarifado'
+            redirect: '/controle_almoxarifado',
+            acesso: getAcess(resultado.data.function)
         });
 
     } catch (error) {

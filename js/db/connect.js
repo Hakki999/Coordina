@@ -209,5 +209,26 @@ async function changeLibDev(dataTemp, id) {
     }
 }
 
+function getAcess(perfil){
+    if(perfil==="Programacão"){
+        return {
+            editlibdev: false,
+            imprimir: false
+        }
+    }
+    if (perfil==="Almoxarifado"){
+        return {
+            editlibdev: true,
+            imprimir: true
+        }
+    }
+    if (perfil==="Alpha"){
+        return {
+            editlibdev: true,
+            imprimir: true
+        }
+    }
+}
+
 
 module.exports = { validarLogin, buscarMateriais, enviarOrcamento, solicitacoesRecentes, filtroSolicitacoes, changeLibDev}
