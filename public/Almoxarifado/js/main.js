@@ -127,7 +127,9 @@ function generateInputRows(matOpcs) {
     for (let i = 0; i < h; i++) {
         rows += `
             <div class="op">
-                ${criarInputComSugestoes('produtos', ['Notebook', 'Mouse', 'Teclado', 'Monitor'], false)}
+                <select class="mat materialsStyle">
+                    ${matOpcs}
+                </select>
                 <input class="materialsStyle inputqtd" type="number">
             </div>
         `;
