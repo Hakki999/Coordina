@@ -1,4 +1,5 @@
 const { createClient } = require('@supabase/supabase-js');
+const { log } = require('console');
 const { appendFileSync } = require('fs');
 require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
 
@@ -210,28 +211,34 @@ async function changeLibDev(dataTemp, id) {
 }
 
 function getAcess(perfil){
-    // if(perfil=="Programação"){
-    //     return {
-    //         editlibdev: false,
-    //         imprimir: false
-    //     }
-    // }
-    // if (perfil=="Almoxarifado"){
-    //     return {
-    //         editlibdev: true,
-    //         imprimir: true
-    //     }
-    // }
-    // if (perfil=="Alpha"){
-    //     return {
-    //         editlibdev: true,
-    //         imprimir: true
-    //     }
-    // }
-
-    return {
+     if(perfil=="Programação"){
+        console.log("====> Perfil de Programação detectado");
+        
+         return {
+             editlibdev: false,
+             imprimir: false
+         }
+     }
+     if (perfil=="Almoxarifado"){
+        console.log("====> Perfil de Almoxarifado detectado");
+         return {
              editlibdev: true,
              imprimir: true
+         }
+     }
+     if (perfil=="Alpha"){
+        console.log("====> Perfil Alpha detectado");
+        
+         return {
+             editlibdev: true,
+             imprimir: true
+         }
+     }
+    
+    console.log("====> Perfil desconhecido, acesso restrito");
+    return {
+             editlibdev: false,
+             imprimir: false
          }
 }
 

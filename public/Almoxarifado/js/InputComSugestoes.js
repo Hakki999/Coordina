@@ -1,197 +1,102 @@
-function criarInputComSugestoes(className, valores, autoCompletar = true) {
-    // Criar elementos HTML
+function criarInputComAutocomplete(inputId, opcoes, placeholder) {
     const container = document.createElement('div');
-    const input = document.createElement('input');
-    const suggestionsBox = document.createElement('div');
+    container.className = 'autocomplete-container';
     
-    // Adicionar classes
-    container.className = `input-suggestions-container ${className}-container`;
-    input.className = `input-suggestions ${className}-input`;
-    suggestionsBox.className = `suggestions-box ${className}-suggestions`;
-    
-    // Configurar atributos do input
-    input.type = 'text';
-    input.autocomplete = 'off';
-    
-    // Aplicar estilos CSS
-    const style = document.createElement('style');
-    style.textContent = `
-        .input-suggestions-container {
-            position: relative;
-            display: inline-block;
-            width: 100%;
-            max-width: 300px;
-        }
-        
-        .input-suggestions {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
-            box-sizing: border-box;
-        }
-        
-        .input-suggestions:focus {
-            outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-        }
-        
-        .suggestions-box {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border: 1px solid #ccc;
-            border-top: none;
-            border-radius: 0 0 4px 4px;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 1000;
-            display: none;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        
-        .suggestion-item {
-            padding: 8px 12px;
-            cursor: pointer;
-            border-bottom: 1px solid #f0f0f0;
-            font-size: 14px;
-        }
-        
-        .suggestion-item:hover {
-            background-color: #f8f9fa;
-        }
-        
-        .suggestion-item:last-child {
-            border-bottom: none;
-        }
-        
-        .suggestion-item.active {
-            background-color: #007bff;
-            color: white;
-        }
+    container.innerHTML = `
+        <input type="text" id="${inputId}" class="autocomplete-input" 
+               placeholder="${placeholder}" autocomplete="off">
+        <div class="autocomplete-list"></div>
     `;
     
-    document.head.appendChild(style);
+    const input = container.querySelector('input');
+    const list = container.querySelector('.autocomplete-list');
     
-    // Variáveis de estado
-    let currentFocus = -1;
-    
-    // Função para filtrar sugestões
-    function filtrarSugestoes(texto) {
-        return valores.filter(valor => 
-            valor.toLowerCase().includes(texto.toLowerCase())
-        );
-    }
-    
-    // Função para mostrar sugestões
-    function mostrarSugestoes(sugestoes) {
-        suggestionsBox.innerHTML = '';
-        suggestionsBox.style.display = sugestoes.length ? 'block' : 'none';
-        
-        sugestoes.forEach((sugestao, index) => {
-            const div = document.createElement('div');
-            div.className = 'suggestion-item';
-            div.textContent = sugestao;
-            
-            div.addEventListener('click', function() {
-                input.value = sugestao;
-                suggestionsBox.style.display = 'none';
-                currentFocus = -1;
-            });
-            
-            suggestionsBox.appendChild(div);
-        });
-    }
-    
-    // Função para autocompletar
-    function autocompletarValor() {
-        const texto = input.value.toLowerCase();
-        if (!texto || !autoCompletar) return;
-        
-        const sugestao = valores.find(valor => 
-            valor.toLowerCase().startsWith(texto)
+    input.addEventListener('input', function() {
+        const value = this.value.toLowerCase();
+        const filtered = opcoes.filter(opcao => 
+            opcao.toLowerCase().includes(value)
         );
         
-        if (sugestao) {
-            input.value = sugestao;
-            input.setSelectionRange(texto.length, sugestao.length);
-        }
-    }
+        mostrarSugestoes(filtered);
+    });
     
-    // Event listeners
-    input.addEventListener('input', function(e) {
-        const texto = e.target.value;
-        
-        if (texto.length === 0) {
-            suggestionsBox.style.display = 'none';
-            currentFocus = -1;
-            return;
+    input.addEventListener('blur', function() {
+        setTimeout(() => {
+            list.style.display = 'none';
+        }, 200);
+    });
+    
+    input.addEventListener('focus', function() {
+        if (this.value) {
+            const value = this.value.toLowerCase();
+            const filtered = opcoes.filter(opcao => 
+                opcao.toLowerCase().includes(value)
+            );
+            mostrarSugestoes(filtered);
+        } else {
+            // Mostrar todas as opções quando focar no input vazio
+            mostrarSugestoes(opcoes.slice(0, 10)); // Limitar a 10 opções
         }
-        
-        const sugestoes = filtrarSugestoes(texto);
-        mostrarSugestoes(sugestoes);
     });
     
     input.addEventListener('keydown', function(e) {
-        const items = suggestionsBox.getElementsByClassName('suggestion-item');
-        
-        if (e.key === 'ArrowDown') {
+        if (e.key === 'Enter') {
             e.preventDefault();
-            currentFocus = Math.min(currentFocus + 1, items.length - 1);
-            adicionarClasseAtiva(items);
-        } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            currentFocus = Math.max(currentFocus - 1, -1);
-            adicionarClasseAtiva(items);
-        } else if (e.key === 'Enter') {
-            e.preventDefault();
-            if (currentFocus > -1 && items[currentFocus]) {
-                items[currentFocus].click();
-            } else if (autoCompletar) {
-                autocompletarValor();
+            const items = list.querySelectorAll('.autocomplete-item');
+            if (items.length > 0) {
+                // Simular clique no primeiro item
+                items[0].dispatchEvent(new MouseEvent('click'));
             }
-        } else if (e.key === 'Escape') {
-            suggestionsBox.style.display = 'none';
-            currentFocus = -1;
-        } else if (e.key === 'Tab' && autoCompletar) {
-            autocompletarValor();
         }
     });
     
-    function adicionarClasseAtiva(items) {
-        // Remove classe ativa de todos os itens
-        for (let i = 0; i < items.length; i++) {
-            items[i].classList.remove('active');
+    function mostrarSugestoes(sugestoes) {
+        if (sugestoes.length === 0) {
+            list.style.display = 'none';
+            return;
         }
         
-        // Adiciona classe ativa ao item atual
-        if (currentFocus > -1 && items[currentFocus]) {
-            items[currentFocus].classList.add('active');
-        }
+        list.innerHTML = sugestoes.map(sugestao => 
+            `<div class="autocomplete-item" data-value="${sugestao}">${sugestao}</div>`
+        ).join('');
+        
+        list.style.display = 'block';
+        
+        // Adicionar eventos aos itens
+        list.querySelectorAll('.autocomplete-item').forEach(item => {
+            item.addEventListener('mousedown', function(e) {
+                e.preventDefault(); // Prevenir que o blur aconteça antes do click
+                input.value = this.getAttribute('data-value');
+                list.style.display = 'none';
+                
+                // Disparar evento de change para validação
+                input.dispatchEvent(new Event('change', { bubbles: true }));
+            });
+        });
     }
     
-    // Fechar sugestões ao clicar fora
-    document.addEventListener('click', function(e) {
-        if (!container.contains(e.target)) {
-            suggestionsBox.style.display = 'none';
-            currentFocus = -1;
+    // Validação para aceitar apenas valores da lista
+    input.addEventListener('change', function() {
+        if (this.value && !opcoes.includes(this.value)) {
+            this.style.borderColor = '#ff4444';
+            
+            // Criar mensagem de erro
+            let errorMsg = this.parentNode.querySelector('.error-message');
+            if (!errorMsg) {
+                errorMsg = document.createElement('div');
+                errorMsg.className = 'error-message';
+                errorMsg.style.color = '#ff4444';
+                errorMsg.style.fontSize = '0.8rem';
+                errorMsg.style.marginTop = '5px';
+                this.parentNode.appendChild(errorMsg);
+            }
+            errorMsg.textContent = 'Por favor, selecione uma opção válida da lista';
+        } else {
+            this.style.borderColor = '';
+            const errorMsg = this.parentNode.querySelector('.error-message');
+            if (errorMsg) errorMsg.remove();
         }
     });
     
-    // Montar a estrutura
-    container.appendChild(input);
-    container.appendChild(suggestionsBox);
-    
     return container;
-}
-
-// Função auxiliar para adicionar ao DOM
-function adicionarInputAoDOM(className, valores, autoCompletar = true, elementoPai = document.body) {
-    const input = criarInputComSugestoes(className, valores, autoCompletar);
-    elementoPai.appendChild(input);
-    return input;
 }

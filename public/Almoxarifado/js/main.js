@@ -908,13 +908,9 @@ async function listarMateriais() {
  * Formata data para formato brasileiro
  */
 function formatarData(dataString) {
-    if (!dataString) return 'N/A';
-    try {
-        const data = new Date(dataString);
-        return data.toLocaleDateString('pt-BR');
-    } catch {
-        return dataString;
-    }
+    let dataTemp = dataString.split('T')[0] || dataString;
+    dataTemp = dataTemp.split('-');
+    return `${dataTemp[2]}/${dataTemp[1]}/${dataTemp[0]}`;
 }
 
 /**
