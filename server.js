@@ -125,7 +125,7 @@ ${tempM}
 
         `
         
-        sendMSG(req.body.tel, msg)
+        // sendMSG(req.body.tel, msg)
 
         res.json({ status: 'Orçamento Enviado!' })
     }).catch(err => {
