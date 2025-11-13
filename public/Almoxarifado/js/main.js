@@ -385,7 +385,8 @@ function collectFormData() {
         materiais: orcados,
         listaNomes: listaNomes,
         solicitante: localStorage.getItem('nome'),
-        datasolic: new Date().toISOString()
+        datasolic: new Date().toISOString(),
+        tel: localStorage.getItem('tel')
     };
 }
 
@@ -421,7 +422,9 @@ function submitBudgetData(formData) {
  * Manipula resposta do envio de orçamento
  */
 function handleBudgetResponse(response) {
-    if (response.ok) {
+    console.log(response.ok);
+    (response)
+    if (response) {
         alert("Orçamento enviado com sucesso!");
     } else {
         alert("Erro no envio do orçamento. Verifique os dados e tente novamente.");

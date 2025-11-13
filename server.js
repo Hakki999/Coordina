@@ -4,7 +4,8 @@ const bodyParser = require('body-parser');
 const { jwt, autenticarToken } = require('./js/midwares/JWT_mid');
 const cookieParser = require('cookie-parser');
 const { validarLogin, buscarMateriais, enviarOrcamento, solicitacoesRecentes, filtroSolicitacoes, changeLibDev, getAcess } = require("./js/db/connect");
-const e = require('express');
+const { sendMSG } = require(__dirname + '/js/WhatsAppSession/whatsAppRest');
+
 
 // ------------------------------- Configuração --------------------------------------
 require('dotenv').config()
@@ -60,7 +61,8 @@ app.post('/login', async (req, res) => {
             message: "Login bem-sucedido",
             nome: resultado.data.user,
             redirect: '/controle_almoxarifado',
-            acesso: getAcess(resultado.data.function)
+            acesso: getAcess(resultado.data.function),
+            tel: resultado.data.Celular
         });
 
     } catch (error) {
@@ -101,11 +103,34 @@ app.post('/enviarOrcamento', autenticarToken, (req, res) => {
         req.body.listaNomes
 
     ).then(data => {
-        console.log('eviado com sucesso');
+        
+        let tempM = "";
+
+        req.body.materiais.forEach(element => {
+            tempM+=`--> ${element.item} -- ${element.qtd}\n`
+        });
+
+
+        const msg = `
+✅ Orçamento enviado com sucesso ✅
+
+Projeto: ${req.body.projeto}
+Cidade: ${req.body.cidade}
+Equipe: ${req.body.equipe}
+Data Execução: ${req.body.dataExe}
+
+Materiais solicitado: 
+
+${tempM}
+
+        `
+        
+        sendMSG(req.body.tel, msg)
 
         res.json({ status: 'Orçamento Enviado!' })
     }).catch(err => {
-        console.log('erro ao enviar o orçamento');
+        console.log(err);
+        console.log('erro ao enviar o orçamento--');
 
         res.json({ status: 'Erro ao enviar o orçamento.' })
     })

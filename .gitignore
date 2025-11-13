@@ -9,3 +9,7 @@ node_modules/
 
 # Ignorar arquivos de bug
 bugs.txt
+
+.wwebjs_auth
+
+.wwebjs_cache
