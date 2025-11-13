@@ -9,8 +9,21 @@ function initializeWhatsApp() {
         authStrategy: new LocalAuth(),
         puppeteer: {
             headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox']
-        }
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-dev-shm-usage',
+                '--disable-accelerated-2d-canvas',
+                '--disable-gpu',
+                '--no-first-run',
+                '--no-zygote',
+                '--single-process', // importante para reduzir RAM
+                '--disable-background-networking',
+                '--disable-background-timer-throttling',
+                '--disable-renderer-backgrounding',
+                '--disable-backgrounding-occluded-windows',
+            ],
+        },
     });
 
     client.on('qr', qr => {
@@ -29,11 +42,11 @@ function initializeWhatsApp() {
 function sendMSG(number, mensagem) {
     if (!clientReady) {
         console.log('❌ WhatsApp não está pronto. Mensagem não enviada.');
-        return 
+        return
     }
 
     console.log(number);
-    
+
 
     return client.sendMessage(`55${number}@c.us`, mensagem)
         .then(() => console.log('📤 Mensagem enviada com sucesso!'))
@@ -44,6 +57,6 @@ function sendMSG(number, mensagem) {
 }
 
 // Inicializa o cliente do WhatsApp
-// initializeWhatsApp();
+ initializeWhatsApp();
 
-// module.exports = { sendMSG };
+ module.exports = { sendMSG };
