@@ -61,7 +61,7 @@ app.get('/controle/obras/add', autenticarToken, (req, res) => {
 
 // ------------------------------- Solicitações ---------------------------------------
 
-app.post('/login', validationSchemas.loginValidation, handleValidationErrors, async (req, res) => {
+app.post('/login', handleValidationErrors, async (req, res) => {
     try {
         const { user, password } = req.body;
 
