@@ -26,10 +26,10 @@ function initializeWhatsApp() {
         },
     });
 
-    client.on('qr', qr => {
-        console.log('📱 Escaneie o QR Code abaixo com o WhatsApp:');
-        qrcode.generate(qr, { small: true });
-    });
+     client.on('qr', qr => {
+         console.log('📱 Escaneie o QR Code abaixo com o WhatsApp:');
+         qrcode.generate(qr, { small: true });
+     });
 
     client.on('ready', () => {
         console.log('✅ WhatsApp conectado com sucesso!');

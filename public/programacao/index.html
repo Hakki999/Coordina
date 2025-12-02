@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="./css/details.css">
+    <link rel="stylesheet" href="./css/tableResults.css">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/optionsBar.css">
+    <link rel="stylesheet" href="./css/graph.css">]
+    <link rel="stylesheet" href="./css/mensagens.css">
+    <link rel="shortcut icon" href="../src/logoIcon.png" type="image/x-icon">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <title>Coordina</title>
+</head>
+
+<body>
+    <nav id="navBar">
+        <div id="thead">
+            <img src="../src/logoIcon.png" alt="Coordina">
+        </div>
+        <ul class="menu">
+            <ul>
+                <li class="optionNav closeOption">Home
+                    <ul>
+                        <li class="menuSelect" onclick="window.location.href = '/home';">Home</li>
+                    </ul>
+                </li>
+                <li class="optionNav closeOption">Almoxarifado
+                    <ul>
+                        <li class="menuSelect" onclick="window.location.href = '/controle_almoxarifado';">Solicitação
+                        </li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle_almoxarifado';">Recebidos</li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle_almoxarifado';">Config</li>
+                        <li class="menuSelect" onclick="window.location.href = '/lista_materiais';">Lista de Materiais</li>
+                    </ul>
+                </li>
+                <li class="optionNav closeOption">Controle
+                    <ul>
+                        <li class="menuSelect">Programado x Executado </li>
+                        <li class="menuSelect">GPM x Asbuilt</li>
+                        <li class="menuSelect">Asbuilt x Recebido</li>
+                    </ul>
+                </li>
+                <li class="optionNav openOption">Programação
+                    <ul>
+                        <li class="menuSelected menuSelect">Materiais x Programado</li>
+                    </ul>
+                </li>
+                <li class="optionNav closeOption">Dashboard
+                    <ul>
+                        <li class="menuSelect" onclick="window.location.href = '/dashboard/equipes';">Dashboard Equipes
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </ul>
+    </nav>
+
+    <main class="root">
+        <nav class="optionsBar">
+            <ul>
+                <li onclick="renderChar(dadosTable)"><img src="./icons/graph.png" alt=".">Grafic.</li>
+                <li onclick="renderInputIntervalo()"><img src="./icons/time.png" alt=".">Intervalo de data</li>
+                <li onclick="exportar()"><img src="./icons/csv_icon.png" alt="." >CSV</li>
+                <li></li>
+                <li></li>
+                <li></li>
+            </ul>
+        </nav>
+        <table class="tableResults">
+            <thead>
+                <tr class="headTable">
+                    <th class="filtroPesquisa" onclick="filtroOpen('Dia')">Dia</th>
+                    <th class="filtroPesquisa" onclick="filtroOpen('Projeto')">Projeto</th>
+                    <th class="filtroPesquisa" onclick="filtroOpen('Equipe')">Equipe</th>
+                    <th>Valor Materiais</th>
+                    <th>Valor Programado</th>
+                    <th>DIF</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+        </table>
+
+    </main>
+
+
+    <script src="./js/exportCSV.js"></script>
+    <script src="./js/mensagem.js"></script>
+    <script src="./js/main.js"></script>
+    <script src="./js/filtro.js"></script>
+    <script src="./js/graph.js"></script>
+</body>
+
+</html>

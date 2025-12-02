@@ -1,0 +1,201 @@
+.inputMensageContainner {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: color-mix(in srgb, var(--thirdColor) 50%, transparent);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+}
+
+.inputMensageWrapper {
+    width: 480px;
+    height: 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
+    background: linear-gradient(145deg, var(--thirdColor), color-mix(in srgb, var(--primaryColor) 70%, transparent));
+    box-shadow: 
+        0px 8px 32px rgba(0, 0, 0, 0.3),
+        0px 0px 20px color-mix(in srgb, var(--emphasisColor) 20%, transparent);
+    border-radius: 20px;
+    border: 1px solid color-mix(in srgb, var(--emphasisColor) 15%, transparent);
+    position: relative;
+    padding: 30px;
+}
+
+.inputMensage {
+    width: 92%;
+    height: 55px;
+    padding: 0px 20px;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--secundaryColor) 90%, transparent);
+    border: 2px solid color-mix(in srgb, var(--emphasisColor) 20%, transparent);
+    color: var(--fontColor);
+    font-family: "Open Sans", sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+}
+
+.inputMensage::placeholder {
+    color: color-mix(in srgb, var(--fontColor) 50%, transparent);
+}
+
+.inputMensage:focus {
+    outline: none;
+    border-color: var(--emphasisColor);
+    box-shadow: 
+        0px 0px 0px 3px color-mix(in srgb, var(--emphasisColor) 20%, transparent),
+        0px 8px 20px color-mix(in srgb, var(--emphasisColor) 30%, transparent);
+    background: var(--secundaryColor);
+    transform: translateY(-2px);
+}
+
+.inputMensage:hover {
+    border-color: color-mix(in srgb, var(--emphasisColor) 40%, transparent);
+    transform: translateY(-1px);
+}
+
+/* Estilização específica para inputs do tipo date */
+.inputMensage[type="date"] {
+    position: relative;
+    cursor: pointer;
+}
+
+.inputMensage[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.8);
+    cursor: pointer;
+    padding: 5px;
+    margin-left: 10px;
+}
+
+.inputMensage[type="date"]::-webkit-datetime-edit {
+    color: var(--fontColor);
+}
+
+.inputMensage[type="date"]::-webkit-datetime-edit-fields-wrapper {
+    color: var(--fontColor);
+}
+
+.btnMensage {
+    width: 100%;
+    height: 60px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--emphasisColor), color-mix(in srgb, var(--emphasisColor) 80%, #1b263b));
+    color: var(--fontColor);
+    border: none;
+    font-family: "Open Sans", sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.btnMensage::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btnMensage:hover {
+    background: linear-gradient(135deg, color-mix(in srgb, var(--emphasisColor) 90%, white), var(--emphasisColor));
+    transform: translateY(-3px);
+    box-shadow: 
+        0px 12px 25px color-mix(in srgb, var(--emphasisColor) 40%, transparent),
+        0px 0px 0px 2px color-mix(in srgb, var(--emphasisColor) 30%, transparent);
+}
+
+.btnMensage:hover::before {
+    left: 100%;
+}
+
+.btnMensage:active {
+    transform: translateY(-1px);
+    box-shadow: 
+        0px 6px 15px color-mix(in srgb, var(--emphasisColor) 30%, transparent),
+        0px 0px 0px 2px color-mix(in srgb, var(--emphasisColor) 20%, transparent);
+}
+
+/* Animação de entrada suave */
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.inputMensageWrapper {
+    animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Efeito de brilho no container */
+.inputMensageWrapper::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, var(--emphasisColor), transparent, var(--emphasisColor));
+    border-radius: 22px;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.inputMensageWrapper:focus-within::before {
+    opacity: 0.3;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .inputMensageWrapper {
+        width: 90%;
+        max-width: 400px;
+        height: 260px;
+        padding: 25px;
+        margin: 20px;
+    }
+    
+    .inputMensage {
+        height: 50px;
+        font-size: 15px;
+    }
+    
+    .btnMensage {
+        height: 55px;
+        font-size: 15px;
+    }
+}
+
+.inputMensageContainner label{
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--fontColor);
+
+}

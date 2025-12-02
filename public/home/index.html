@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/home.css">
     <link rel="shortcut icon" href="../src/logoIcon.png" type="image/x-icon">
 
     <title>Coordina</title>
@@ -17,36 +18,49 @@
             <img src="../src/logoIcon.png" alt="Coordina">
         </div>
         <ul class="menu">
-                <ul>
-                    <li class="optionNav openOption">Almoxarifado 
-                        <ul>
-                            <li>Solicitação</li>
-                            <li>Recebidos</li>
-                            <li>Config</li>
-                        </ul>
-                    </li>
-                    <li class="optionNav closeOption">Controle
-                        <ul>
-                            <li>Programado x Executado </li>
-                            <li>GPM x Asbuilt</li>
-                            <li>Asbuilt x Recebido</li>
-                        </ul>
-                    </li>
-                    <li class="optionNav closeOption">Relatório de erros
-                        <ul>
-                            <li>Materiais x Programado</li>
-                            <li>Final</li>
-                        </ul>
-                    </li>
-                    <li class="optionNav closeOption">Relatório de alerta
-                        <ul>
-                            <li>Abaixo da meta</li>
-                            <li>Acima da meta</li>
-                        </ul>
-                    </li>
-                </ul>
+            <ul>
+                <li class="optionNav openOption">Home
+                    <ul>
+                        <li class="menuSelect menuSelected">Home</li>
+                    </ul>
+                </li>
+                <li class="optionNav closeOption">Almoxarifado
+                    <ul>
+                        <li class="menuSelect"  onclick="window.location.href = '/controle_almoxarifado';" >Solicitação</li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle_almoxarifado';" >Recebidos</li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle_almoxarifado';">Config</li>
+                        <li class="menuSelect" onclick="window.location.href = '/lista_materiais';">Lista de Materiais</li>
+                    </ul>
+                </li>
+                <li class="optionNav closeOption">Controle
+                    <ul>
+                        <li class="menuSelect">Programado x Executado </li>
+                        <li class="menuSelect">GPM x Asbuilt</li>
+                        <li class="menuSelect">Asbuilt x Recebido</li>
+                    </ul>
+                </li>
+               <li class="optionNav closeOption">Programação
+                    <ul>
+                        <li class="menuSelect" onclick="window.location.href = '/programacao';">Materiais x Programado</li>
+                    </ul>
+                </li>
+                <li class="optionNav closeOption">Dashboard
+                    <ul>
+                        <li class="menuSelect" onclick="window.location.href = '/dashboard/equipes';">Dashboard Equipes</li>
+                    </ul>
+                </li>
+            </ul>
         </ul>
     </nav>
+
+    <main id="rootMain">
+        <section id="mainContent">
+            <h1>Bem-vindo ao Coordina</h1>
+            <p>Seu sistema de controle de almoxarifado e programação de materiais.</p>
+            <img src="../src/logo Veman.png" alt="Imagem ilustrativa do sistema Coordina">
+        </section>
+
+    </main>
 
     <script src="./js/main.js"></script>
 </body>

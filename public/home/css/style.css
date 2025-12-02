@@ -239,3 +239,11 @@ body{
 html {
     scroll-behavior: smooth;
 }
+
+.menuSelected{
+    color: var(--emphasisColor);
+    border-left-color: var(--emphasisColor);
+    transform: translateX(5px);
+    background: color-mix(in srgb, var(--emphasisColor) 10%, transparent);
+    border-radius: 4px;
+}

@@ -1,0 +1,27 @@
+
+
+.graphClose{
+    width: 100vw;
+    height: 100vh;
+
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 998;
+
+    background-color: color-mix(in srgb, var(--primaryColor) 50%, transparent);
+    backdrop-filter: blur(5px);
+}
+
+.graph{
+    width: 90vw;
+    height: 90vh;
+
+    position: absolute;
+    left: 5vw;
+    top: 5vh;
+    z-index: 999;
+
+    background-color: var(--thirdColor);
+    border-radius: 15px;
+}

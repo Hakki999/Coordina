@@ -1,0 +1,308 @@
+.tableResults {
+    width: 90%;
+    height: 90vh;
+    /* Usando viewport height para altura fixa */
+    background-color: var(--primaryColor);
+    box-shadow: 0px 0px 5px var(--primaryColor);
+    border-radius: 15px;
+    overflow: hidden;
+    border-collapse: collapse;
+    font-family: 'Segoe UI', sans-serif;
+    table-layout: fixed;
+    margin-top: 60px;
+    /* Garante layout consistente */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
+
+.tableResults thead tr {
+    height: 60px;
+    background-color: color-mix(in srgb, var(--primaryColor) 70%, var(--thirdColor)) !important;
+    text-align: center;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tableResults thead th {
+    position: relative;
+    overflow: hidden;
+    padding: 8px; /* Mude para 8px para combinar com o td */
+    font-weight: 600;
+    font-size: 14px;
+    border-bottom: 2px solid color-mix(in srgb, var(--fontColor) 40%, transparent);
+}
+
+.tableResults thead th:nth-child(1) {
+    width: 8%;
+}
+
+.tableResults thead th:nth-child(2) {
+    width: 12%;
+}
+
+.tableResults thead th:nth-child(3) {
+    width: 12%;
+}
+
+.tableResults thead th:nth-child(4) {
+    width: 15%;
+}
+
+.tableResults thead th:nth-child(5) {
+    width: 15%;
+}
+
+.tableResults thead th:nth-child(6) {
+    width: 15%;
+}
+
+.tableResults thead th:nth-child(7) {
+    width: 11%;
+}
+
+.tableResults thead th:nth-child(8) {
+    width: 12%;
+}
+
+.tableResults tbody td:nth-child(1) {
+    width: 8%;
+}
+
+.tableResults tbody td:nth-child(2) {
+    width: 12%;
+}
+
+.tableResults tbody td:nth-child(3) {
+    width: 12%;
+}
+
+.tableResults tbody td:nth-child(4) {
+    width: 15%;
+}
+
+.tableResults tbody td:nth-child(5) {
+    width: 15%;
+}
+
+.tableResults tbody td:nth-child(6) {
+    width: 15%;
+}
+
+.tableResults tbody td:nth-child(7) {
+    width: 11%;
+}
+
+.tableResults tbody td:nth-child(8) {
+    width: 12%;
+}
+
+.tableResults tbody {
+    display: block;
+    width: 100%;
+    height: calc(90vh - 60px);
+    padding: 0px !important;
+    overflow-y: auto;
+    /* Scroll vertical se necessário */
+
+    
+}
+
+.tableResults thead,
+.tableResults tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    /* Garante que as células tenham exatamente a mesma largura */
+}
+
+.tableResults th,
+.tableResults td {
+    box-sizing: border-box; /* Inclui padding na largura total */
+}
+.tableResults tbody td {
+    height: 30px;
+    text-align: center;
+    font-size: 13px;
+    padding: 8px;
+    border-bottom: 1px solid color-mix(in srgb, var(--secundaryColor) 30%, transparent);
+    transition: background-color 0.2s ease;
+    word-wrap: break-word;
+    /* Quebra palavras longas */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.tableResults tbody tr:nth-child(even) {
+    background-color: color-mix(in srgb, var(--thirdColor) 80%, transparent);
+}
+
+.tableResults tbody tr:nth-child(odd) {
+    background-color: color-mix(in srgb, var(--thirdColor) 100%, transparent);
+}
+.tableRow{
+    transition: 0.1s ease-in-out;
+}
+
+/* Efeito hover para melhor interação */
+.tableRow:hover {
+    background-color: color-mix(in srgb, var(--thirdColor) 50%, transparent) !important;
+    color: var(--fontColor);
+    font-weight: 600;
+    border-left: 1px solid var(--emphasisColor);
+}
+
+.tableRow:hover td{
+    transform: scale(1.05);
+}
+
+/* Scrollbar personalizada */
+.tableResults tbody::-webkit-scrollbar {
+    width: 8px;
+}
+
+.tableResults tbody::-webkit-scrollbar-track {
+    background: color-mix(in srgb, var(--secundaryColor) 10%, transparent);
+}
+
+.tableResults tbody::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--primaryColor) 60%, transparent);
+    border-radius: 4px;
+}
+
+.filtroPesquisa {
+    cursor: pointer;
+}
+
+.filtroPesquisa::before {
+    content: "🔍";
+
+    position: absolute;
+    transform: translate3d(-20px, 20px, 0) scale(0);
+    transition: 0.2s ease-in-out;
+
+    background: var(--fontColor);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+}
+
+.filtroPesquisa:hover:before {
+    transform: translate3d(-20px, 0px, 0) scale(1);
+}
+
+
+#tableBody{
+    overflow-x: hidden;
+}
+
+#tableBody::-webkit-scrollbar{
+    display: none;
+}
+
+/* ------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------ */
+
+.filtroCont {
+    width: 100%;
+    height: 100%;
+
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background-color: color-mix(in srgb, var(--secundaryColor) 50%, transparent);
+    backdrop-filter: blur(5px);
+}
+
+.filtro {
+    width: 400px;
+    height: 300px;
+
+    background-color: var(--thirdColor);
+    box-shadow: 0px 0px 10px var(--primaryColor);
+    border-radius: 15px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.titleFiltro {
+    width: 100%;
+    padding: 10px 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-bottom: 1px solid color-mix(in srgb, var(--fontColor) 50%, transparent);
+}
+
+.filtroBody {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.orders {
+    width: 40%;
+    height: 80%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.inputFiltro {
+    width: 40%;
+    height: 80%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+
+    background-color: var(--primaryColor);
+    border-radius: 10px;
+}
+
+.inputFiltro input {
+    width: 90%;
+    height: 50%;
+
+    border-radius: 15px;
+
+    background-color: var(--fontColor);
+    text-align: center;
+}
+
+
+
+.filtroStyleButton {
+    width: 90%;
+    background-color: var(--fontColor);
+    text-align: center;
+    padding: 5px 15px;
+    border-radius: 15px;
+    transition: 0.2s ease-in-out;
+}
+
+.filtroStyleButton:hover {
+    transform: scale(1.05);
+}

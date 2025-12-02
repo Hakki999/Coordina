@@ -1,5 +1,6 @@
 const acess = JSON.parse(localStorage.getItem('acesso'));
 console.log(acess);
+let dadosTable = "";
 
 // =============================================
 // VARIÁVEIS GLOBAIS E INICIALIZAÇÃO
@@ -38,7 +39,7 @@ function initializeEventListeners() {
 
     // Prevenir submit padrão
     document.querySelector(".unSubmit").addEventListener("submit", preventDefaultSubmit);
-    
+
     // Menu mobile
     initMobileMenu();
 }
@@ -89,19 +90,19 @@ function renderSolicitacoes() {
         (obj, index, self) =>
             index === self.findIndex(o => o.itemID === obj.itemID)
     );
-    
+
     // Gerar opções de materiais
     const matOpcs = generateMaterialOptions(unicos);
-    
+
     // Gerar linhas de entrada
     const opcs = generateInputRows(matOpcs);
-    
+
     // Construir interface
     const materialsInterface = buildMaterialsInterface(opcs);
-    
+
     displayMain.style.flexDirection = "collum";
     displayMain.innerHTML = buildMaterialsHeader() + materialsInterface;
-    
+
     // Configurar eventos dos materiais
     setupMaterialEvents(materiais);
 }
@@ -112,7 +113,7 @@ function renderSolicitacoes() {
 function generateMaterialOptions(materiaisUnicos) {
     let options = '<option value=""></option>';
     materiaisUnicos.forEach(material => {
-        options += `<option value="${material.itemID}">${material.itemID}</option>`;
+        options += `<option value="${material.itemID.replace(/"/g, '&quot;')}">${material.itemID}</option>`;
     });
     return options;
 }
@@ -123,7 +124,7 @@ function generateMaterialOptions(materiaisUnicos) {
 function generateInputRows(matOpcs) {
     const h = Math.floor(window.innerHeight / 22);
     let rows = "";
-    
+
     for (let i = 0; i < h; i++) {
         rows += `
             <div class="op">
@@ -187,7 +188,7 @@ function setupMaterialEvents(materiaisData) {
  */
 function updateOrcadosList(materiaisData) {
     orcados = [];
-    
+
     document.querySelectorAll('.mat').forEach((select, index) => {
         materiaisData.forEach(m => {
             if (m.itemID == select.value) {
@@ -201,7 +202,7 @@ function updateOrcadosList(materiaisData) {
             }
         });
     });
-    
+
     orcados = agruparItensSeguro(orcados);
     renderListaMateriais(orcados);
 }
@@ -212,7 +213,7 @@ function updateOrcadosList(materiaisData) {
 function renderListaMateriais(materiaisLista) {
     const tableRows = generateMaterialTableRows(materiaisLista);
     const tableContent = buildMaterialTable(tableRows);
-    
+
     document.querySelector('.listMaterials').innerHTML = tableContent;
     setupTableRowEvents();
 }
@@ -266,8 +267,8 @@ function setupTableRowEventsLibDev() {
     let tableRowOrcados = document.querySelectorAll('.modlibdev');
 
     tableRowOrcados.forEach(row => {
-        if (acess.editlibdev)row.addEventListener('click', handleTableRowDoubleClick);
-        if (acess.editlibdev)row.addEventListener('change', changeLiberadoDevolvido);
+        if (acess.editlibdev) row.addEventListener('click', handleTableRowDoubleClick);
+        if (acess.editlibdev) row.addEventListener('change', changeLiberadoDevolvido);
     });
 }
 
@@ -278,11 +279,11 @@ function handleTableRowDoubleClick(evt) {
     const editInput = `
         <input type="text" class="materialChangeInput" value="${evt.target.innerHTML}" placeholder="Digite o material desenjado..." />
     `;
-    
+
     evt.target.innerHTML = editInput;
     const materialChangeInput = evt.target.querySelector('.materialChangeInput');
     materialChangeInput.focus();
-    
+
     materialChangeInput.addEventListener('blur', handleMaterialInputBlur);
 }
 
@@ -352,10 +353,10 @@ function openFormMaterials() {
 function sendForm() {
     // Coletar dados do formulário
     const formData = collectFormData();
-    
+
     // Atualizar nomes dos materiais editados
     updateEditedMaterialNames();
-    
+
     // Enviar para o backend
     submitBudgetData(formData);
 }
@@ -372,7 +373,15 @@ function collectFormData() {
     const tipo = document.getElementById("tipoServ").value;
     const obs = document.getElementById("Obs").value;
 
-    const listaNomes = Array.from(document.querySelectorAll('.mat')).map(x => x.value);
+    const listaNomes = [];
+
+    document.querySelectorAll('.mat').forEach((select, index) => {
+
+        listaNomes.push([
+            document.querySelectorAll('.mat')[index].value,
+            document.querySelectorAll('.inputqtd')[index].value
+        ])
+    });
 
     return {
         projeto,
@@ -414,20 +423,20 @@ function submitBudgetData(formData) {
         body: JSON.stringify(formData),
         credentials: 'include'
     })
-    .then(handleBudgetResponse)
-    .catch(handleBudgetError);
+        .then(handleBudgetResponse)
+        .catch(handleBudgetError);
 }
 
 /**
  * Manipula resposta do envio de orçamento
  */
 function handleBudgetResponse(response) {
-    console.log(response.ok);
+    console.warn(response);
     (response)
-    if (response) {
-        alert("Orçamento enviado com sucesso!");
+    if (response.status === 200) {
+        criarMensagem(true, 'Sucesso ao enviar o orçamento!');
     } else {
-        alert("Erro no envio do orçamento. Verifique os dados e tente novamente.");
+        criarMensagem(false, 'Erro ao enviar o orçamento.');
     }
 }
 
@@ -436,14 +445,14 @@ function handleBudgetResponse(response) {
  */
 function handleBudgetError(error) {
     console.error(error);
-    alert("Erro ao enviar o orçamento. Tente novamente mais tarde.");
+    criarMensagem(false, 'Erro ao enviar o orçamento. . Tente novamente mais tarde.');
 }
 /** Atualiza os valores de liberado e devolvido no backend */
 
 async function changeLiberadoDevolvido(evt) {
     // Força uma atualização síncrona dos valores antes de processar
     await forceValueUpdate();
-    
+
     let dataTemp = [];
     document.querySelectorAll('.changeLibDevAlmox').forEach(row => {
         // Para inputs, pega o value diretamente
@@ -472,14 +481,14 @@ async function changeLiberadoDevolvido(evt) {
 // Função auxiliar para pegar valores de inputs ou textContent
 function getValue(element) {
     if (!element) return '';
-    
+
     // Se for input, select ou textarea, pega o value
-    if (element.tagName === 'INPUT' || 
-        element.tagName === 'SELECT' || 
+    if (element.tagName === 'INPUT' ||
+        element.tagName === 'SELECT' ||
         element.tagName === 'TEXTAREA') {
         return element.value || '';
     }
-    
+
     // Se não, pega o textContent
     return element.textContent?.trim() || '';
 }
@@ -491,7 +500,7 @@ function forceValueUpdate() {
         document.querySelectorAll('input, select, textarea').forEach(input => {
             input.dispatchEvent(new Event('input', { bubbles: true }));
         });
-        
+
         // Pequeno delay para garantir processamento
         setTimeout(resolve, 50);
     });
@@ -504,9 +513,10 @@ function forceValueUpdate() {
 /**
  * Renderiza solicitações recebidas com filtros
  */
-function renderRecebidos(filtro = "/solicitacoesRecentes", valor = 100) {
+function renderRecebidos(filtro = "/solicitacoesRecentes", valor = 9999) {
     fetchSolicitacoes(filtro, valor)
         .then(data => {
+            dadosTable = data.data;
             console.log('📦 Dados recebidos:', data);
             renderizarTabelaComFiltros(data.data || data);
         })
@@ -527,37 +537,54 @@ async function fetchSolicitacoes(endpoint, valor) {
         body: JSON.stringify({ valor: valor }),
         credentials: 'include'
     });
-    
+
     if (!response.ok) {
         throw new Error(`Erro HTTP: ${response.status}`);
     }
-    
     return await response.json();
 }
 
 /**
  * Renderiza tabela com sistema de filtros
  */
-function renderizarTabelaComFiltros(dados) {
-    console.log('🎨 Renderizando tabela com filtros:', dados);
+/**
+ * Renderiza tabela com sistema de filtros - VERSÃO CORRIGIDA
+ */
+function renderizarTabelaComFiltros(dadoss) {
+    console.log('🎨 Renderizando tabela com:', dadoss.length, 'registros');
+    console.log('📊 Dados recebidos:', dadoss);
+
+    // Verifica se há dados
+    if (!dadoss || dadoss.length === 0) {
+        console.warn('⚠️ Nenhum dado para renderizar');
+        displayMain.innerHTML = `
+            <div style="padding: 20px; text-align: center; color: #666;">
+                <h3>Nenhum registro encontrado</h3>
+                <p>Não há dados para o filtro aplicado.</p>
+            </div>
+        `;
+        return;
+    }
 
     // Gerar dados únicos para filtros
-    const filterData = generateFilterData(dados);
-    
+    const filterData = generateFilterData(dadoss);
+
     // Gerar conteúdo da tabela
-    const tabelaBody = generateSolicitacoesTableBody(dados);
-    
+    const tabelaBody = generateSolicitacoesTableBody(dadoss);
+
     // Construir interface completa
     const interfaceCompleta = buildSolicitacoesInterface(filterData, tabelaBody);
-    
-    displayMain.style.flexDirection = "column";
-    displayMain.innerHTML = interfaceCompleta;
-    
-    // Configurar eventos
-    setupFilterEvents();
-    configurarDuploClique(dados);
-}
 
+    // LIMPA completamente o displayMain antes de adicionar novo conteúdo
+    displayMain.innerHTML = "";
+    displayMain.style.flexDirection = "column";
+
+    // Adiciona o novo conteúdo
+    displayMain.innerHTML = interfaceCompleta;
+
+    console.log('✅ Tabela renderizada. Linhas:', document.querySelectorAll('#tabelaResposta tbody tr').length);
+
+}
 /**
  * Gera dados únicos para os filtros
  */
@@ -574,19 +601,40 @@ function generateFilterData(dados) {
 /**
  * Gera o corpo da tabela de solicitações
  */
+/**
+ * Gera o corpo da tabela de solicitações - VERSÃO CORRIGIDA
+ */
 function generateSolicitacoesTableBody(dados) {
-    return dados.map(item => `
-        <tr class="tableRowRecebidos" id="row-${item.id}">
-            <td>${item.Solicitante || 'N/A'}</td>
-            <td>${item.equipe || 'N/A'}</td>
-            <td>${item.Projeto || 'N/A'}</td>
-            <td>${item.Tensao || 'N/A'}</td>
-            <td>${item.Cidade || 'N/A'}</td>
-            <td>${formatarData(item.DataExe) || 'N/A'}</td>
-            <td>${item.tipo || 'N/A'}</td>
-            <td>${item.obs || 'N/A'}</td>
-        </tr>
-    `).join('');
+    console.log('📝 Gerando corpo da tabela com', dados.length, 'itens');
+
+    if (!dados || !Array.isArray(dados)) {
+        console.error('❌ Dados inválidos para gerar tabela');
+        return '<tr><td colspan="8" style="text-align: center; color: red;">Erro: Dados inválidos</td></tr>';
+    }
+
+    const tableRows = dados.map((item, index) => {
+        // Debug: log do primeiro item para ver a estrutura
+        if (index === 0) {
+            console.log('🔍 Estrutura do primeiro item:', item);
+        }
+
+        return `
+            <tr class="tableRowRecebidos" ondblclick="dbclickRow(${item.id || index})" id="row-${item.id || index}">
+                <td>${item.Solicitante || 'N/A'}</td>
+                <td>${item.equipe || 'N/A'}</td>
+                <td>${item.Projeto || 'N/A'}</td>
+                <td>${item.Tensao || 'N/A'}</td>
+                <td>${item.Cidade || 'N/A'}</td>
+                <td>${formatarData(item.DataExe) || 'N/A'}</td>
+                <td>${item.tipo || 'N/A'}</td>
+                <td>${item.obs || 'N/A'}</td>
+            </tr>
+        `;
+    }).join('');
+
+    console.log('📋 HTML gerado para tabela (primeiros 500 chars):', tableRows.substring(0, 500));
+
+    return tableRows;
 }
 
 /**
@@ -599,6 +647,7 @@ function buildSolicitacoesInterface(filterData, tabelaBody) {
                 ${buildFilterGroups(filterData)}
                 
                 <div class="filtro-botoes">
+                    <button class="btn-filtro" onclick="exportTab(dadosTable, 'tabela_orcamento.csv')">CSV</button>
                     <button class="btn-filtro" onclick="limparFiltros()">Limpar</button>
                     <button class="btn-filtro primario" onclick="aplicarFiltros()">Filtrar</button>
                 </div>
@@ -617,7 +666,7 @@ function buildSolicitacoesInterface(filterData, tabelaBody) {
                     <th>Obs.</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="tabelaRespostaBody">
                 ${tabelaBody}
             </tbody>
         </table>
@@ -647,10 +696,7 @@ function buildFilterGroups(filterData) {
         
         <div class="filtro-grupo">
             <label class="filtro-label">Projeto</label>
-            <select id="filtroProjeto" class="filtro-select">
-                <option value="">Todos</option>
-                ${filterData.projetos.map(p => `<option value="${p}">${p}</option>`).join('')}
-            </select>
+            <input type="text" id="filtroProjeto" class="filtro-select" placeholder="Digite o numero do projeto"/>
         </div>
         
         <div class="filtro-grupo">
@@ -673,6 +719,11 @@ function buildFilterGroups(filterData) {
             <label class="filtro-label">Data Execução</label>
             <input type="date" id="filtroData" class="filtro-input">
         </div>
+
+        <div class="filtro-grupo">
+            <label class="filtro-label">Intervalo Data</label>
+            <button class="filtro-input" onclick="renderInputIntervalo()">Aplicar</button>
+        </div>
     `;
 }
 
@@ -681,43 +732,38 @@ function buildFilterGroups(filterData) {
 // =============================================
 
 /**
- * Configura eventos dos filtros
- */
-function setupFilterEvents() {
-    document.querySelectorAll('.filtro-select, .filtro-input').forEach(element => {
-        element.addEventListener('change', aplicarFiltros);
-    });
-}
-
-/**
  * Aplica filtros nas solicitações
  */
 function aplicarFiltros() {
     const filtros = getCurrentFilters();
-    
+
     fetch('/solicitacoesRecentes', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ valor: 100 }),
+        body: JSON.stringify({ valor: 9999 }),
         credentials: 'include'
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`Erro HTTP: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        const dadosCompletos = data.data || data;
-        const dadosFiltrados = filterSolicitacoes(dadosCompletos, filtros);
-        console.log(`🎯 ${dadosFiltrados.length} solicitações após filtro`);
-        renderizarTabelaComFiltros(dadosFiltrados);
-    })
-    .catch(error => {
-        console.error('❌ Erro ao buscar solicitações:', error);
-    });
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("dados = filtro");
+            
+            const dadosFiltrados = filterSolicitacoes(dadosTable, filtros);
+            dadosTable = dadosFiltrados;
+            console.log(`🎯 ${dadosFiltrados.length} solicitações após filtro`);
+            criarMensagem(true, `${dadosFiltrados.length} solicitações após filtro`);
+            renderizarTabelaComFiltros(dadosFiltrados);
+        })
+        .catch(error => {
+            console.error('❌ Erro ao buscar solicitações:', error);
+            criarMensagem(false, 'Erro ao buscar solicitações.');
+        });
 }
 
 /**
@@ -794,26 +840,20 @@ function limparFiltros() {
 /**
  * Configura duplo clique nas linhas da tabela
  */
-function configurarDuploClique(dados) {
-    const listamateriais = document.getElementById("listamateriais");
 
-    document.querySelectorAll('.tableRowRecebidos').forEach(row => {
-        row.addEventListener('dblclick', (evt) => {
-            const rowId = row.id.split('-')[1];
-            const itemData = dados.find(d => d.id == rowId);
+function dbclickRow(rowId) {
+    const itemData = dadosTable.find(d => d.id == rowId);
 
-            if (!itemData) {
-                console.error('❌ Dados não encontrados para o ID:', rowId);
-                return;
-            }
+    if (!itemData) {
+        console.error('❌ Dados não encontrados para o ID:', rowId);
+        return;
+    }
 
-            preencherModalDetalhes(itemData);
-            listamateriais.style.display = "block";
-            listamateriais.setAttribute('data-id', rowId);
+    preencherModalDetalhes(itemData);
+    listamateriais.style.display = "block";
+    listamateriais.setAttribute('data-id', rowId);
 
-            setupTableRowEventsLibDev();
-        });
-    });
+    setupTableRowEventsLibDev();
 }
 
 /**
@@ -848,7 +888,7 @@ function buildMaterialDetailsTable(materiais) {
 
     if (materiais && Array.isArray(materiais)) {
         console.log(materiais);
-        
+
         materialListBodyContent = materiais.map(mate => `
             <tr class="changeLibDevAlmox" >
                 <td>${mate.item || 'N/A'}</td>
@@ -890,11 +930,12 @@ async function listarMateriais() {
         console.log('🔍 Fazendo requisição...');
         const response = await fetch('/listarMateriais');
         console.log('📨 Response object:', response);
-
+        console.warn('-------');
+        
         const data = await response.json();
         console.log('📦 Dados extraídos:');
         console.log(data);
-
+        dadosTable = data;
         materiais = data;
         renderSolicitacoes(data);
 
@@ -959,18 +1000,205 @@ function renderizarTabela(dados) {
 // =============================================
 
 // Inicializar quando o DOM carregar
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     initializeEventListeners();
     listarMateriais();
 });
 
 // Configurar evento do formulário de materiais
-document.getElementById("formMaterials").addEventListener("submit", function(evt) {
+document.getElementById("formMaterials").addEventListener("submit", function (evt) {
     evt.preventDefault();
     sendForm();
 });
 
 // Configurar evento de PDF na lista de materiais
-document.getElementById("listamateriais").addEventListener("dblclick", function(evt) {
-    if(acess.imprimir)gerarPDFListaMateriais();
+document.getElementById("listamateriais").addEventListener("dblclick", function (evt) {
+    if (acess.imprimir) gerarPDFListaMateriais();
 });
+
+
+fetch('/buscarFiltro', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        tabela: 'Equipes',
+        coluna: 'Prefixo',
+        valor: 'all',
+        orderBy: true,
+        orderCamp: 'Prefixo'
+    }),
+    credentials: 'include'
+})
+    .then(response => response.json())
+    .then(data => {
+        console.log("✅ Dados da equipes recebidos!");
+
+        const equipeSelect = document.getElementById("equipe");
+        data.data.forEach(equipe => {
+            const option = document.createElement("option");
+            option.value = equipe.Prefixo;
+            option.textContent = equipe.Prefixo;
+            equipeSelect.appendChild(option);
+        });
+
+    })
+    .catch(error => {
+        console.error('Erro ao filtrar materiais:', error);
+    });
+
+
+function renderInputIntervalo() {
+    console.log('pressionou');
+
+    const htmlItervalo = `
+        <div class="inputMensageContainner">
+        <div class="detailsClose" onclick="this.parentElement.remove()"></div>
+        <div class="inputMensageWrapper">
+            <input type="date" class="inputMensage" id="dataInicio" placeholder="Mensagem..." id="inputMensageField">
+            <input type="date" class="inputMensage" id="dataFim" placeholder="Mensagem..." id="inputMensageField">
+            <button type="submit" class="btnMensage" id="btnMensage" onclick="getFiltroIntevaloData()">Enviar</button>
+        </div>
+    </div>
+    `
+
+    document.body.innerHTML += htmlItervalo;
+}
+
+
+function getFiltroIntevaloData() {
+    const dataInicio = document.getElementById('dataInicio').value;
+    const dataFim = document.getElementById('dataFim').value;
+
+    // Validação das datas
+    if (!dataInicio || !dataFim) {
+        criarMensagem(false, "Por favor, selecione ambas as datas!");
+        return;
+    }
+
+    let startDate, endDate;
+
+    // Garante que a data inicial seja menor que a final
+    if (dataInicio > dataFim) {
+        startDate = dataFim;
+        endDate = dataInicio;
+    } else {
+        startDate = dataInicio;
+        endDate = dataFim;
+    }
+
+    console.log('Filtrando por intervalo:', startDate, 'até', endDate);
+
+    fetch('/buscarFiltro', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            tabela: 'Materiais Solicitados', // ou a tabela correta
+            coluna: 'DataExe',
+            valor: 'all',
+            orderBy: true,
+            orderCamp: 'DataExe',
+            qtdLimite: 999,
+            minValue: startDate,
+            maxValue: endDate
+        }),
+        credentials: 'include'
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(dados => {
+            console.log("✅ Dados filtrados recebidos:", dados);
+            dadosTable = dados.data;
+            console.log("dados = filtro");
+            if (dados.data && dados.data.length > 0) {
+                displayMain.innerHTML = '';
+                document.getElementById('tabelaRespostaBody').innerHTML = generateSolicitacoesTableBody(dados.data);
+                criarMensagem(true, `Filtro aplicado! ${dados.data.length} registros encontrados.`);
+            } else {
+                criarMensagem(false, "Nenhum registro encontrado para o período selecionado.");
+                // Limpa a tabela ou mostra mensagem
+                displayMain.querySelector('table tbody').innerHTML = '<tr><td colspan="8" style="text-align: center;">Nenhum registro encontrado</td></tr>';
+            }
+
+            // Fecha o modal
+            const modal = document.querySelector('.inputMensageContainner');
+            if (modal) modal.remove();
+        })
+        .catch(error => {
+            console.error('❌ Erro ao buscar materiais:', error);
+            criarMensagem(false, "Erro ao realizar o filtro!");
+        });
+}
+function exportTab() {
+    console.log(dadosTable);
+
+    let tempExport = [];
+
+
+    dadosTable.forEach((item, index) => {
+        console.clear()
+        console.log(item);
+
+        let materiaisDist = [];
+        let qtdDist = [];
+        let devDist = [];
+        let libDist = [];
+
+        item.Materiais.forEach(material => {
+            console.warn(material);
+            
+            materiaisDist.push(material.item.replace('.', ',') || "err");
+            libDist.push(material.lib || 0);
+            qtdDist.push(material.qtd || 0);
+            devDist.push(material.dev || 0);
+        })
+
+        tempExport.push([
+            item.id ||  "",
+            item.Projeto || "",
+            formatarData(item.DataExe) || "",
+            formatarData(item.DataSol) || "",
+            item.Solicitante || "",
+            item.Tensao || "",
+            item.equipe || "",
+            item.obs || "",
+            item.tipo || "",
+            item.updated_at || "",
+            materiaisDist || "",
+            qtdDist || "",
+            devDist || "",
+            libDist || ""
+        ])
+
+        console.log(tempExport);
+
+    })
+
+    exportCSV({
+        head: [
+            'id',
+            'projeto',
+            'dataExe',
+            'dataSol',
+            'solicitante',
+            'tensao',
+            'equipe',
+            'obs',
+            'tipo',
+            'updated_at',
+            'materiais',
+            'qtd',
+            'dev',
+            'lib'
+        ],
+        body: tempExport
+    }, 'Orçamentos recebidos');
+
+}

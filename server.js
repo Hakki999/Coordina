@@ -1,11 +1,21 @@
 // ------------------------------- Requisição ----------------------------------------
 const express = require('express')
 const bodyParser = require('body-parser');
-const { jwt, autenticarToken } = require('./js/midwares/JWT_mid');
+const { jwt, autenticarToken, gotoHome } = require('./js/middleware/JWT_mid');
 const cookieParser = require('cookie-parser');
-const { validarLogin, buscarMateriais, enviarOrcamento, solicitacoesRecentes, filtroSolicitacoes, changeLibDev, getAcess } = require("./js/db/connect");
+const { validarLogin, buscarMateriais, enviarOrcamento, solicitacoesRecentes, filtroSolicitacoes, changeLibDev, getAcess, buscarDados, inserirNovo } = require("./js/db/connect");
 const { sendMSG } = require(__dirname + '/js/WhatsAppSession/whatsAppRest');
+const { processDataMS } = require('./js/dataAnalytics/processMS');
+const { processMP } = require('./js/dataAnalytics/processMP');
+const { processLM } = require('./js/dataAnalytics/processLM');
+const { processVP } = require('./js/dataAnalytics/processVP');
+const { handleValidationErrors, validationSchemas } = require('./js/middleware/express_mid');
+const http = require("http");
+const compression = require("compression");
+const { log } = require('console');
 
+
+console.log("🚀 Iniciando servidor...");
 
 // ------------------------------- Configuração --------------------------------------
 require('dotenv').config()
@@ -13,8 +23,10 @@ const port = process.env.PORT;
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(express.json());
 app.use(express.static(__dirname + "/public/"));
 app.use(cookieParser());
+app.use(compression());
 
 // ------------------------------- Rotas ---------------------------------------------
 
@@ -26,9 +38,30 @@ app.get('/controle_almoxarifado', autenticarToken, (req, res) => {
     res.sendFile(__dirname + "/public/Almoxarifado/index.html")
 })
 
+app.get('/lista_materiais', autenticarToken, (req, res) => {
+    res.sendFile(__dirname + "/public/lista_materiais/")
+})
+
+app.get('/programacao', autenticarToken, (req, res) => {
+    res.sendFile(__dirname + "/public/programacao/index.html")
+})
+
+app.get('/home', autenticarToken, (req, res) => {
+    res.sendFile(__dirname + "/public/home/index.html")
+})
+
+app.get('/dashboard/equipes', autenticarToken, (req, res) => {
+    res.sendFile(__dirname + "/public/dashboard/dashboardEquipes/index.html")
+});
+
+app.get('/controle/obras/add', autenticarToken, (req, res) => {
+    res.sendFile(__dirname + "/public/public/controle/obras/add/index.html")
+})
+
+
 // ------------------------------- Solicitações ---------------------------------------
 
-app.post('/login', async (req, res) => {
+app.post('/login', validationSchemas.loginValidation, handleValidationErrors, async (req, res) => {
     try {
         const { user, password } = req.body;
 
@@ -39,16 +72,16 @@ app.post('/login', async (req, res) => {
         const resultado = (await validarLogin(user, password));
 
         console.log(resultado);
-        
+
 
         if (!resultado.success) {
             return res.status(401).json({ error: "Credenciais inválidas" });
         }
 
         const token = jwt.sign(
-            { userId: resultado.data.user.id }, 
-            process.env.JWT_SECRET, 
-            { expiresIn: '30m' }
+            { userId: resultado.data.user.id },
+            process.env.JWT_SECRET,
+            { expiresIn: '300m' }
         );
 
         res.cookie('token', token, {
@@ -60,7 +93,7 @@ app.post('/login', async (req, res) => {
             success: true,
             message: "Login bem-sucedido",
             nome: resultado.data.user,
-            redirect: '/controle_almoxarifado',
+            redirect: '/home',
             acesso: getAcess(resultado.data.function),
             tel: resultado.data.Celular
         });
@@ -81,71 +114,130 @@ app.get('/listarMateriais', (req, res) => {
 
     buscarMateriais().then(data => {
         console.log(data.length);
-        
+
         res.json(data)
     })
 })
-//(solicitante, cidade, dataexe, datasolic, materiais, projeto)
-app.post('/enviarOrcamento', autenticarToken, (req, res) => {
+
+app.post('/enviarOrcamento', validationSchemas.enviarOrcamento, handleValidationErrors, autenticarToken, async (req, res) => {
     console.log("✅ Orçamento recebido!");
 
-    enviarOrcamento(
-        req.body.solicitante,
-        req.body.cidade,
-        req.body.dataExe,
-        req.body.datasolic,
-        req.body.materiais,
-        req.body.projeto,
-        req.body.obs,
-        req.body.tensao,
-        req.body.equipe,
-        req.body.tipo,
-        req.body.listaNomes
+    try {
+        // 1. Primeiro, enviar o orçamento
+        const data = await enviarOrcamento(
+            req.body.solicitante,
+            req.body.cidade,
+            req.body.dataExe,
+            req.body.datasolic,
+            req.body.materiais,
+            req.body.projeto,
+            req.body.obs,
+            req.body.tensao,
+            req.body.equipe,
+            req.body.tipo,
+            req.body.listaNomes
+        );
 
-    ).then(data => {
-        
+        // 2. Preparar e enviar mensagens
         let tempM = "";
+        let tempLN = "";
 
         req.body.materiais.forEach(element => {
-            tempM+=`--> ${element.item} -- ${element.qtd}\n`
+            tempM += `*_--> ${element.qtd}x_* -- _${element.item}_ \n`;
         });
 
+        req.body.listaNomes.forEach(element => {
+            if (Array.isArray(element)) {
+                if (element[0] != "") tempLN += `*_--> ${element[1]}x_* -- _${element[0]}_ \n`;
+            } else {
+                if (element != "") tempLN += `*_--> 1x_* -- _${element}_ \n`;
+            }
+        });
 
         const msg = `
-✅ Orçamento enviado com sucesso ✅
+✅ *Orçamento enviado com sucesso* ✅
 
-Projeto: ${req.body.projeto}
-Cidade: ${req.body.cidade}
-Equipe: ${req.body.equipe}
-Data Execução: ${req.body.dataExe}
+*Projeto:* ${req.body.projeto}
+*Cidade:* ${req.body.cidade}
+*Equipe:* ${req.body.equipe}
+*Data Execução:* ${req.body.dataExe}
 
-Materiais solicitado: 
+*Estruturas solicitadas:*
+${tempLN}
+
+*Materiais solicitados:*
 
 ${tempM}
+        `;
 
-        `
-        
-         sendMSG(req.body.tel, msg)
+        // Enviar mensagens em paralelo
+        await Promise.all([
+            sendMSG(req.body.tel, msg),
+            sendMSG('6286016758', msg)
+        ]);
 
-        res.json({ status: 'Orçamento Enviado!' })
-    }).catch(err => {
-        console.log(err);
-        console.log('erro ao enviar o orçamento--');
+        // 3. Buscar dados da equipe
+        const dataResp = await buscarDados('Equipes', 'Prefixo', req.body.equipe, 1, true, 'Prefixo');
+        console.log(`🔃 Processando equipe:`, dataResp);
 
-        res.json({ status: 'Erro ao enviar o orçamento.' })
-    })
-}
-)
+        if (!dataResp || dataResp.length === 0) {
+            throw new Error('Equipe não encontrada');
+        }
 
+        // 4. Processar dados sequencialmente com validações
+        const barremos = await processDataMS(data.dados, req.body.tensao, dataResp[0].trabalho, data.dados[0].id);
+
+        if (!barremos || !barremos.data) {
+            throw new Error('Dados de materiais solicitados inválidos ou vazios');
+        }
+
+        const dataMP = await processMP(barremos.data);
+
+         const dataVP = await processVP({
+             table: 'res_cubo_obra_programacao',
+             filters: {
+                 des_equipe: req.body.equipe,
+                 dta_programacao: req.body.dataExe,
+                 num_obra: req.body.projeto
+             }
+         }, dataMP[0].id)
+
+        // 5. Só enviar resposta quando TUDO estiver concluído
+        res.json({
+            status: 'Orçamento Enviado!',
+            id: data.dados[0]?.id
+        });
+
+    } catch (error) {
+        console.error('❌ Erro no processamento do orçamento:');
+        console.error(error);
+
+        // Enviar resposta de erro apropriada
+        if (error.message.includes('Equipe não encontrada')) {
+            res.status(404).json({
+                status: 'Erro: Equipe não encontrada'
+            });
+        } else if (error.message.includes('Materiais solicitados inválidos')) {
+            res.status(500).json({
+                status: 'Erro ao processar materiais solicitados'
+            });
+        } else {
+            res.status(500).json({
+                status: 'Erro ao enviar o orçamento',
+                error: error.message
+            });
+        }
+    }
+});
 app.post('/solicitacoesRecentes', autenticarToken, (req, res) => {
     console.log("✅ Solicitações recentes enviadas!");
-    
+
     const qtd = req.body.valor;
-    
+
     solicitacoesRecentes(qtd)
         .then(data => {
             console.log('Sucesso ao buscar solicitações recentes');
-            
+
             res.json({
                 data: data
             });
@@ -169,24 +261,127 @@ app.post('/filtroSolicitacoes', autenticarToken, (req, res) => {
     )
 });
 
-app.post('/changeLibDev', autenticarToken, (req, res) => {
+app.post('/changeLibDev', validationSchemas.changeLibDev, handleValidationErrors, autenticarToken, (req, res) => {
     console.log(req.body);
-    
+
     changeLibDev(req.body.dataTemp, req.body.id).then(data => {
-        console.log('🔃Atualização realizada com sucesso🔃 id:'+req.body.id);
-        
+        console.log('🔃Atualização realizada com sucesso🔃 id:' + req.body.id);
+
         res.json({ status: 'Atualização realizada com sucesso!' })
     })
 });
 
-// ------------------------------- Abertura do Servidor -------------------------------
+app.post('/getMP', autenticarToken, async (req, res) => {
+    try {
+        console.log("📦 Buscando dados de Material x Programado...");
 
-app.listen(port, err => {
-    if (err) {
-        console.log("Erro ao iniciar o servidor :(");
-        console.log("\x1b[Erro ao iniciar o servidor :(\x1b[0m");
-    } else {
-        console.log("\x1b[32mServidor iniciado com sucesso :)\x1b[0m");
+        const data = await buscarDados('Material x Programado', 'id', 'all');
 
+        if (!data || data.length === 0) {
+            console.log("⚠️  Nenhum dado encontrado na tabela Material x Programado");
+            return res.json({
+                status: 'success',
+                message: 'Nenhum dado encontrado',
+                data: []
+            });
+        }
+
+        console.log(`✅ ${data.length} registros encontrados e enviados!`);
+        res.json({
+            status: 'success',
+            data: data
+        });
+
+    } catch (err) {
+        console.error('❌ Erro ao buscar dados de Material x Programado:', err);
+        res.status(500).json({
+            status: 'error',
+            message: 'Erro interno do servidor'
+        });
     }
+});
+
+app.post('/buscarFiltro', validationSchemas.buscarFiltro, handleValidationErrors, autenticarToken, (req, res) => {
+    const tabela = req.body.tabela;
+    const coluna = req.body.coluna;
+    const valor = req.body.valor;
+    const qtdLimite = req.body.qtdLimite;
+    const orderBy = req.body.orderBy;
+    const orderCamp = req.body.orderCamp || 'data';
+    const minValue = req.body.minValue || null;
+    const maxValue = req.body.maxValue || null;
+
+    console.log('-------------------------------------');
+    
+    console.log({
+        coluna,
+        orderCamp
+    });
+    
+
+    console.log(`🔍 Buscando dados em ${tabela} onde ${coluna} = ${valor}...`)
+    buscarDados(tabela, coluna, valor, qtdLimite, orderBy, orderCamp, minValue, maxValue).then(data => {
+        console.log(`✅ ${data.length} registros encontrados e enviados!`)
+        res.json({
+            status: 'success',
+            data: data
+        });
+    }
+    ).catch(err => {
+        console.error(`❌ Erro ao buscar dados em ${tabela}:`, err);
+        res.status(500).json({
+            status: 'error',
+            message: 'Erro interno do servidor'
+        });
+    }
+    );
+});
+
+app.post('/cadastrar_nova_obra', autenticarToken, (req, res) => {
+    console.log(req.body);
+    // inserirNovo({
+    //     nota: req.body.nota,
+    //     status: undefined,
+    //     cidade: req.body.cidade,
+    //     tipo_obra: req.body.tipo_obra,
+    //     proxima_exe: undefined,
+    //     pi: req.body.pi,
+    //     valor: undefined,
+    //     resp_asbuilt: undefined,
+    //     criador_obra: req.body.criador,
+    //     ultima_edicao: undefined
+    // })
 })
+
+app.post('/getListMaterials', autenticarToken, (req, res) => {
+
+    processLM().then(data => {
+
+        console.log("✅ Materiais distrinchados enviados! - processLM()");
+        console.log(data);
+
+        res.json(data)
+    }).catch(err => {
+
+        console.log("❌ Erro ao buscar materiais! distinchados - processLM()");
+        console.log(err);
+
+    })
+})
+
+// ------------------------------- ping ----------------------------------------------
+app.get('/ping', (req, res) => {
+    res.send('pong');
+})
+// ------------------------------- Abertura do Servidor -------------------------------
+// Cria servidor HTTP manual com keep-alive otimizado
+const server = http.createServer(app);
+
+// Configura Keep Alive — ESSENCIAL PARA LOCAL TUNNEL
+server.keepAliveTimeout = 60 * 1000; // 60s
+server.headersTimeout = 65 * 1000;   // 65s
+
+
+server.listen(port, async () => {
+    console.log(`🌍 Servidor público na porta: http://localhost:${port}/`);
+});

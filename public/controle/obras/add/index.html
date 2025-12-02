@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/form.css">
+    <link rel="shortcut icon" href="./src/logoIcon.png" type="image/x-icon">
+
+    <title>Coordina</title>
+</head>
+
+<body>
+    <nav id="navBar">
+        <div id="thead">
+            <img src="./src/logoIcon.png" alt="Coordina">
+        </div>
+        <ul class="menu">
+            <ul>
+                <li class="optionNav closeOption">Home
+                    <ul>
+                        <li class="menuSelect ">Home</li>
+                    </ul>
+                </li>
+                <li class="optionNav closeOption">Almoxarifado
+                    <ul>
+                        <li class="menuSelect"  onclick="window.location.href = '/controle_almoxarifado';" >Solicitação</li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle_almoxarifado';" >Recebidos</li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle_almoxarifado';">Config</li>
+                        <li class="menuSelect" onclick="window.location.href = '/lista_materiais';">Lista de Materiais</li>
+                    </ul>
+                </li>
+                <li class="optionNav openOption">Controle
+                    <ul>
+                        <li class="menuSelect menuSelected">Cadastrar Obra</li>
+                        <li class="menuSelect">Obras</li>
+                        <li class="menuSelect">Programado x Executado </li>
+                        <li class="menuSelect">GPM x Asbuilt</li>
+                        <li class="menuSelect">Asbuilt x Recebido</li>
+                    </ul>
+                </li>
+               <li class="optionNav closeOption">Programação
+                    <ul>
+                        <li class="menuSelect" onclick="window.location.href = '/programacao';">Materiais x Programado</li>
+                    </ul>
+                </li>
+                <li class="optionNav closeOption">Dashboard
+                    <ul>
+                        <li class="menuSelect" onclick="window.location.href = '/dashboard/equipes';">Dashboard Equipes</li>
+                    </ul>
+                </li>
+            </ul>
+        </ul>
+    </nav>
+
+    <main id="rootMain">
+    <div id="rootMain">
+        <form id="formAdd" action="/cadastrar_nova_obra" method="post">
+            <h1 id="headForm">Cadastrar nova Obra</h1>
+            
+            <div class="form-group">
+                <label for="nota">Número da Nota</label>
+                <input type="text" id="nota" name="nota" placeholder="Digite o número da nota" value="oi">
+            </div>
+                
+            <div class="form-group">
+                <label for="cidade">Cidade</label>
+                <select type="text" id="cidade" name="cidade" placeholder="Digite a cidade">
+                    
+                </select>
+            </div>
+            
+                <div class="form-group">
+                    <label for="dataInicio">Data de Início</label>
+                    <input type="date" id="dataInicio" name="dataInicio" value="21/11/2025">
+                </div>
+                
+                <div class="form-group">
+                    <label for="pi">PI</label>
+                    <input type="text" id="pi" name="pi" placeholder="Nome do PI" value="MBX">
+                </div>
+            
+            <div class="form-group">
+                <label for="os">OS</label>
+                <input type="text" id="os" name="os" placeholder="Número da OS" value="MSTT">
+            </div>
+            
+            <button type="submit" class="btn-submit">Cadastrar Obra</button>
+        </form>
+    </div>
+    </main>
+
+    <script src="./js/main.js"></script>
+    <script src="./js/cidadesOption.js"></script>
+</body>
+
+</html>

@@ -82,9 +82,11 @@ function gerarPDFListaMateriais() {
                         margin-bottom: 30px;
                     }
                     .info-item {
+                    
                         margin-bottom: 8px;
                     }
                     .info-label {
+                    position: relative;
                         font-weight: bold;
                         color: #2c3e50;
                     }
@@ -136,6 +138,16 @@ function gerarPDFListaMateriais() {
                         body { margin: 0; }
                         .no-print { display: none; }
                     }
+                    .ass:before {
+                    content: "";
+                    display: block;
+                    width: 400px;
+                    border-bottom: 1px solid #333;
+                    margin-bottom: 5px;
+                    padding-bottom: 5px;
+                    position: absolute;
+                    bottom: -20px;
+                    }
                 </style>
             </head>
             <body>
@@ -173,6 +185,16 @@ function gerarPDFListaMateriais() {
                     <div class="info-item">
                         <span class="info-label">Data Execução:</span>
                         <span class="info-value">${dataExe}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label ass">Resp. Entrega:</span>
+                            <br>
+                            <br>
+                            <br>
+                        <span class="info-label ass">Resp. Recebimento:</span>
+                    </div>
+                     <div class="info-item">
+                        
                     </div>
                 </div>
 

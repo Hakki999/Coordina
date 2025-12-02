@@ -2,13 +2,11 @@ const { createClient } = require('@supabase/supabase-js');
 const { log } = require('console');
 const { appendFileSync } = require('fs');
 require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
-const { processDataMS } = require('../dataAnalytics/processMS');
 
 const supabase = createClient(
     process.env.DATABASE_URL,
     process.env.DATABASE_KEY
 )
-
 
 async function validarLogin(usuario, senha) {
     try {
@@ -103,6 +101,7 @@ async function buscarMateriais() {
         return [];
     }
 }
+
 async function enviarOrcamento(solicitante, cidade, dataexe, datasolic, materiais, projeto, obs, tensao, equipe, tipo, listaNomes) {
     try {
         const { data, error } = await supabase
@@ -121,16 +120,18 @@ async function enviarOrcamento(solicitante, cidade, dataexe, datasolic, materiai
                     tipo: tipo,
                     lista_nomes: listaNomes
                 }
-            ]);
+            ])
+            .select();
 
         if (error) {
             console.error('Erro ao inserir dados:', error);
             throw error;
         }
 
-        console.log('Dados inseridos com sucesso:', data);
+        console.log('✅ - Dados inseridos com sucesso... ');
         return {
-            success: "Dados inseridos com sucesso"
+            success: "Dados inseridos com sucesso",
+            dados: data
         };
 
     } catch (error) {
@@ -310,11 +311,10 @@ async function updateValor(dataResp) {
     }
 
     try {
-        console.log(`Atualizando registro ID: ${dataResp.id}`, dataResp);
 
         const { data, error, status } = await supabase
             .from('Materiais Solicitados')
-            .update({ 
+            .update({
                 barremos: dataResp
             })
             .eq('id', dataResp.id)
@@ -331,20 +331,21 @@ async function updateValor(dataResp) {
         }
 
         if (!data || data.length === 0) {
-            console.warn(`Nenhum registro encontrado com ID: ${dataResp.id}`);
-            return { 
-                success: false, 
+            return {
+                success: false,
                 error: 'Registro não encontrado',
-                id: dataResp.id 
+                id: dataResp.id,
+                data: null
             };
         }
 
         console.log(`✅ Registro atualizado com sucesso - ID: ${dataResp.id}`);
-        return { 
-            success: true, 
+        return {
+            success: true,
             data: data[0],
             id: dataResp.id,
-            updatedAt: new Date().toISOString()
+            updatedAt: new Date().toISOString(),
+            data: data[0]
         };
 
     } catch (error) {
@@ -353,9 +354,9 @@ async function updateValor(dataResp) {
             error: error.message,
             stack: error.stack
         });
-        
-        return { 
-            success: false, 
+
+        return {
+            success: false,
             error: error.message,
             id: dataResp.id,
             code: error.code
@@ -363,14 +364,125 @@ async function updateValor(dataResp) {
     }
 }
 
-async function  pegarTodaTabela() {
-    const {data, error } = await supabase
-    .from('Materiais Solicitados')
-    .select('*')
-    
+async function pegarTodaTabelaMateriaisSolicitados() {
+    const { data, error } = await supabase
+        .from('Materiais Solicitados')
+        .select('*')
+
 
     return data;
- }
+}
+
+async function verificarExistenciaTabela(tabela, coluna, valor) {
+    try {
+        const { data, error } = await supabase
+            .from(tabela)
+            .select('*')
+            .eq(coluna, valor);
+        if (error) {
+            console.error('Erro ao verificar existência da tabela:', error);
+            throw error;
+        }
+        if (data.length === 0) {
+            console.log(`Nenhum registro encontrado em ${tabela} onde ${coluna} = ${valor}`);
+            return false;
+        } else {
+            return true;
+        }
+    } catch (error) {
+        console.error('Erro na função verificarExistenciaTabela:', error);
+        return false;
+    }
+}
+
+async function inserirNovo(tabela, dados) {
+    try {
+        const { data, error } = await supabase
+            .from(tabela)
+            .insert([dados])
+            .select('id')
+        if (error) {
+            console.error('❌ Erro ao inserir novo registro:', error);
+            throw error;
+        }
+        console.log(`✅ Registro inserido com sucesso em ${tabela}:`, data);
+        
+        return data;
+    } catch (error) {
+        console.error('❌ Erro na função inserirNovo:', error);
+        return null;
+    }
+
+}
+
+async function atualizarDados(tabela, dados, coluna, rowId) {
+    try {
+        const { data, error } = await supabase
+            .from(tabela)
+            .update(dados)
+            .eq(coluna, rowId)
+            .select('id')
+        if (error) {
+            console.error('❌ Erro ao atualizar registro:', error);
+            throw error;
+        }
+        console.log(`✅ Registro atualizado com sucesso em ${tabela}:`, rowId);
+        return data;
+    } catch (error) {
+        console.error('❌ Erro na função atualizarDados:', error);
+        return null;
+    }
+}
+
+async function buscarDados(tabela, coluna, valor, qtdLimite = 999, order = true, orderCamp, minValue = null, maxValue = null) {
+    try {
+
+        console.log("=-------------------------------> ", orderCamp);
+        console.log("=-------------------------------> ", coluna);
+        
+        if (!tabela || !coluna || valor === undefined) {
+            throw new Error('Parâmetros inválidos para buscarDados');
+        }
+        if (typeof tabela !== 'string' || typeof coluna !== 'string') {
+            throw new Error('Tabela e coluna devem ser strings');
+        }
+
+        if (valor === null || valor === '' || valor === undefined) valor = 'all';
+        // Cria a consulta base
+        let query = supabase
+            .from(tabela)
+            .select('*');
+
+        // Aplica o filtro APENAS se valor não for 'all'
+        if (valor !== 'all') {
+            query = query.eq(coluna, valor);
+        }
+
+        if (!order) {
+            query = query.order(orderCamp, { ascending: order });
+        }
+
+        if (!isNaN(qtdLimite) && qtdLimite > 0) {
+            query = query.limit(qtdLimite);
+        }
+
+        if (minValue !== null && maxValue !== null) {
+            query = query.gte(orderCamp, minValue).lte(orderCamp, maxValue);
+        }
+
+        // Executa a consulta
+        const { data, error } = await query;
+
+        if (error) {
+            console.error('Erro ao buscar dados:', error);
+            throw error;
+        }
+        return data;
+    } catch (error) {
+        console.error('Erro na função buscarDados:', error);
+        return null;
+    }
+}
 
 
-module.exports = { validarLogin, buscarMateriais, enviarOrcamento, solicitacoesRecentes, filtroSolicitacoes, changeLibDev, getAcess, buscarArray, updateValor, pegarTodaTabela}
+module.exports = { validarLogin, buscarMateriais, enviarOrcamento, solicitacoesRecentes, filtroSolicitacoes, changeLibDev, getAcess, buscarArray, updateValor, pegarTodaTabelaMateriaisSolicitados, verificarExistenciaTabela, inserirNovo, atualizarDados, buscarDados }

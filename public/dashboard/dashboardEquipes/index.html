@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="./dashboardEquipes/css/style.css">
+    <link rel="stylesheet" href="./dashboardEquipes/css/home.css">
+    <link rel="stylesheet" href="./dashboardEquipes/css/form.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="shortcut icon" href="../src/logoIcon.png" type="image/x-icon">
+
+    <title>Coordina</title>
+</head>
+
+<body>
+    <div class="loading">
+        <div class="contBalls">
+            <div class="balls"></div>
+            <div class="balls"></div>
+            <div class="balls"></div>
+        </div>
+    </div>
+<nav id="navBar">
+        <div id="thead">
+            <img src="../src/logoIcon.png" alt="Coordina">
+        </div>
+        <ul class="menu">
+            <ul>
+                <li class="optionNav closeOption">Home
+                    <ul>
+                        <li class="menuSelect" onclick="window.location.href = '/home';">Home</li>
+                    </ul>
+                </li>
+                <li class="optionNav closeOption">Almoxarifado
+                    <ul>
+                        <li class="menuSelect" onclick="window.location.href = '/controle_almoxarifado';">Solicitação
+                        </li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle_almoxarifado';">Recebidos</li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle_almoxarifado';">Config</li>
+                        <li class="menuSelect" onclick="window.location.href = '/lista_materiais';">Lista de Materiais</li>
+                    </ul>
+                </li>
+                <li class="optionNav closeOption">Controle
+                    <ul>
+                        <li class="menuSelect">Programado x Executado </li>
+                        <li class="menuSelect">GPM x Asbuilt</li>
+                        <li class="menuSelect">Asbuilt x Recebido</li>
+                    </ul>
+                </li>
+                <li class="optionNav closeOption">Programação
+                    <ul>
+                        <li class="menuSelect" onclick="window.location.href = '/programacao';">Materiais x Programado</li>
+                    </ul>
+                </li>
+                <li class="optionNav openOption">Dashboard
+                    <ul>
+                        <li class="menuSelect menuSelected">Dashboard Equipes</li>
+                    </ul>
+                </li>
+            </ul>
+        </ul>
+    </nav>
+
+    <main id="root">
+        <!-- Conteúdo será inserido via JavaScript -->
+
+        
+    </main>
+
+    <canvas id="meuGrafico" style="display: none;"></canvas>
+
+    <script>
+        alert("Página em construção!");
+    </script>
+
+    <script src="./dashboardEquipes/js/main.js"></script>
+    <script src="./dashboardEquipes/js/chart.js"></script>
+</body>
+
+</html>

@@ -1,6 +1,6 @@
 .filtro {
     width: calc(100% - 300px);
-    height: 120px;
+    height: 150px;
     position: fixed;
     top: 0px;
     left: 300px;
@@ -273,7 +273,7 @@
 /* Responsividade */
 @media (max-width: 1400px) {
     .filtro {
-        height: 140px;
+        height: 200px;
         padding: 15px 20px;
     }
     
@@ -287,6 +287,7 @@
     
     #tabelaResposta {
         width: calc(100% - 330px);
+        top: 200px;
         left: 310px;
     }
 }

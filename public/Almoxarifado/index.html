@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="./Almoxarifado/css/almoxariado.css">
     <link rel="stylesheet" href="./Almoxarifado/css/recebido.css">
     <link rel="stylesheet" href="./Almoxarifado/css/listamateriais.css">
+    <link rel="stylesheet" href="./Almoxarifado/css/inputbox.css">
     <link rel="shortcut icon" href="../src/logoIcon.png" type="image/x-icon">
 
     <title>Coordina</title>
@@ -17,15 +18,21 @@
 <body>
     <nav id="navBar">
         <div id="thead">
-            <img src="../src/logo Veman.png" alt="Coordina">
+            <img src="../src/logoIcon.png" alt="Coordina">
         </div>
         <ul class="menu">
             <ul>
+                <li class="optionNav closeOption">Home
+                    <ul>
+                        <li class="menuSelect" onclick="window.location.href = '/home';">Home</li>
+                    </ul>
+                </li>
                 <li class="optionNav openOption">Almoxarifado
                     <ul>
                         <li class="menuSelect menuSelected" onclick="renderSolicitacoes()">Solicitação</li>
                         <li class="menuSelect" onclick="renderRecebidos()">Recebidos</li>
                         <li class="menuSelect">Config</li>
+                        <li class="menuSelect" onclick="window.location.href = '/lista_materiais';">Lista de Materiais</li>
                     </ul>
                 </li>
                 <li class="optionNav closeOption">Controle
@@ -35,16 +42,15 @@
                         <li class="menuSelect">Asbuilt x Recebido</li>
                     </ul>
                 </li>
-                <li class="optionNav closeOption">Relatório de erros
+                <li class="optionNav closeOption">Programação
                     <ul>
-                        <li class="menuSelect">Materiais x Programado</li>
-                        <li class="menuSelect">Final</li>
+                        <li class="menuSelect" onclick="window.location.href = '/programacao';">Materiais x Programado
+                        </li>
                     </ul>
                 </li>
-                <li class="optionNav closeOption">Relatório de alerta
+                <li class="optionNav closeOption">Dashboard
                     <ul>
-                        <li class="menuSelect">Abaixo da meta</li>
-                        <li class="menuSelect">Acima da meta</li>
+                        <li class="menuSelect" onclick="window.location.href = '/dashboard/equipes';">Dashboard Equipes</li>
                     </ul>
                 </li>
             </ul>
@@ -85,7 +91,9 @@
                 </div>
                 <div class="form-group">
                     <label for="equipe">Equipe</label>
-                    <input type="text" id="equipe" class="form-input" required placeholder="Nome da equipe">
+                    <select type="text" id="equipe" class="form-input" required placeholder="Nome da equipe">
+                        <option value="">Selecione uma equipe...</option>
+                    </select>
                 </div>
             </div>
 
@@ -123,7 +131,7 @@
             </button>
         </div>
     </form>
-    
+
     <div id="listamateriais" style="display: none;">
         <table>
             <thead>
@@ -166,9 +174,11 @@
             </thead>
         </table>
 
-         <button type="button" class="closeFather unSubmit"></button>
+        <button type="button" class="closeFather unSubmit" onclick="this.parentElement.style.display = 'none'"></button>
     </div>
 
+    <script src="./Almoxarifado/js/exportCSV.js"></script>
+    <script src="./Almoxarifado/js/mensagem.js"></script>
     <script src="./Almoxarifado/js/gerarpdf.js"></script>
     <script src="./Almoxarifado/js/main.js"></script>
     <script src="./Almoxarifado/js/InputComSugestoes.js"></script>
