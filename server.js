@@ -191,16 +191,16 @@ ${tempM}
             throw new Error('Dados de materiais solicitados inválidos ou vazios');
         }
 
-        const dataMP = await processMP(barremos.data);
+        // const dataMP = await processMP(barremos.data);
 
-         const dataVP = await processVP({
-             table: 'res_cubo_obra_programacao',
-             filters: {
-                 des_equipe: req.body.equipe,
-                 dta_programacao: req.body.dataExe,
-                 num_obra: req.body.projeto
-             }
-         }, dataMP[0].id)
+        //  const dataVP = await processVP({
+        //      table: 'res_cubo_obra_programacao',
+        //      filters: {
+        //          des_equipe: req.body.equipe,
+        //          dta_programacao: req.body.dataExe,
+        //          num_obra: req.body.projeto
+        //      }
+        //  }, dataMP[0].id)
 
         // 5. Só enviar resposta quando TUDO estiver concluído
         res.json({
