@@ -57,6 +57,6 @@ function sendMSG(number, mensagem) {
 }
 
 // Inicializa o cliente do WhatsApp
- initializeWhatsApp();
+//  initializeWhatsApp();
 
  module.exports = { sendMSG };

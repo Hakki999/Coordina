@@ -5,11 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="./css/style.css">
-    <link rel="stylesheet" href="./css/home.css">
-    <link rel="stylesheet" href="./css/tableResults.css">
-    <link rel="stylesheet" href="./css/optionsBar.css">
-    <link rel="stylesheet" href="./css/details.css">
+    <link rel="stylesheet" href="/controle/obras/obras/css/style.css">
+    <link rel="stylesheet" href="/controle/obras/obras/css/home.css">
+    <link rel="stylesheet" href="/controle/obras/obras/css/tableResults.css">
+    <link rel="stylesheet" href="/controle/obras/obras/css/optionsBar.css">
+    <link rel="stylesheet" href="/controle/obras/obras/css/details.css">
     <link rel="shortcut icon" href="../src/logoIcon.png" type="image/x-icon">
 
     <title>Coordina</title>
@@ -18,7 +18,7 @@
 <body>
     <nav id="navBar">
         <div id="thead">
-            <img src="../src/logoIcon.png" alt="Coordina">
+            <img src="/controle/obras/obras/icons/logoIcon.png" alt="Coordina">
         </div>
         <ul class="menu">
             <ul>
@@ -29,29 +29,30 @@
                 </li>
                 <li class="optionNav closeOption">Almoxarifado
                     <ul>
-                        <li class="menuSelect"  onclick="window.location.href = '/controle_almoxarifado';" >Solicitação</li>
-                        <li class="menuSelect" onclick="window.location.href = '/controle_almoxarifado';" >Recebidos</li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle_almoxarifado';">Solicitação
+                        </li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle_almoxarifado';">Recebidos</li>
                         <li class="menuSelect" onclick="window.location.href = '/controle_almoxarifado';">Config</li>
-                        <li class="menuSelect" onclick="window.location.href = '/lista_materiais';">Lista de Materiais</li>
+                        <li class="menuSelect" onclick="window.location.href = '/lista_materiais';">Lista de Materiais
+                        </li>
                     </ul>
                 </li>
                 <li class="optionNav openOption">Controle
                     <ul>
-                        <li class="menuSelect">Cadastrar Obra</li>
-                        <li class="menuSelect menuSelected">Obras</li>
-                        <li class="menuSelect">Programado x Executado </li>
-                        <li class="menuSelect">GPM x Asbuilt</li>
-                        <li class="menuSelect">Asbuilt x Recebido</li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle/iop/add';">Cadastrar Obra</li>
+                        <li class="menuSelect menuSelected" onclick="window.location.href = '/controle/iop/obras';">Obras</li>
                     </ul>
                 </li>
-               <li class="optionNav closeOption">Programação
+                <li class="optionNav closeOption">Programação
                     <ul>
-                        <li class="menuSelect" onclick="window.location.href = '/programacao';">Materiais x Programado</li>
+                        <li class="menuSelect" onclick="window.location.href = '/programacao';">Materiais x Programado
+                        </li>
                     </ul>
                 </li>
                 <li class="optionNav closeOption">Dashboard
                     <ul>
-                        <li class="menuSelect" onclick="window.location.href = '/dashboard/equipes';">Dashboard Equipes</li>
+                        <li class="menuSelect" onclick="window.location.href = '/dashboard/equipes';">Dashboard Equipes
+                        </li>
                     </ul>
                 </li>
             </ul>
@@ -61,8 +62,9 @@
     <main class="root">
         <nav class="optionsBar">
             <ul>
-                <li onclick="renderChar(dadosTable)"><img src="./icons/graph.png" alt=".">Grafic.</li>
-                <li><img src="./icons/time.png" alt=".">Intervalo de data</li>
+                <li onclick="renderChar(dadosTable)"><img src="/controle/obras/obras/icons/graph.png" alt=".">Grafic.
+                </li>
+                <li><img src="/controle/obras/obras/icons/time.png" alt=".">Intervalo de data</li>
                 <li></li>
                 <li></li>
                 <li></li>
@@ -72,67 +74,23 @@
         <table class="tableResults">
             <thead>
                 <tr class="headTable">
+                    <th>Edit</th>
                     <th>Nota</th>
                     <th>Status</th>
-                    <th>Equipe</th>
                     <th>Cidade</th>
-                    <th>Tipo de Obra</th>
-                    <th>Proxima Exe</th>
-                    <th>PI</th>
-                    <th>Valor</th>
+                    <th>Nome Obra</th>
+                    <th>Data Exe.</th>
+                    <th>Resp.</th>
                 </tr>
             </thead>
             <tbody id="tableBody">
-                <tr>
-                    <td>04200000000</td>
-                    <td>1- Em execução</td>
-                    <td>Firminópolis</td>
-                    <td>FIRO004M</td>
-                    <th>IOP</th>
-                    <td>21/12/2025</td>
-                    <td>MMT</td>
-                    <td>R$ 1.000,00</td>
-                </tr>
             </tbody>
         </table>
     </main>
 
-    <div class="detailsContainer">
-        <div class="closeDetails" onclick="this.parentElement.remove()"></div>
-        <div class="details">
-            <table class="ultimasEquipes">
-                <thead>
-                    <tr>
-                        <th>Equipe</th>
-                        <th>Dia</th>
-                        <th>Valor</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>FIRO001</td>
-                        <td>21/11/2025</td>
-                        <td>R$ 21</td>
-                    </tr>
-                </tbody>
-            </table>
 
-            <div class="infoDetails">
-                <input type="text" placeholder="Nota">
-                <input type="text" placeholder="Status">
-                <select type="text" id="cidadesInput" placeholder="Cidade">
-                    
-                </select>
-                <input type="text" placeholder="Proxima exe" disabled>
-                <input type="text" placeholder="PI">
-                <input type="text" placeholder="valor" disabled>
-                <input type="text" placeholder="responsavel asbuilt">
-            </div>
-        </div>
-    </div>
-
-    <script src="./js/main.js"></script>
-    <script src="./js/cidadesOption.js"></script>
+    <script src="/controle/obras/obras/js/main.js"></script>
+    <script src="/controle/obras/obras/js/cidadesOption.js"></script>
 </body>
 
 </html>

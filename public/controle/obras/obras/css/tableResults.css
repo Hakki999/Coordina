@@ -37,70 +37,6 @@
     border-bottom: 2px solid color-mix(in srgb, var(--fontColor) 40%, transparent);
 }
 
-.tableResults thead th:nth-child(1) {
-    width: 8%;
-}
-
-.tableResults thead th:nth-child(2) {
-    width: 12%;
-}
-
-.tableResults thead th:nth-child(3) {
-    width: 12%;
-}
-
-.tableResults thead th:nth-child(4) {
-    width: 15%;
-}
-
-.tableResults thead th:nth-child(5) {
-    width: 15%;
-}
-
-.tableResults thead th:nth-child(6) {
-    width: 15%;
-}
-
-.tableResults thead th:nth-child(7) {
-    width: 11%;
-}
-
-.tableResults thead th:nth-child(8) {
-    width: 12%;
-}
-
-.tableResults tbody td:nth-child(1) {
-    width: 8%;
-}
-
-.tableResults tbody td:nth-child(2) {
-    width: 12%;
-}
-
-.tableResults tbody td:nth-child(3) {
-    width: 12%;
-}
-
-.tableResults tbody td:nth-child(4) {
-    width: 15%;
-}
-
-.tableResults tbody td:nth-child(5) {
-    width: 15%;
-}
-
-.tableResults tbody td:nth-child(6) {
-    width: 15%;
-}
-
-.tableResults tbody td:nth-child(7) {
-    width: 11%;
-}
-
-.tableResults tbody td:nth-child(8) {
-    width: 12%;
-}
-
 .tableResults tbody {
     display: block;
     width: 100%;
@@ -305,4 +241,16 @@
 
 .filtroStyleButton:hover {
     transform: scale(1.05);
+}
+
+.editButton{
+    width: 15px;
+    height: 15px;
+    color: transparent;
+    background-image: url('/controle/obras/obras/icons/editar.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
 }

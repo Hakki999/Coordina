@@ -54,9 +54,13 @@ app.get('/dashboard/equipes', autenticarToken, (req, res) => {
     res.sendFile(__dirname + "/public/dashboard/dashboardEquipes/index.html")
 });
 
-app.get('/controle/obras/add', autenticarToken, (req, res) => {
-    res.sendFile(__dirname + "/public/public/controle/obras/add/index.html")
-})
+app.get('/controle/iop/add', autenticarToken, (req, res) => {
+    res.sendFile(__dirname + "/public/controle/obras/add/index.html");
+});
+
+app.get('/controle/iop/obras', autenticarToken, (req, res) => {
+    res.sendFile(__dirname + "/public/controle/obras/obras/index.html");
+});
 
 
 // ------------------------------- Solicitações ---------------------------------------
@@ -312,12 +316,12 @@ app.post('/buscarFiltro', validationSchemas.buscarFiltro, handleValidationErrors
     const maxValue = req.body.maxValue || null;
 
     console.log('-------------------------------------');
-    
+
     console.log({
         coluna,
         orderCamp
     });
-    
+
 
     console.log(`🔍 Buscando dados em ${tabela} onde ${coluna} = ${valor}...`)
     buscarDados(tabela, coluna, valor, qtdLimite, orderBy, orderCamp, minValue, maxValue).then(data => {
@@ -368,6 +372,176 @@ app.post('/getListMaterials', autenticarToken, (req, res) => {
 
     })
 })
+
+app.post('/createNewIOP', autenticarToken, async (req, res) => {
+    try {
+        console.log('📝 Tentativa de criação de novo IOP:', req.body);
+
+        /* =========================
+           Validação de campos
+        ========================== */
+        const camposObrigatorios = [
+            'nota',
+            'nome_obra',
+            'cidade',
+            'pg',
+            'tipo',
+            'oc',
+            'dataExecucao'
+        ];
+
+        const camposFaltantes = camposObrigatorios.filter(
+            campo => !req.body[campo]
+        );
+
+        if (camposFaltantes.length > 0) {
+            console.log('❌ Campos obrigatórios faltando:', camposFaltantes);
+            return res.status(400).json({
+                status: 'error',
+                message: 'Campos obrigatórios não preenchidos',
+                camposFaltantes
+            });
+        }
+
+        /* =========================
+           Validação da data
+        ========================== */
+        const dataExecucao = new Date(req.body.dataExecucao);
+
+        if (isNaN(dataExecucao.getTime())) {
+            console.log('❌ Data de execução inválida:', req.body.dataExecucao);
+            return res.status(400).json({
+                status: 'error',
+                message: 'Data de execução inválida'
+            });
+        }
+
+        /* =========================
+           Preparação dos dados
+        ========================== */
+        const now = new Date();
+        const dataAtual = now.toLocaleString('pt-BR', {
+            timeZone: 'America/Sao_Paulo',
+            dateStyle: 'short',
+            timeStyle: 'medium'
+        });
+
+        const dadosIOP = {
+            res_nota: req.body.nota.trim(),
+            res_status: 'pendente',
+            res_nome_obra: req.body.nome_obra.trim(),
+            res_cidade: req.body.cidade.trim(),
+            res_pg: req.body.pg.trim(),
+            res_tipo: req.body.tipo.trim(),
+            res_oc: req.body.oc.trim(),
+            res_data_exe: req.body.dataExecucao,
+            res_data_cri: dataAtual,
+            res_resp: req.body.resp || 'Sistema'
+        };
+
+        console.log('📋 Dados do IOP preparados:', dadosIOP);
+
+        /* =========================
+           Verificação de duplicidade
+        ========================== */
+        // const iopExistente = await verificarExistente('table_iop', {
+        //   res_nota: dadosIOP.res_nota
+        // });
+
+        const iopExistente = false;
+
+        if (iopExistente) {
+            console.log('⚠️ IOP já existe com nota:', dadosIOP.res_nota);
+            return res.status(409).json({
+                status: 'error',
+                message: 'Já existe um IOP com esta nota',
+                iopExistente: iopExistente.id
+            });
+        }
+
+        /* =========================
+           Inserção no banco
+        ========================== */
+        const result = await inserirNovo('table_iop', dadosIOP);
+
+        if (!result) {
+            console.error('❌ Erro ao criar novo IOP - resultado inválido:', result);
+            throw new Error('Falha na criação do IOP');
+        }
+
+        console.log('✅ Novo IOP criado com sucesso! ID:', result.id);
+
+        /* =========================
+           Notificação (opcional)
+        ========================== */
+        if (process.env.ENABLE_NOTIFICATIONS === 'true') {
+            await enviarNotificacao({
+                tipo: 'novo_iop',
+                iop_id: result.id,
+                nota: dadosIOP.res_nota,
+                obra: dadosIOP.res_nome_obra,
+                criado_por: dadosIOP.res_resp
+            });
+        }
+
+        /* =========================
+           Resposta final
+        ========================== */
+        return res.status(201).json({
+            status: 'success',
+            message: 'IOP criado com sucesso',
+            data: {
+                id: result.id,
+                nota: dadosIOP.res_nota,
+                obra: dadosIOP.res_nome_obra,
+                data_criacao: dadosIOP.res_data_cri,
+                status: dadosIOP.res_status
+            },
+            timestamp: new Date().toISOString()
+        });
+
+    } catch (error) {
+        console.error('🔥 Erro crítico ao criar IOP:', error);
+
+        const statusCode = error.code === 'ER_DUP_ENTRY' ? 409 : 500;
+
+        return res.status(statusCode).json({
+            status: 'error',
+            message:
+                error.code === 'ER_DUP_ENTRY'
+                    ? 'Já existe um registro com esta nota'
+                    : 'Erro interno do servidor ao criar IOP',
+            error:
+                process.env.NODE_ENV === 'development'
+                    ? error.message
+                    : undefined,
+            timestamp: new Date().toISOString()
+        });
+    }
+});
+
+app.post('/getIOP', async (req, res) => {
+    try {
+        const data = await buscarDados(
+            'table_iop',   // tabela
+            'id',          // campo chave
+            'all',         // filtro
+            999,           // limite
+            false,         // paginação
+            'res_data_cri' // ordenação
+        );
+
+        console.log('Dados IOP:', data);
+        res.json(data);
+
+    } catch (error) {
+        console.error('Erro ao buscar dados IOP:', error);
+        res.status(500).json({
+            error: 'Erro ao buscar dados IOP'
+        });
+    }
+});
+
 
 // ------------------------------- ping ----------------------------------------------
 app.get('/ping', (req, res) => {

@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="./css/style.css">
-    <link rel="stylesheet" href="./css/form.css">
-    <link rel="shortcut icon" href="./src/logoIcon.png" type="image/x-icon">
+    <link rel="stylesheet" href="/controle/obras/add/css/style.css">
+    <link rel="stylesheet" href="/controle/obras/add/css/form.css">
+    <link rel="shortcut icon" href="/controle/obras/add/src/logoIcon.png" type="image/x-icon">
 
     <title>Coordina</title>
 </head>
@@ -34,11 +34,8 @@
                 </li>
                 <li class="optionNav openOption">Controle
                     <ul>
-                        <li class="menuSelect menuSelected">Cadastrar Obra</li>
-                        <li class="menuSelect">Obras</li>
-                        <li class="menuSelect">Programado x Executado </li>
-                        <li class="menuSelect">GPM x Asbuilt</li>
-                        <li class="menuSelect">Asbuilt x Recebido</li>
+                        <li class="menuSelect menuSelected" onclick="window.location.href = '/controle/iop/add';">Cadastrar Obra</li>
+                        <li class="menuSelect " onclick="window.location.href = '/controle/iop/obras';">Obras</li>
                     </ul>
                 </li>
                <li class="optionNav closeOption">Programação
@@ -62,7 +59,7 @@
             
             <div class="form-group">
                 <label for="nota">Número da Nota</label>
-                <input type="text" id="nota" name="nota" placeholder="Digite o número da nota" value="oi">
+                <input type="number" id="nota" name="nota" placeholder="Digite o número da nota" value="oi">
             </div>
                 
             <div class="form-group">
@@ -73,27 +70,46 @@
             </div>
             
                 <div class="form-group">
-                    <label for="dataInicio">Data de Início</label>
-                    <input type="date" id="dataInicio" name="dataInicio" value="21/11/2025">
+                    <label for="dataexe">Data de Execução</label>
+                    <input type="date" id="dataexe" name="dataexe" value="21/11/2025">
                 </div>
                 
                 <div class="form-group">
-                    <label for="pi">PI</label>
-                    <input type="text" id="pi" name="pi" placeholder="Nome do PI" value="MBX">
+                    <label for="tipo">Abrangência</label>
+                    <select id="tipo" name="tipo">
+                        <option value="">...</option>
+                        <option value="RC">RECAPACITAÇÃO DE CONDUTORES</option>
+                        <option value="RE">RECAPACITAÇÃO DE EQUIPAMENTOS DE RD</option>
+                        <option value="RF">RECAPACITAÇÃO DE CFA, CFU E PR</option>
+                        <option value="RP">RECAPACITAÇÃO DE POSTES</option>
+                        <option value="RT">RECAPACITAÇÃO DE TRANSFORMADOR DE RD</option>
+
+                    </select>
                 </div>
             
             <div class="form-group">
-                <label for="os">OS</label>
-                <input type="text" id="os" name="os" placeholder="Número da OS" value="MSTT">
+                <label for="oc">OC</label>
+                <input type="text" id="oc" name="oc" placeholder="Número da OC" value="">
             </div>
-            
+
+            <div class="form-group">
+                <label for="pg">Ponto Geográfico</label>
+                <input type="text" id="pg" name="pg" placeholder="Número do Ponto Geográfico" value="">
+            </div>
+
+            <div class="form-group">
+                <label for="nome_obra">Nome Obra</label>
+                <input type="text" id="nome_obra" name="nome_obra" placeholder="Nome da Obra" value="">
+            </div>
+
             <button type="submit" class="btn-submit">Cadastrar Obra</button>
         </form>
     </div>
     </main>
 
-    <script src="./js/main.js"></script>
-    <script src="./js/cidadesOption.js"></script>
+    <script src="/controle/obras/add/js/mensagem.js"></script>
+    <script src="/controle/obras/add/js/main.js"></script>
+    <script src="/controle/obras/add/js/cidadesOption.js"></script>
 </body>
 
 </html>
