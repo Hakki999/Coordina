@@ -3,7 +3,7 @@ const express = require('express')
 const bodyParser = require('body-parser');
 const { jwt, autenticarToken, gotoHome } = require('./js/middleware/JWT_mid');
 const cookieParser = require('cookie-parser');
-const { validarLogin, buscarMateriais, enviarOrcamento, solicitacoesRecentes, filtroSolicitacoes, changeLibDev, getAcess, buscarDados, inserirNovo } = require("./js/db/connect");
+const { validarLogin, buscarMateriais, enviarOrcamento, solicitacoesRecentes, filtroSolicitacoes, changeLibDev, getAcess, buscarDados, inserirNovo, atualizarDados} = require("./js/db/connect");
 const { sendMSG } = require(__dirname + '/js/WhatsAppSession/whatsAppRest');
 const { processDataMS } = require('./js/dataAnalytics/processMS');
 const { processMP } = require('./js/dataAnalytics/processMP');
@@ -55,11 +55,11 @@ app.get('/dashboard/equipes', autenticarToken, (req, res) => {
 });
 
 app.get('/controle/iop/add', autenticarToken, (req, res) => {
-    res.sendFile(__dirname + "/public/controle/obras/add/index.html");
+    res.sendFile(__dirname + "/public/controle/IOP/add/index.html");
 });
 
-app.get('/controle/iop/obras', autenticarToken, (req, res) => {
-    res.sendFile(__dirname + "/public/controle/obras/obras/index.html");
+app.get('/controle/iop/lista_iop', autenticarToken, (req, res) => {
+    res.sendFile(__dirname + "/public/controle/IOP/lista_iop/index.html");
 });
 
 
@@ -341,22 +341,6 @@ app.post('/buscarFiltro', validationSchemas.buscarFiltro, handleValidationErrors
     );
 });
 
-app.post('/cadastrar_nova_obra', autenticarToken, (req, res) => {
-    console.log(req.body);
-    // inserirNovo({
-    //     nota: req.body.nota,
-    //     status: undefined,
-    //     cidade: req.body.cidade,
-    //     tipo_obra: req.body.tipo_obra,
-    //     proxima_exe: undefined,
-    //     pi: req.body.pi,
-    //     valor: undefined,
-    //     resp_asbuilt: undefined,
-    //     criador_obra: req.body.criador,
-    //     ultima_edicao: undefined
-    // })
-})
-
 app.post('/getListMaterials', autenticarToken, (req, res) => {
 
     processLM().then(data => {
@@ -520,7 +504,7 @@ app.post('/createNewIOP', autenticarToken, async (req, res) => {
     }
 });
 
-app.post('/getIOP', async (req, res) => {
+app.post('/getIOP', autenticarToken, async (req, res) => {
     try {
         const data = await buscarDados(
             'table_iop',   // tabela
@@ -542,6 +526,68 @@ app.post('/getIOP', async (req, res) => {
     }
 });
 
+app.post('/atualizar_iop', autenticarToken, (req, res) => {
+    // Lógica para atualizar IOP
+
+    atualizarDados('table_iop', req.body, 'id', req.body.id)
+        .then(() => {
+            res.json({
+                success: true,
+                message: 'IOP atualizado com sucesso'
+            })
+        })
+        .catch((error) => {
+            res.json({
+                success: false,
+                message: 'Erro ao atualizar IOP'
+            })
+        });
+});
+
+app.post('/parcelaadd', autenticarToken, (req, res) => {
+    const dados = req.body;
+    
+    console.log('Dados recebidos:', dados);
+    
+    // Se vier com array de parcelas
+    if (dados.parcelas && Array.isArray(dados.parcelas)) {
+        // Salva como JSON string na coluna parcelas_adicionais
+        const updateData = {
+            parcelas_adicionais: JSON.stringify(dados.parcelas)
+        };
+        
+        atualizarDados('table_iop', updateData, 'id', dados.id)
+        .then(() => {
+            res.json({
+                success: true,
+                message: `${dados.parcelas.length} parcela(s) salva(s) com sucesso`
+            })
+        })
+        .catch((error) => {
+            console.error('Erro:', error);
+            res.json({
+                success: false,
+                message: 'Erro ao salvar parcelas'
+            })
+        });
+    } else {
+        // Mantém compatibilidade com o formato antigo
+        atualizarDados('table_iop', dados, 'id', dados.id)
+        .then(() => {
+            res.json({
+                success: true,
+                message: 'Dados atualizados com sucesso'
+            })
+        })
+        .catch((error) => {
+            console.error('Erro:', error);
+            res.json({
+                success: false,
+                message: 'Erro ao atualizar dados'
+            })
+        });
+    }
+});
 
 // ------------------------------- ping ----------------------------------------------
 app.get('/ping', (req, res) => {

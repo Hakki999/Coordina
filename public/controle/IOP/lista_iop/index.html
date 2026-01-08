@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="/controle/IOP/lista_iop/css/style.css">
+    <link rel="stylesheet" href="/controle/IOP/lista_iop/css/home.css">
+    <link rel="stylesheet" href="/controle/IOP/lista_iop/css/tableResults.css">
+    <link rel="stylesheet" href="/controle/IOP/lista_iop/css/optionsBar.css">
+    <link rel="stylesheet" href="/controle/IOP/lista_iop/css/details.css">
+    <link rel="stylesheet" href="/controle/IOP/lista_iop/css/filter.css">
+    <link rel="stylesheet" href="/controle/IOP/lista_iop/css/editor.css">
+    <link rel="stylesheet" href="/controle/IOP/lista_iop/css/padd.css">
+    <link rel="shortcut icon" href="/controle/IOP/lista_iop/icons/logoIcon.png" type="image/x-icon">
+
+    <title>Coordina</title>
+</head>
+
+<body>
+    <nav id="navBar">
+        <div id="thead">
+            <img src="/controle/IOP/lista_iop/icons/logoIcon.png" alt="Coordina">
+        </div>
+        <ul class="menu">
+            <ul>
+                <li class="optionNav closeOption">Home
+                    <ul>
+                        <li class="menuSelect ">Home</li>
+                    </ul>
+                </li>
+                <li class="optionNav closeOption">Almoxarifado
+                    <ul>
+                        <li class="menuSelect" onclick="window.location.href = '/controle_almoxarifado';">Solicitação
+                        </li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle_almoxarifado';">Recebidos</li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle_almoxarifado';">Config</li>
+                        <li class="menuSelect" onclick="window.location.href = '/lista_materiais';">Lista de Materiais
+                        </li>
+                    </ul>
+                </li>
+                <li class="optionNav openOption">Controle
+                    <ul>
+                        <li class="menuSelect" onclick="window.location.href = '/controle/iop/add';">Cadastrar IOP</li>
+                        <li class="menuSelect menuSelected" onclick="window.location.href = '/controle/iop/lista_iop';">
+                            IOP</li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle/obras/add';">Cadastrar Obra
+                        </li>
+                        <li class="menuSelect " onclick="window.location.href = '/controle/obras/obras';">Obras</li>
+                    </ul>
+                </li>
+                <li class="optionNav closeOption">Programação
+                    <ul>
+                        <li class="menuSelect" onclick="window.location.href = '/programacao';">Materiais x Programado
+                        </li>
+                    </ul>
+                </li>
+                <li class="optionNav closeOption">Dashboard
+                    <ul>
+                        <li class="menuSelect" onclick="window.location.href = '/dashboard/equipes';">Dashboard Equipes
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </ul>
+    </nav>
+
+    <main class="root">
+        <nav class="optionsBar">
+            <ul>
+                <li onclick="exportTableToCSV()">CSV</li>
+                <li></li>
+                <li></li>
+                <li></li>
+            </ul>
+        </nav>
+        <table class="tableResults">
+            <thead>
+                <tr class="headTable">
+                    <th>Edit</th>
+                    <th onclick="filtroOpen('nota')" style="cursor: pointer">Nota</th>
+                    <th onclick="filtroOpen('status')" style="cursor: pointer">Status</th>
+                    <th onclick="filtroOpen('cidade')" style="cursor: pointer">Cidade</th>
+                    <th onclick="filtroOpen('nomeObra')" style="cursor: pointer">Nome Obra</th>
+                    <th onclick="filtroOpen('dataExe')" style="cursor: pointer">Data Exe.</th>
+                    <th onclick="filtroOpen('resp')" style="cursor: pointer">Resp.</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+        </table>
+    </main>
+
+<!-- Substitua todo o conteúdo do modal atual por este: -->
+<div class="parcela-container" style="display: none;" data-iop-id="">
+    <div class="parcela-overlay" onclick="fecharModalParcelas()"></div>
+
+    <div class="parcela-wrapper">
+        <div class="parcela-header">
+            <h2><i class="fas fa-layer-group"></i> Parcelas Adicionais</h2>
+            <button class="btn-add-parcela" onclick="adicionarNovaParcela()">
+                <i class="fas fa-plus-circle"></i> Adicionar Parcela
+            </button>
+        </div>
+
+        <div class="parcelas-scroll-container" id="parcelasContainer">
+            <!-- As parcelas serão inseridas aqui -->
+        </div>
+
+        <div class="parcela-totais">
+            <div class="total-item">
+                <span><i class="fas fa-clock"></i> Total Horas:</span>
+                <strong id="totalHoras">0</strong>
+            </div>
+            <div class="total-item">
+                <span><i class="fas fa-money-bill-wave"></i> Total Valor:</span>
+                <strong id="totalValor">R$ 0,00</strong>
+            </div>
+            <div class="total-item">
+                <span><i class="fas fa-microphone"></i> Total Voz:</span>
+                <strong id="totalVoz">0</strong>
+            </div>
+        </div>
+
+        <div class="parcela-footer">
+            <button class="btn-secondary" onclick="fecharModalParcelas()">
+                <i class="fas fa-times"></i> Cancelar
+            </button>
+            <button class="btn-primary" onclick="salvarTodasParcelas()">
+                <i class="fas fa-save"></i> Salvar Todas as Parcelas
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Template para uma parcela -->
+<template id="parcelaTemplate">
+    <div class="parcela-item" data-index="">
+        <div class="parcela-item-header">
+            <h3><i class="fas fa-calculator"></i> Parcela <span class="parcela-numero">1</span></h3>
+            <button class="btn-remove-parcela" onclick="removerParcela(this)">
+                <i class="fas fa-trash"></i> Remover
+            </button>
+        </div>
+        
+        <div class="parcela-grid">
+            <!-- Datas -->
+            <div class="parcela-field">
+                <label>
+                    <i class="fas fa-play-circle"></i> Data de Acionamento
+                </label>
+                <input type="datetime-local" class="parcela-input acionamentoData" onchange="calcularEstaParcela(this)">
+            </div>
+
+            <div class="parcela-field">
+                <label>
+                    <i class="fas fa-map-marker-alt"></i> Data de Chegada
+                </label>
+                <input type="datetime-local" class="parcela-input chegadaData" onchange="calcularEstaParcela(this)">
+            </div>
+
+            <div class="parcela-field">
+                <label>
+                    <i class="fas fa-flag-checkered"></i> Data de Finalização
+                </label>
+                <input type="datetime-local" class="parcela-input finalizacaoData" onchange="calcularEstaParcela(this)">
+            </div>
+
+            <div class="parcela-field">
+                <label>
+                    <i class="fas fa-hourglass-half"></i> Horas Trabalhadas
+                </label>
+                <div class="parcela-result">
+                    <span class="quantidadeHoras">0</span> horas
+                </div>
+            </div>
+
+            <!-- Tipo de Parcela -->
+            <div class="parcela-field">
+                <label>
+                    <i class="fas fa-tags"></i> Tipo de Parcela
+                </label>
+                <select class="parcela-select tipoParcela" onchange="calcularEstaParcela(this)">
+                    <option value="1138.01">TURMA LINHA MORTA 5H CAM ATENDIMENTO EMERGENCIAL</option>
+                    <option value="1422.53">TURMA LINHA MORTA 5H CAM ATENDIMENTO EMERGENCIAL HORA EXTRA 25%</option>
+                    <option value="681.97">TURMA LV 3H CAM ATEND EMERGENCIAL</option>
+                    <option value="852.01">TURMA LV 4H CAM ATEND EMERGENCIAL</option>
+                    <option value="852.46">TURMA LV 3H CAM ATEND EMERGENCIAL HE25%</option>
+                    <option value="1065.01">TURMA LV 4H CAM ATEND EMERGENCIAL HE25%</option>
+                    <option value="266.85">TURMA LM 2H LEVE ATEND EMERGENCIAL HE25%</option>
+                    <option value="213.47">TURMA LM 2H LEVE ATEND EMERGENCIAL</option>
+                    <option value="339.56">TURMA LM 2H CEST ATEND EMERGENCIAL HE25%</option>
+                    <option value="271.65">TURMA LM 2H CESTO ATEND EMERGENCIAL</option>
+                </select>
+            </div>
+
+            <!-- Valor Orçado -->
+            <div class="parcela-field">
+                <label>
+                    <i class="fas fa-file-invoice-dollar"></i> Valor Orçado
+                </label>
+                <div class="input-with-symbol">
+                    <span class="currency-symbol">R$</span>
+                    <input type="number" step="0.01" min="0" placeholder="0,00" 
+                           class="parcela-input valorOrcado" onchange="calcularEstaParcela(this)">
+                </div>
+            </div>
+
+            <!-- Cálculo e Voz -->
+            <div class="parcela-field">
+                <label>
+                    <i class="fas fa-calculator"></i> Valor Calculado
+                </label>
+                <div class="parcela-result valor">
+                    <span class="valorCalculado">R$ 0,00</span>
+                </div>
+            </div>
+
+            <div class="parcela-field">
+                <label>
+                    <i class="fas fa-microphone-alt"></i> Quantidade Voz
+                </label>
+                <div class="parcela-result">
+                    <span class="quantidadeVoz">0</span>
+                </div>
+            </div>
+
+            <!-- Observações -->
+            <div class="parcela-field fullWidth">
+                <label>
+                    <i class="fas fa-comment-alt"></i> Observações
+                </label>
+                <textarea class="parcela-input observacoes" rows="2" placeholder="Observações desta parcela..."></textarea>
+            </div>
+        </div>
+    </div>
+</template> 
+
+    <script src="/controle/IOP/lista_iop/js/exportCSV.js"></script>
+    <script src="/controle/IOP/lista_iop/js/mensagem.js"></script>
+    <script src="/controle/IOP/lista_iop/js/filtro.js"></script>
+    <script src="/controle/IOP/lista_iop/js/main.js"></script>
+    <script src="/controle/IOP/lista_iop/js/editor.js"></script>
+    <script src="/controle/IOP/lista_iop/js/padd.js"></script>
+</body>
+
+</html>

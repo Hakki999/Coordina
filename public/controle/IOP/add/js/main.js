@@ -29,6 +29,7 @@ document.querySelector('#formAdd').addEventListener('submit', function (evt) {
 
     fetch('/createNewIOP', {
         method: 'POST',
+        credentials: 'include',
         headers: {
             'Content-Type': 'application/json'
         },

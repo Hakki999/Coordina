@@ -31,7 +31,8 @@
 .tableResults thead th {
     position: relative;
     overflow: hidden;
-    padding: 8px; /* Mude para 8px para combinar com o td */
+    padding: 8px;
+    /* Mude para 8px para combinar com o td */
     font-weight: 600;
     font-size: 14px;
     border-bottom: 2px solid color-mix(in srgb, var(--fontColor) 40%, transparent);
@@ -45,7 +46,7 @@
     overflow-y: auto;
     /* Scroll vertical se necessário */
 
-    
+
 }
 
 .tableResults thead,
@@ -58,8 +59,10 @@
 
 .tableResults th,
 .tableResults td {
-    box-sizing: border-box; /* Inclui padding na largura total */
+    box-sizing: border-box;
+    /* Inclui padding na largura total */
 }
+
 .tableResults tbody td {
     height: 30px;
     text-align: center;
@@ -82,7 +85,8 @@
 .tableResults tbody tr:nth-child(odd) {
     background-color: color-mix(in srgb, var(--thirdColor) 100%, transparent);
 }
-.tableRow{
+
+.tableRow {
     transition: 0.1s ease-in-out;
 }
 
@@ -94,7 +98,7 @@
     border-left: 1px solid var(--emphasisColor);
 }
 
-.tableRow:hover td{
+.tableRow:hover td {
     transform: scale(1.05);
 }
 
@@ -135,11 +139,11 @@
 }
 
 
-#tableBody{
+#tableBody {
     overflow-x: hidden;
 }
 
-#tableBody::-webkit-scrollbar{
+#tableBody::-webkit-scrollbar {
     display: none;
 }
 
@@ -243,14 +247,28 @@
     transform: scale(1.05);
 }
 
-.editButton{
-    width: 15px;
-    height: 15px;
-    color: transparent;
-    background-image: url('/controle/obras/obras/icons/editar.png');
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
+.editButton {
+        width: 15px;
+        height: 15px;
+        color: transparent;
+        background-image: url('/controle/IOP/lista_iop/icons/editar.png');
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        filter: invert(1);
+}
+
+.padd{
+        width: 15px;
+        height: 15px;
+        color: transparent;
+        background-image: url('/controle/IOP/lista_iop/icons/padd.png');
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        filter: invert(1);
 }
