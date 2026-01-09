@@ -248,27 +248,41 @@
 }
 
 .editButton {
-        width: 15px;
-        height: 15px;
-        color: transparent;
-        background-image: url('/controle/IOP/lista_iop/icons/editar.png');
-        background-repeat: no-repeat;
-        background-size: cover;
-        background-color: transparent;
-        border: none;
-        cursor: pointer;
-        filter: invert(1);
+    width: 15px;
+    height: 15px;
+    color: transparent;
+    background-image: url('/controle/IOP/lista_iop/icons/editar.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    filter: invert(1);
 }
 
-.padd{
-        width: 15px;
-        height: 15px;
-        color: transparent;
-        background-image: url('/controle/IOP/lista_iop/icons/padd.png');
-        background-repeat: no-repeat;
-        background-size: cover;
-        background-color: transparent;
-        border: none;
-        cursor: pointer;
-        filter: invert(1);
+.padd {
+    width: 15px;
+    height: 15px;
+    color: transparent;
+    background-image: url('/controle/IOP/lista_iop/icons/padd.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    filter: invert(1);
+}
+
+.copyinfo {
+    width: 15px;
+    height: 15px;
+    color: transparent;
+    background-image: url('/controle/IOP/lista_iop/icons/padd.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    filter: invert(1);
+    background-color: red;
 }

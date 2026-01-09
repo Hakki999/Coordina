@@ -1,0 +1,641 @@
+/* ===============================
+   CONTAINER
+================================ */
+.parcela-container {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: color-mix(in srgb, var(--thirdColor) 80%, transparent);
+    backdrop-filter: blur(12px);
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        backdrop-filter: blur(0);
+    }
+    to {
+        opacity: 1;
+        backdrop-filter: blur(12px);
+    }
+}
+
+/* ===============================
+   WRAPPER
+================================ */
+.parcela-wrapper {
+    width: 100%;
+    max-width: 950px;
+
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(
+        145deg,
+        var(--thirdColor),
+        color-mix(in srgb, var(--primaryColor) 70%, transparent)
+    );
+    border-radius: 20px;
+    border: 1px solid color-mix(in srgb, var(--emphasisColor) 20%, transparent);
+    box-shadow:
+        0 10px 40px rgba(0, 0, 0, 0.4),
+        0 0 25px color-mix(in srgb, var(--emphasisColor) 25%, transparent),
+        inset 0 1px 0 color-mix(in srgb, white 5%, transparent);
+    overflow: hidden;
+    animation: modalSlide 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+@keyframes modalSlide {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-15px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Glow sutil */
+.parcela-wrapper::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 22px;
+    background: linear-gradient(
+        45deg,
+        var(--emphasisColor),
+        transparent 30%,
+        transparent 70%,
+        var(--emphasisColor)
+    );
+    opacity: 0.35;
+    z-index: -1;
+}
+
+/* ===============================
+   HEADER
+================================ */
+.parcela-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    background: linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--primaryColor) 40%, transparent),
+        color-mix(in srgb, var(--primaryColor) 30%, transparent)
+    );
+    border-bottom: 1px solid color-mix(in srgb, var(--emphasisColor) 15%, transparent);
+}
+
+.parcela-header h2 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--fontColor);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-shadow: 0 1px 2px rgba(0,0,0,.3);
+}
+
+.parcela-header h2 i {
+    color: var(--emphasisColor);
+    filter: drop-shadow(0 0 8px color-mix(in srgb, var(--emphasisColor) 40%, transparent));
+}
+
+.close-parcela {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid color-mix(in srgb, var(--emphasisColor) 25%, transparent);
+    background: color-mix(in srgb, var(--thirdColor) 80%, transparent);
+    color: var(--fontColor);
+    cursor: pointer;
+    transition: all .3s ease;
+}
+
+.close-parcela:hover {
+    background: color-mix(in srgb, var(--emphasisColor) 25%, transparent);
+    border-color: var(--emphasisColor);
+    transform: rotate(90deg) scale(1.05);
+}
+
+/* ===============================
+   GRID
+================================ */
+.parcela-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 30px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* ===============================
+   FIELDS
+================================ */
+.parcela-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.parcela-field.fullWidth {
+    grid-column: 1 / -1;
+}
+
+.parcela-field label {
+    font-size: .85rem;
+    margin-bottom: 10px;
+    display: flex;
+    gap: 8px;
+    color: var(--fontColor);
+}
+
+.parcela-field label i {
+    color: var(--emphasisColor);
+    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--emphasisColor) 30%, transparent));
+}
+
+/* ===============================
+   INPUTS
+================================ */
+.parcela-input,
+.parcela-select {
+    padding: 13px 16px;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--secundaryColor) 95%, transparent);
+    border: 2px solid color-mix(in srgb, var(--emphasisColor) 25%, transparent);
+    color: var(--fontColor);
+    font-size: 14px;
+    transition: all .25s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: inset 0 1px 3px rgba(0,0,0,.2);
+}
+
+.parcela-input:focus,
+.parcela-select:focus {
+    outline: none;
+    border-color: var(--emphasisColor);
+    box-shadow:
+        0 0 0 3px color-mix(in srgb, var(--emphasisColor) 20%, transparent),
+        0 6px 20px color-mix(in srgb, var(--emphasisColor) 25%, transparent);
+    transform: translateY(-1px);
+}
+
+/* Select */
+.parcela-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%230888ff' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 12px;
+    padding-right: 40px;
+}
+
+/* ===============================
+   FOOTER
+================================ */
+.parcela-footer {
+    padding: 25px 30px;
+    display: flex;
+    justify-content: flex-end;
+    background: linear-gradient(
+        0deg,
+        color-mix(in srgb, var(--primaryColor) 40%, transparent),
+        color-mix(in srgb, var(--primaryColor) 30%, transparent)
+    );
+    border-top: 1px solid color-mix(in srgb, var(--emphasisColor) 15%, transparent);
+}
+
+.btn-calc {
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-weight: 600;
+    background: linear-gradient(
+        135deg,
+        var(--emphasisColor),
+        color-mix(in srgb, var(--emphasisColor) 80%, #1b263b)
+    );
+    color: var(--fontColor);
+    cursor: pointer;
+    transition: all .3s ease;
+    border: none;
+    box-shadow: 0 6px 20px color-mix(in srgb, var(--emphasisColor) 35%, transparent);
+}
+
+.btn-calc:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px color-mix(in srgb, var(--emphasisColor) 45%, transparent);
+}
+
+.parcela-overlay{
+    width: 100%;
+    height: 100%;
+
+
+    position: absolute;
+}
+
+/* ===============================
+   LISTA DE PARCELAS
+================================ */
+.parcelas-list-container {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: color-mix(in srgb, var(--thirdColor) 90%, transparent);
+    backdrop-filter: blur(12px);
+    z-index: 2000;
+    animation: fadeIn 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.parcelas-list-wrapper {
+    width: 100%;
+    max-width: 1200px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(
+        145deg,
+        var(--thirdColor),
+        color-mix(in srgb, var(--primaryColor) 70%, transparent)
+    );
+    border-radius: 20px;
+    border: 1px solid color-mix(in srgb, var(--emphasisColor) 20%, transparent);
+    box-shadow:
+        0 10px 40px rgba(0, 0, 0, 0.4),
+        0 0 25px color-mix(in srgb, var(--emphasisColor) 25%, transparent),
+        inset 0 1px 0 color-mix(in srgb, white 5%, transparent);
+    overflow: hidden;
+}
+
+.parcelas-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    background: linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--primaryColor) 40%, transparent),
+        color-mix(in srgb, var(--primaryColor) 30%, transparent)
+    );
+    border-bottom: 1px solid color-mix(in srgb, var(--emphasisColor) 15%, transparent);
+}
+
+.parcelas-list-header h2 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--fontColor);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn-add-parcela {
+    padding: 10px 20px;
+    border-radius: 10px;
+    background: linear-gradient(
+        135deg,
+        var(--emphasisColor),
+        color-mix(in srgb, var(--emphasisColor) 80%, #1b263b)
+    );
+    color: var(--fontColor);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all .3s ease;
+}
+
+.btn-add-parcela:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px color-mix(in srgb, var(--emphasisColor) 35%, transparent);
+}
+
+.parcelas-list-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.parcelas-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: color-mix(in srgb, var(--thirdColor) 95%, transparent);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.parcelas-table th {
+    padding: 15px;
+    text-align: left;
+    background: color-mix(in srgb, var(--primaryColor) 30%, transparent);
+    color: var(--fontColor);
+    font-weight: 600;
+    border-bottom: 2px solid color-mix(in srgb, var(--emphasisColor) 20%, transparent);
+}
+
+.parcelas-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid color-mix(in srgb, var(--emphasisColor) 10%, transparent);
+    color: var(--fontColor);
+}
+
+.parcelas-table tr:hover {
+    background: color-mix(in srgb, var(--emphasisColor) 5%, transparent);
+}
+
+.parcelas-list-footer {
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(
+        0deg,
+        color-mix(in srgb, var(--primaryColor) 40%, transparent),
+        color-mix(in srgb, var(--primaryColor) 30%, transparent)
+    );
+    border-top: 1px solid color-mix(in srgb, var(--emphasisColor) 15%, transparent);
+}
+
+.parcelas-summary {
+    display: flex;
+    gap: 30px;
+}
+
+.summary-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.summary-item span {
+    font-size: 0.85rem;
+    color: color-mix(in srgb, var(--fontColor) 70%, transparent);
+}
+
+.summary-item strong {
+    font-size: 1.1rem;
+    color: var(--emphasisColor);
+}
+
+.btn-close {
+    padding: 10px 25px;
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--thirdColor) 80%, transparent);
+    color: var(--fontColor);
+    border: 1px solid color-mix(in srgb, var(--emphasisColor) 25%, transparent);
+    cursor: pointer;
+    transition: all .3s ease;
+}
+
+.btn-close:hover {
+    background: color-mix(in srgb, var(--emphasisColor) 25%, transparent);
+    border-color: var(--emphasisColor);
+}
+
+.btn-action {
+    padding: 5px 10px;
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--thirdColor) 80%, transparent);
+    color: var(--fontColor);
+    border: 1px solid color-mix(in srgb, var(--emphasisColor) 25%, transparent);
+    cursor: pointer;
+    margin: 0 2px;
+    transition: all .2s ease;
+}
+
+.btn-action:hover {
+    background: color-mix(in srgb, var(--emphasisColor) 25%, transparent);
+    border-color: var(--emphasisColor);
+}
+
+/* ===============================
+   CONTAINER DE MÚLTIPLAS PARCELAS
+================================ */
+.parcelas-scroll-container {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Item de Parcela Individual */
+.parcela-item {
+    background: color-mix(in srgb, var(--secundaryColor) 95%, transparent);
+    border-radius: 15px;
+    padding: 20px;
+    border: 2px solid color-mix(in srgb, var(--emphasisColor) 15%, transparent);
+    position: relative;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.parcela-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid color-mix(in srgb, var(--emphasisColor) 10%, transparent);
+}
+
+.parcela-item-header h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--fontColor);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.parcela-item-header h3 i {
+    color: var(--emphasisColor);
+}
+
+.btn-remove-parcela {
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: color-mix(in srgb, #dc3545 20%, transparent);
+    color: #dc3545;
+    border: 1px solid color-mix(in srgb, #dc3545 30%, transparent);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.btn-remove-parcela:hover {
+    background: color-mix(in srgb, #dc3545 30%, transparent);
+    transform: scale(1.05);
+}
+
+/* Botões do Header */
+.btn-add-parcela {
+    padding: 10px 20px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--emphasisColor), color-mix(in srgb, var(--emphasisColor) 80%, #1b263b));
+    color: var(--fontColor);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px color-mix(in srgb, var(--emphasisColor) 25%, transparent);
+}
+
+.btn-add-parcela:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px color-mix(in srgb, var(--emphasisColor) 35%, transparent);
+}
+
+/* Totais */
+.parcela-totais {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px 30px;
+    background: color-mix(in srgb, var(--primaryColor) 20%, transparent);
+    border-top: 1px solid color-mix(in srgb, var(--emphasisColor) 15%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--emphasisColor) 15%, transparent);
+}
+
+.total-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.total-item span {
+    font-size: 0.9rem;
+    color: color-mix(in srgb, var(--fontColor) 70%, transparent);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.total-item strong {
+    font-size: 1.2rem;
+    color: var(--emphasisColor);
+    font-weight: 600;
+}
+
+/* Botões do Footer */
+.parcela-footer {
+    padding: 20px 30px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    background: linear-gradient(0deg, color-mix(in srgb, var(--primaryColor) 40%, transparent), color-mix(in srgb, var(--primaryColor) 30%, transparent));
+}
+
+.btn-primary {
+    padding: 12px 30px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--emphasisColor), color-mix(in srgb, var(--emphasisColor) 80%, #1b263b));
+    color: var(--fontColor);
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px color-mix(in srgb, var(--emphasisColor) 25%, transparent);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px color-mix(in srgb, var(--emphasisColor) 45%, transparent);
+}
+
+.btn-secondary {
+    padding: 12px 30px;
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--thirdColor) 80%, transparent);
+    color: var(--fontColor);
+    border: 1px solid color-mix(in srgb, var(--emphasisColor) 25%, transparent);
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background: color-mix(in srgb, var(--emphasisColor) 15%, transparent);
+    border-color: var(--emphasisColor);
+}
+
+/* Ajustes no Grid das Parcelas */
+.parcela-item .parcela-grid {
+    padding: 0;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.parcela-item .fullWidth {
+    grid-column: 1 / -1;
+}
+
+/* Estilos para resultados */
+.parcela-item .parcela-result {
+    padding: 12px;
+    background: color-mix(in srgb, var(--thirdColor) 90%, transparent);
+    border-radius: 8px;
+    border: 1px solid color-mix(in srgb, var(--emphasisColor) 10%, transparent);
+    font-weight: 500;
+}
+
+.parcela-item .parcela-result.valor {
+    color: var(--emphasisColor);
+    font-weight: 600;
+}
+
+/* Scrollbar personalizada */
+.parcelas-scroll-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.parcelas-scroll-container::-webkit-scrollbar-track {
+    background: color-mix(in srgb, var(--thirdColor) 80%, transparent);
+    border-radius: 4px;
+}
+
+.parcelas-scroll-container::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--emphasisColor) 40%, transparent);
+    border-radius: 4px;
+}
+
+.parcelas-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--emphasisColor) 60%, transparent);
+}

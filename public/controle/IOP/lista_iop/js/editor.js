@@ -25,6 +25,16 @@ const campoConfig = {
         ],
         required: true
     },
+    "res_opex": {
+        label: "Opex",
+        type: "select",
+        icon: "fas fa-tasks",
+        options: [
+            { value: "Não", label: "Não" },
+            { value: "Sim", label: "Sim" },
+        ],
+        required: true
+    },
     "res_nome_obra": {
         label: "Nome da Obra",
         type: "text",
@@ -185,7 +195,7 @@ function abrirEdicao(dados) {
         
         // Ordena os campos para melhor layout
         const camposOrdenados = [
-            'id', 'res_nota', 'res_status',
+            'id', 'res_nota', 'res_status', 'res_opex',
             'res_nome_obra', 'res_pep',
             'res_cidade', 'res_pg',
             'res_tipo', 'res_oc',

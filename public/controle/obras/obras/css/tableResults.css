@@ -1,0 +1,736 @@
+.tableResults {
+    width: 90%;
+    height: 90vh;
+    /* Usando viewport height para altura fixa */
+    background-color: var(--primaryColor);
+    box-shadow: 0px 0px 5px var(--primaryColor);
+    border-radius: 15px;
+    overflow: hidden;
+    border-collapse: collapse;
+    font-family: 'Segoe UI', sans-serif;
+    table-layout: fixed;
+    margin-top: 60px;
+    /* Garante layout consistente */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
+
+.tableResults thead tr {
+    height: 60px;
+    background-color: color-mix(in srgb, var(--primaryColor) 70%, var(--thirdColor)) !important;
+    text-align: center;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tableResults thead th {
+    position: relative;
+    overflow: hidden;
+    padding: 8px;
+    /* Mude para 8px para combinar com o td */
+    font-weight: 600;
+    font-size: 14px;
+    border-bottom: 2px solid color-mix(in srgb, var(--fontColor) 40%, transparent);
+}
+
+.tableResults tbody {
+    display: block;
+    width: 100%;
+    height: calc(90vh - 60px);
+    padding: 0px !important;
+    overflow-y: auto;
+    /* Scroll vertical se necessário */
+
+
+}
+
+.tableResults thead,
+.tableResults tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    /* Garante que as células tenham exatamente a mesma largura */
+}
+
+.tableResults th,
+.tableResults td {
+    box-sizing: border-box;
+    /* Inclui padding na largura total */
+}
+
+.tableResults tbody td {
+    height: 30px;
+    text-align: center;
+    font-size: 13px;
+    padding: 8px;
+    border-bottom: 1px solid color-mix(in srgb, var(--secundaryColor) 30%, transparent);
+    transition: background-color 0.2s ease;
+    word-wrap: break-word;
+    /* Quebra palavras longas */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.tableResults tbody tr:nth-child(even) {
+    background-color: color-mix(in srgb, var(--thirdColor) 80%, transparent);
+}
+
+.tableResults tbody tr:nth-child(odd) {
+    background-color: color-mix(in srgb, var(--thirdColor) 100%, transparent);
+}
+
+.tableRow {
+    transition: 0.1s ease-in-out;
+}
+
+/* Efeito hover para melhor interação */
+.tableRow:hover {
+    background-color: color-mix(in srgb, var(--thirdColor) 50%, transparent) !important;
+    color: var(--fontColor);
+    font-weight: 600;
+    border-left: 1px solid var(--emphasisColor);
+}
+
+.tableRow:hover td {
+    transform: scale(1.05);
+}
+
+/* Scrollbar personalizada */
+.tableResults tbody::-webkit-scrollbar {
+    width: 8px;
+}
+
+.tableResults tbody::-webkit-scrollbar-track {
+    background: color-mix(in srgb, var(--secundaryColor) 10%, transparent);
+}
+
+.tableResults tbody::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--primaryColor) 60%, transparent);
+    border-radius: 4px;
+}
+
+.filtroPesquisa {
+    cursor: pointer;
+}
+
+.filtroPesquisa::before {
+    content: "🔍";
+
+    position: absolute;
+    transform: translate3d(-20px, 20px, 0) scale(0);
+    transition: 0.2s ease-in-out;
+
+    background: var(--fontColor);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+}
+
+.filtroPesquisa:hover:before {
+    transform: translate3d(-20px, 0px, 0) scale(1);
+}
+
+
+#tableBody {
+    overflow-x: hidden;
+}
+
+#tableBody::-webkit-scrollbar {
+    display: none;
+}
+
+/* ------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------ */
+
+.filtroCont {
+    width: 100%;
+    height: 100%;
+
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background-color: color-mix(in srgb, var(--secundaryColor) 50%, transparent);
+    backdrop-filter: blur(5px);
+}
+
+.filtro {
+    width: 400px;
+    height: 300px;
+
+    background-color: var(--thirdColor);
+    box-shadow: 0px 0px 10px var(--primaryColor);
+    border-radius: 15px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.titleFiltro {
+    width: 100%;
+    padding: 10px 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-bottom: 1px solid color-mix(in srgb, var(--fontColor) 50%, transparent);
+}
+
+.filtroBody {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.orders {
+    width: 40%;
+    height: 80%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.inputFiltro {
+    width: 40%;
+    height: 80%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+
+    background-color: var(--primaryColor);
+    border-radius: 10px;
+}
+
+.inputFiltro input {
+    width: 90%;
+    height: 50%;
+
+    border-radius: 15px;
+
+    background-color: var(--fontColor);
+    text-align: center;
+}
+
+
+
+.filtroStyleButton {
+    width: 90%;
+    background-color: var(--fontColor);
+    text-align: center;
+    padding: 5px 15px;
+    border-radius: 15px;
+    transition: 0.2s ease-in-out;
+}
+
+.filtroStyleButton:hover {
+    transform: scale(1.05);
+}
+
+/* ============================================
+   ESTILIZAÇÃO DE SELECTS DENTRO DO #tableBody
+   ============================================ */
+
+/* Container do select */
+#tableBody select {
+    width: 100%;
+    min-width: 120px;
+    max-width: 200px;
+    padding: 7px 12px;
+    border-radius: 10px;
+    background: linear-gradient(145deg, 
+        color-mix(in srgb, var(--secundaryColor) 95%, transparent),
+        color-mix(in srgb, var(--secundaryColor) 85%, transparent));
+    border: 1.5px solid color-mix(in srgb, var(--emphasisColor) 20%, transparent);
+    color: var(--fontColor);
+    font-family: "Open Sans", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    box-sizing: border-box;
+    appearance: none;
+    position: relative;
+    z-index: 5;
+    box-shadow: 
+        inset 0 1px 3px rgba(0, 0, 0, 0.1),
+        0 1px 2px rgba(255, 255, 255, 0.05);
+    text-align: center;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+/* Seta customizada para todos os selects */
+#tableBody select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%230888ff' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 10px;
+    padding-right: 28px;
+}
+
+/* Estados de hover - mais sutil na tabela */
+#tableBody select:hover {
+    border-color: color-mix(in srgb, var(--emphasisColor) 40%, transparent);
+    background: linear-gradient(145deg, 
+        color-mix(in srgb, var(--secundaryColor) 100%, transparent),
+        color-mix(in srgb, var(--secundaryColor) 90%, transparent));
+    box-shadow: 
+        inset 0 1px 3px rgba(0, 0, 0, 0.1),
+        0 2px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+    z-index: 10; /* Eleva o select em hover */
+}
+
+/* Estado de foco - destaque visível */
+#tableBody select:focus {
+    outline: none;
+    border-color: var(--emphasisColor);
+    box-shadow: 
+        0px 0px 0px 2px color-mix(in srgb, var(--emphasisColor) 25%, transparent),
+        0px 4px 12px color-mix(in srgb, var(--emphasisColor) 20%, transparent),
+        inset 0 1px 3px rgba(255, 255, 255, 0.1);
+    background: var(--secundaryColor);
+    transform: translateY(-1px);
+    z-index: 20; /* Eleva ainda mais em foco */
+}
+
+/* Estado ativo (clicado) */
+#tableBody select:active {
+    transform: translateY(0);
+    transition: transform 0.1s;
+}
+
+/* Estado desabilitado */
+#tableBody select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: color-mix(in srgb, var(--secundaryColor) 60%, transparent);
+    border-color: color-mix(in srgb, var(--emphasisColor) 10%, transparent);
+    transform: none !important;
+    box-shadow: none;
+}
+
+/* ============================================
+   ESTILIZAÇÃO DAS OPTIONS
+   ============================================ */
+
+/* Container das options (dropdown) */
+#tableBody select option {
+    background-color: var(--primaryColor);
+    color: var(--fontColor);
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 400;
+    border-bottom: 1px solid color-mix(in srgb, var(--thirdColor) 30%, transparent);
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+/* Option quando selecionada */
+#tableBody select option:checked {
+    background: linear-gradient(135deg, 
+        color-mix(in srgb, var(--emphasisColor) 30%, transparent),
+        color-mix(in srgb, var(--emphasisColor) 20%, transparent));
+    color: white;
+    font-weight: 500;
+    position: relative;
+}
+
+/* Efeito hover nas options */
+#tableBody select option:hover {
+    background-color: color-mix(in srgb, var(--emphasisColor) 40%, transparent);
+    color: white;
+    transform: translateX(5px);
+    box-shadow: -2px 0 0 var(--emphasisColor);
+}
+
+/* Option selecionada por padrão (placeholder) */
+#tableBody select option[value=""][disabled] {
+    color: color-mix(in srgb, var(--fontColor) 50%, transparent);
+    font-style: italic;
+    background-color: var(--primaryColor);
+}
+
+/* Option com valor padrão */
+#tableBody select option.default-option {
+    font-weight: 600;
+    border-left: 3px solid var(--emphasisColor);
+}
+
+/* ============================================
+   ESTADOS ESPECIAIS POR TIPO DE SELECT
+   ============================================ */
+
+/* Select de OPEX */
+#tableBody select.opex-select {
+    min-width: 100px;
+    font-weight: 500;
+}
+
+/* Estados de valor para OPEX */
+#tableBody select.opex-select[value="Sim"],
+#tableBody select.opex-select option[value="Sim"] {
+    color: #4CAF50;
+    background-color: color-mix(in srgb, #4CAF50 10%, transparent);
+}
+
+#tableBody select.opex-select[value="Não"],
+#tableBody select.opex-select option[value="Não"] {
+    color: #F44336;
+    background-color: color-mix(in srgb, #F44336 10%, transparent);
+}
+
+#tableBody select.opex-select[value="Pendente"],
+#tableBody select.opex-select option[value="Pendente"] {
+    color: #FF9800;
+    background-color: color-mix(in srgb, #FF9800 10%, transparent);
+}
+
+/* Classes dinâmicas para OPEX */
+#tableBody select.opex-select.sim-selected {
+    background: linear-gradient(145deg, 
+        color-mix(in srgb, #4CAF50 15%, transparent),
+        color-mix(in srgb, #4CAF50 10%, transparent));
+    border-color: color-mix(in srgb, #4CAF50 40%, transparent);
+}
+
+#tableBody select.opex-select.nao-selected {
+    background: linear-gradient(145deg, 
+        color-mix(in srgb, #F44336 15%, transparent),
+        color-mix(in srgb, #F44336 10%, transparent));
+    border-color: color-mix(in srgb, #F44336 40%, transparent);
+}
+
+#tableBody select.opex-select.pendente-selected {
+    background: linear-gradient(145deg, 
+        color-mix(in srgb, #FF9800 15%, transparent),
+        color-mix(in srgb, #FF9800 10%, transparent));
+    border-color: color-mix(in srgb, #FF9800 40%, transparent);
+}
+
+/* Select de responsável */
+#tableBody select.resp-select {
+    min-width: 140px;
+}
+
+/* Select de status */
+#tableBody select.status-select {
+    min-width: 110px;
+    font-weight: 500;
+}
+
+/* Estados para status */
+#tableBody select.status-select[value="pendente"],
+#tableBody select.status-select option[value="pendente"] {
+    color: #FF9800;
+}
+
+#tableBody select.status-select[value="em_andamento"],
+#tableBody select.status-select option[value="em_andamento"] {
+    color: #2196F3;
+}
+
+#tableBody select.status-select[value="finalizado"],
+#tableBody select.status-select option[value="finalizado"] {
+    color: #4CAF50;
+}
+
+#tableBody select.status-select[value="cancelado"],
+#tableBody select.status-select option[value="cancelado"] {
+    color: #F44336;
+}
+
+/* Select de prioridade */
+#tableBody select.prioridade-select {
+    min-width: 100px;
+    font-weight: 500;
+}
+
+/* Estados para prioridade */
+#tableBody select.prioridade-select[value="baixa"],
+#tableBody select.prioridade-select option[value="baixa"] {
+    color: #4CAF50;
+}
+
+#tableBody select.prioridade-select[value="media"],
+#tableBody select.prioridade-select option[value="media"] {
+    color: #FF9800;
+}
+
+#tableBody select.prioridade-select[value="alta"],
+#tableBody select.prioridade-select option[value="alta"] {
+    color: #F44336;
+}
+
+#tableBody select.prioridade-select[value="urgente"],
+#tableBody select.prioridade-select option[value="urgente"] {
+    color: #9C27B0;
+    font-weight: 600;
+}
+
+/* ============================================
+   ANIMAÇÕES E EFEITOS VISUAIS
+   ============================================ */
+
+/* Animação ao alterar valor */
+#tableBody select.updated {
+    animation: selectUpdate 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes selectUpdate {
+    0% { 
+        transform: scale(1);
+        background-color: inherit;
+    }
+    50% { 
+        transform: scale(1.03);
+        background-color: color-mix(in srgb, var(--emphasisColor) 20%, transparent);
+    }
+    100% { 
+        transform: scale(1);
+        background-color: inherit;
+    }
+}
+
+/* Efeito de validação (erro) */
+#tableBody select:invalid:not(:focus):not(:placeholder-shown) {
+    border-color: #F44336;
+    animation: selectShake 0.5s ease;
+    box-shadow: 0 0 0 1px color-mix(in srgb, #F44336 20%, transparent);
+}
+
+@keyframes selectShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-3px); }
+    75% { transform: translateX(3px); }
+}
+
+/* Efeito de loading */
+#tableBody select.loading {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%230888ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 12a9 9 0 1 1-6.219-8.56'/%3E%3C/svg%3E");
+    background-position: right 10px center;
+    background-size: 12px;
+    animation: spin 1s linear infinite;
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   INTERAÇÃO COM A LINHA DA TABELA
+   ============================================ */
+
+/* Quando a linha está com hover */
+.tableRow:hover select {
+    border-color: color-mix(in srgb, var(--emphasisColor) 50%, transparent);
+    background: linear-gradient(145deg, 
+        color-mix(in srgb, var(--secundaryColor) 100%, transparent),
+        color-mix(in srgb, var(--secundaryColor) 95%, transparent));
+    z-index: 15;
+}
+
+/* Quando a linha está selecionada */
+.tableRow.selected select {
+    background: linear-gradient(145deg, 
+        color-mix(in srgb, var(--emphasisColor) 20%, transparent),
+        color-mix(in srgb, var(--emphasisColor) 15%, transparent));
+    border-color: var(--emphasisColor);
+    color: white;
+    font-weight: 500;
+}
+
+/* Eleva o select quando a linha está selecionada */
+.tableRow.selected select:focus {
+    z-index: 25;
+}
+
+/* ============================================
+   TOOLTIP PARA VALORES LONGO
+   ============================================ */
+
+#tableBody select[title] {
+    position: relative;
+}
+
+#tableBody select[title]:hover::before {
+    content: attr(title);
+    position: absolute;
+    bottom: calc(100% + 5px);
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--primaryColor);
+    color: var(--fontColor);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    white-space: nowrap;
+    z-index: 1000;
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.3),
+        0 0 0 1px color-mix(in srgb, var(--emphasisColor) 30%, transparent);
+    pointer-events: none;
+    opacity: 0;
+    animation: tooltipFadeIn 0.2s forwards;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@keyframes tooltipFadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateX(-50%) translateY(10px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateX(-50%) translateY(0); 
+    }
+}
+
+/* ============================================
+   RESPONSIVIDADE
+   ============================================ */
+
+@media (max-width: 1024px) {
+    #tableBody select {
+        min-width: 100px;
+        padding: 6px 10px;
+        font-size: 11px;
+        padding-right: 26px;
+        background-position: right 8px center;
+        background-size: 9px;
+    }
+}
+
+@media (max-width: 768px) {
+    #tableBody select {
+        min-width: 90px;
+        max-width: 150px;
+        padding: 5px 8px;
+        font-size: 10px;
+        padding-right: 24px;
+        background-position: right 6px center;
+        background-size: 8px;
+    }
+    
+    #tableBody select option {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+}
+
+/* Para telas muito pequenas */
+@media (max-width: 480px) {
+    #tableBody select {
+        min-width: 80px;
+        max-width: 120px;
+        font-size: 9px;
+        padding-right: 22px;
+    }
+}
+
+/* ============================================
+   ESTILOS PARA DARK/LIGHT MODE
+   ============================================ */
+
+/* Dark mode nativo */
+@media (prefers-color-scheme: dark) {
+    #tableBody select {
+        background: linear-gradient(145deg, 
+            color-mix(in srgb, var(--secundaryColor) 90%, transparent),
+            color-mix(in srgb, var(--secundaryColor) 80%, transparent));
+    }
+    
+    #tableBody select option {
+        background-color: color-mix(in srgb, var(--primaryColor) 95%, transparent);
+    }
+}
+
+/* Light mode nativo */
+@media (prefers-color-scheme: light) {
+    #tableBody select {
+        background: linear-gradient(145deg, 
+            color-mix(in srgb, white 95%, transparent),
+            color-mix(in srgb, #f5f5f5 95%, transparent));
+        border-color: color-mix(in srgb, var(--emphasisColor) 30%, transparent);
+    }
+    
+    #tableBody select option {
+        background-color: white;
+        color: #333;
+    }
+}
+
+/* ============================================
+   ESTILOS PARA SCROLLBAR DO DROPDOWN
+   ============================================ */
+
+/* Webkit (Chrome, Safari, Edge) */
+#tableBody select::-webkit-scrollbar {
+    width: 8px;
+}
+
+#tableBody select::-webkit-scrollbar-track {
+    background: color-mix(in srgb, var(--primaryColor) 90%, transparent);
+    border-radius: 4px;
+}
+
+#tableBody select::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--emphasisColor) 40%, transparent);
+    border-radius: 4px;
+}
+
+#tableBody select::-webkit-scrollbar-thumb:hover {
+    background: var(--emphasisColor);
+}
+
+/* Firefox */
+#tableBody select {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--emphasisColor) 40%, transparent) 
+                     color-mix(in srgb, var(--primaryColor) 90%, transparent);
+}
+
+/* ============================================
+   ESTILOS PARA GRUPOS DE OPTIONS
+   ============================================ */
+
+#tableBody select optgroup {
+    background-color: color-mix(in srgb, var(--primaryColor) 80%, transparent);
+    color: var(--fontColor);
+    font-weight: 600;
+    font-size: 11px;
+    padding: 5px;
+    border-bottom: 1px solid color-mix(in srgb, var(--emphasisColor) 30%, transparent);
+}
+
+#tableBody select optgroup option {
+    padding-left: 20px;
+    font-weight: normal;
+}

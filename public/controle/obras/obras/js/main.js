@@ -264,8 +264,28 @@ optionNav.forEach(option => {
 
 const tableBody = document.querySelector("#tableBody");
 
+function ordenarDados(dados) {
+    const prioridades = new Map([
+        ['Pendente', 0],
+        ['Concluido V1', 1],
+        ['Concluido V2', 2],
+        ['Problema Sistemico', 3],
+        ['Aguardando Evidências', 4],
+        ['Ir em campo', 5]
+    ]);
+
+    // Filtrar e ordenar em uma única operação
+    return dados
+        .filter(item => {
+            const status = item.res_status_asbuilt;
+            return status && prioridades.has(status);
+        })
+        .sort((a, b) => {
+            return prioridades.get(a.res_status_asbuilt) - prioridades.get(b.res_status_asbuilt);
+        });
+}
 function buscar_dados() {
-    fetch('/getIOP', {
+    fetch('/getObras', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -275,8 +295,9 @@ function buscar_dados() {
         .then(data => {
             // Process the response data
             console.log(data);
-
-            dadosTable = data;
+            console.warn();
+            
+            dadosTable = ordenarDados(data);
             render_dados();
         })
         .catch(error => {
@@ -285,20 +306,20 @@ function buscar_dados() {
 }
 buscar_dados()
 
-// MODIFIQUE a função render_dados para atualizar os botões com informações das parcelas
 function render_dados() {
+
     data = dadosTable;
     // Update the table with the fetched data
     tableBody.innerHTML = ""; // Clear existing rows
     data.forEach(item => {
         const row = document.createElement("tr");
         row.setAttribute('data-id', item.id);
-        
+
         // Processar parcelas_adicionais para mostrar no botão
         let totalParcelas = 0;
         let totalValor = 0;
         let tooltipText = 'Adicionar parcelas';
-        
+
         if (item.parcelas_adicionais) {
             try {
                 // Processar a string JSON
@@ -307,7 +328,7 @@ function render_dados() {
                     parcelasStr = parcelasStr.slice(1, -1);
                 }
                 parcelasStr = parcelasStr.replace(/'/g, '"');
-                
+
                 const parcelas = JSON.parse(parcelasStr);
                 if (Array.isArray(parcelas)) {
                     totalParcelas = parcelas.length;
@@ -322,22 +343,39 @@ function render_dados() {
                 console.error('Erro ao processar parcelas para display:', error);
             }
         }
-        
+
         row.innerHTML = `
-          <th style="display: flex; gap: 15px; align-items: center; justify-content: center; padding: 8px;">
-            <button class="editButton" data-id="${item.id}">Edit</button>
-            <button class="padd" data-id="${item.id}" onclick="openParcelaModal(${item.id})" 
-                    title="${tooltipText}">
-              ${totalParcelas > 0 ? `Parcelas (${totalParcelas})` : 'Parcela adicional'}
-            </button>
-            <button class="copyinfo" data-id="${item.id}">Copy Info</button>
-          </th>
           <td>${item.res_nota || ''}</td>
-          <td>${item.res_status || ''}</td>
+                    <td>
+    <select class="status-select" data-id="${item.id || ''}" ${item.readonly ? 'disabled' : ''}>
+        <option value="" ${!item.res_status_asbuilt ? 'selected' : ''} disabled>Selecione</option>
+        <option value="Pendente" ${item.res_status_asbuilt === 'Pendente' ? 'selected' : ''}>Pendente</option>
+        <option value="Concluido V1" ${item.res_status_asbuilt === 'Concluido V1' ? 'selected' : ''}>Concluido V1</option>
+        <option value="Concluido V2" ${item.res_status_asbuilt === 'Concluido V2' ? 'selected' : ''}>Concluido V2</option>
+        <option value="Problema Sistemico" ${item.res_status_asbuilt === 'Problema Sistemico' ? 'selected' : ''}>Problema Sistemico</option>
+        <option value="Aguardando Evidências" ${item.res_status_asbuilt === 'Aguardando Evidências' ? 'selected' : ''}>Aguardando Evidências</option>
+        <option value="Ir em campo" ${item.res_status_asbuilt === 'Ir em campo' ? 'selected' : ''}>Ir em campo</option>
+    </select>
           <td>${cidades.find(cidade => cidade.value === item.res_cidade)?.label || item.res_cidade || ''}</td>
-          <td>${item.res_nome_obra || ''}</td>
           <td>${item.res_data_exe || ''}</td>
-          <td>${item.res_resp || ''}</td>
+          <td>
+    <select class="opex-select" data-id="${item.id || ''}" ${item.readonly ? 'disabled' : ''}>
+        <option value="" ${!item.res_opex ? 'selected' : ''} disabled>Selecione</option>
+        <option value="Sim" ${item.res_opex === 'Sim' ? 'selected' : ''}>Sim</option>
+        <option value="Não" ${item.res_opex === 'Não' ? 'selected' : ''}>Não</option>
+    </select>
+</td>
+          <td>
+    <select class="resp-select" data-id="${item.id || ''}" ${item.readonly ? 'disabled' : ''}>
+        <option value="" ${!item.res_resp_asbuilt ? 'selected' : ''} disabled>Selecione</option>
+        <option value="Lucas Ramos" ${item.res_resp_asbuilt === 'Lucas Ramos' ? 'selected' : ''}>Lucas Ramos</option>
+        <option value="Lucas Botelho" ${item.res_resp_asbuilt === 'Lucas Botelho' ? 'selected' : ''}>Lucas Botelho</option>
+        <option value="José Miguel" ${item.res_resp_asbuilt === 'José Miguel' ? 'selected' : ''}>José Miguel</option>
+        <option value="Luiz" ${item.res_resp_asbuilt === 'Luiz' ? 'selected' : ''}>Luiz</option>
+        <option value="Rafael" ${item.res_resp_asbuilt === 'Rafael' ? 'selected' : ''}>Rafael</option>
+        <option value="Leonardo" ${item.res_resp_asbuilt === 'Leonardo' ? 'selected' : ''}>Leonardo</option>
+    </select>
+</td>
         `;
         tableBody.appendChild(row);
     });
@@ -351,8 +389,34 @@ function render_dados() {
             abrirEdicao(item);
         });
     });
-}
 
+    
+    const selects = document.querySelectorAll('#tableBody select');
+    
+    selects.forEach(select => {
+        // Adiciona classe baseada no valor atual
+        updateSelectClass(select);
+        
+        // Adiciona evento de change
+        select.addEventListener('change', function() {
+            updateSelectClass(this);
+            
+            // Animação de atualização
+            this.classList.add('updated');
+            setTimeout(() => {
+                this.classList.remove('updated');
+            }, 500);
+        });
+        
+        // Adiciona tooltip se o texto for muito longo
+        if (select.options[select.selectedIndex]) {
+            const selectedText = select.options[select.selectedIndex].text;
+            if (selectedText.length > 15) {
+                select.setAttribute('title', selectedText);
+            }
+        }
+    });
+}
 
 function exportTableToCSV() {
     console.log(dadosTable);
@@ -408,4 +472,86 @@ function openParcelaModal(parcelaId) {
     parcelaContainer.setAttribute('data-parcela-id', parcelaId);
 
     console.warn(dadosTable.find(item => item.id == parcelaId));
+}
+
+function atualizarDadosTabela(dados) {
+    fetch('/atualizar_obras', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dados),
+        credentials: 'include'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            criarMensagem(true, data.message || 'Atualizado com sucesso');
+            
+        } else {
+            criarMensagem(false, data.message || 'Erro ao atualizar');
+        }
+    })
+    .catch(error => {
+        console.error('Erro na requisição:', error);
+    });
+}
+
+tableBody.addEventListener("change", evt => {
+    // Obtém o elemento que foi alterado
+    const changedElement = evt.target;
+    
+    // Verifica se é um dos selects que queremos monitorar
+    if (!changedElement.classList.contains('opex-select') && 
+        !changedElement.classList.contains('resp-select') &&
+        !changedElement.classList.contains('status-select')
+    ) {
+        return; // Sai se não for um dos nossos selects
+    }
+    
+    // Obtém o ID da linha/registro
+    const id = changedElement.getAttribute("data-id");
+    
+    if (!id) {
+        console.warn('Elemento sem data-id:', changedElement);
+        return;
+    }
+    
+    // Encontra o item correspondente
+    let item = dadosTable.find(item => item.id == id);
+    
+    if (item) {
+        console.log('Item encontrado:', item);
+
+        const linha = changedElement.closest('tr');
+        if (linha) {
+            const opexSelect = linha.querySelector('.opex-select');
+            const respSelect = linha.querySelector('.resp-select');
+            const statusSelect = linha.querySelector('.status-select');
+            
+            if (opexSelect) item.res_opex = opexSelect.value;
+            if (respSelect) item.res_resp_asbuilt = respSelect.value;
+            if (statusSelect) item.res_status_asbuilt = statusSelect.value;
+        }
+        
+        // Atualiza a tabela
+        atualizarDadosTabela(item);
+    } else {
+        console.warn('Item não encontrado para ID:', id);
+    }
+});
+
+function updateSelectClass(select) {
+    // Remove todas as classes de estado
+    select.classList.remove('sim-selected', 'nao-selected', 'pendente-selected');
+    
+    const value = select.value.toLowerCase();
+    const classes = select.className;
+    
+    // Adiciona classe baseada no tipo e valor
+    if (select.classList.contains('opex-select')) {
+        if (value.includes('sim')) select.classList.add('sim-selected');
+        else if (value.includes('não') || value.includes('nao')) select.classList.add('nao-selected');
+        else if (value.includes('pendente')) select.classList.add('pendente-selected');
+    }
 }

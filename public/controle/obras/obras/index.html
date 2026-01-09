@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="/controle/obras/obras/css/style.css">
+    <link rel="stylesheet" href="/controle/obras/obras/css/home.css">
+    <link rel="stylesheet" href="/controle/obras/obras/css/tableResults.css">
+    <link rel="stylesheet" href="/controle/obras/obras/css/optionsBar.css">
+    <link rel="stylesheet" href="/controle/obras/obras/css/details.css">
+    <link rel="stylesheet" href="/controle/obras/obras/css/filter.css">
+    <link rel="stylesheet" href="/controle/obras/obras/css/editor.css">
+    <link rel="stylesheet" href="/controle/obras/obras/css/padd.css">
+    <link rel="shortcut icon" href="/controle/obras/obras/icons/logoIcon.png" type="image/x-icon">
+
+    <title>Coordina</title>
+</head>
+
+<body>
+    <nav id="navBar">
+        <div id="thead">
+            <img src="/controle/obras/obras/icons/logoIcon.png" alt="Coordina">
+        </div>
+        <ul class="menu">
+            <ul>
+                <li class="optionNav closeOption">Home
+                    <ul>
+                        <li class="menuSelect " onclick="window.location.href = '/home';">Home</li>
+                    </ul>
+                </li>
+                <li class="optionNav closeOption">Almoxarifado
+                    <ul>
+                        <li class="menuSelect" onclick="window.location.href = '/controle_almoxarifado';">Solicitação
+                        </li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle_almoxarifado';">Recebidos</li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle_almoxarifado';">Config</li>
+                        <li class="menuSelect " onclick="window.location.href = '/lista_materiais';">Lista de Materiais
+                        </li>
+                    </ul>
+                </li>
+                <li class="optionNav openOption">Controle
+                    <ul>
+                        <li class="menuSelect" onclick="window.location.href = '/controle/iop/add';">Cadastrar IOP</li>
+                        <li class="menuSelect " onclick="window.location.href = '/controle/iop/lista_iop';">
+                            IOP</li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle/obras/add';">Cadastrar Obra
+                        </li>
+                        <li class="menuSelect menuSelected" onclick="window.location.href = '/controle/obras/obras';">Obras</li>
+                    </ul>
+                </li>
+                <li class="optionNav closeOption">Programação
+                    <ul>
+                        <li class="menuSelect" onclick="window.location.href = '/programacao';">Materiais x Programado
+                        </li>
+                    </ul>
+                </li>
+                <li class="optionNav closeOption">Dashboard
+                    <ul>
+                        <li class="menuSelect" onclick="window.location.href = '/dashboard/equipes';">Dashboard Equipes
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </ul>
+    </nav>
+
+    <main class="root">
+        <nav class="optionsBar">
+            <ul>
+                <li onclick="exportTableToCSV()">CSV</li>
+                <li></li>
+                <li></li>
+                <li></li>
+            </ul>
+        </nav>
+        <table class="tableResults">
+            <thead>
+                <tr class="headTable">
+                    <th onclick="filtroOpen('nota')" style="cursor: pointer">Nota</th>
+                    <th onclick="filtroOpen('cidade')" style="cursor: pointer">Status Asbuilt</th>
+                    <th onclick="filtroOpen('status')" style="cursor: pointer">Cidade</th>
+                    <th onclick="filtroOpen('nomeObra')" style="cursor: pointer">Data Exe.</th>
+                    <th onclick="filtroOpen('dataExe')" style="cursor: pointer">Opex</th>
+                    <th onclick="filtroOpen('resp')" style="cursor: pointer">Resp.</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+        </table>
+    </main>
+
+    <script src="/controle/obras/obras/js/exportCSV.js"></script>
+    <script src="/controle/obras/obras/js/mensagem.js"></script>
+    <script src="/controle/obras/obras/js/filtro.js"></script>
+    <script src="/controle/obras/obras/js/main.js"></script>
+</body>
+
+</html>

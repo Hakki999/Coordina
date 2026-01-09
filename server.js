@@ -63,6 +63,10 @@ app.get('/controle/iop/lista_iop', autenticarToken, (req, res) => {
 });
 
 
+app.get('/controle/obras/add', autenticarToken, (req, res) => {
+    res.sendFile(__dirname + "/public/controle/obras/add/index.html");
+});
+
 // ------------------------------- Solicitações ---------------------------------------
 
 app.post('/login', async (req, res) => {
@@ -587,6 +591,202 @@ app.post('/parcelaadd', autenticarToken, (req, res) => {
             })
         });
     }
+});
+
+app.post('/createNewObras', autenticarToken, async (req, res) => {
+    try {
+        console.log('📝 Tentativa de criação de nova obra:', req.body);
+        
+        // Log do usuário que está fazendo a requisição (se disponível)
+        if (req.user) {
+            console.log('👤 Usuário solicitante:', req.user.id || req.user.email);
+        }
+
+        /* =========================
+           Validação de campos
+        ========================== */
+        const camposObrigatorios = [
+            'nota',
+            'cidade',
+            'data_exe',
+            'resp'
+        ];
+
+        const camposFaltantes = camposObrigatorios.filter(
+            campo => !req.body[campo] || req.body[campo].toString().trim() === ''
+        );
+
+        if (camposFaltantes.length > 0) {
+            console.log('❌ Campos obrigatórios faltando:', camposFaltantes);
+            return res.status(400).json({
+                status: 'error',
+                message: 'Campos obrigatórios não preenchidos',
+                camposFaltantes,
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        /* =========================
+           Validação da data
+        ========================== */
+        // Verifica se a data_exe está no formato correto
+        const dataExe = req.body.data_exe.trim();
+        const dataExecucao = new Date(dataExe);
+        
+        if (isNaN(dataExecucao.getTime())) {
+            console.log('❌ Data de execução inválida:', dataExe);
+            return res.status(400).json({
+                status: 'error',
+                message: 'Data de execução inválida. Use o formato YYYY-MM-DD ou YYYY-MM-DD HH:MM:SS',
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        // Valida se a data não é futura (se necessário)
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+        dataExecucao.setHours(0, 0, 0, 0);
+        
+        if (dataExecucao > hoje) {
+            console.log('⚠️ Data de execução é futura:', dataExe);
+            // Retorne um erro se não permitir datas futuras
+            // return res.status(400).json({
+            //     status: 'error',
+            //     message: 'Data de execução não pode ser futura'
+            // });
+        }
+
+        /* =========================
+           Preparação dos dados
+        ========================== */
+        const now = new Date();
+        const dataAtualISO = now.toISOString();
+        const dataAtualBR = now.toLocaleString('pt-BR', {
+            timeZone: 'America/Sao_Paulo',
+            dateStyle: 'short',
+            timeStyle: 'medium'
+        });
+
+        // Sanitização e preparação dos dados
+        const dadosObra = {
+            res_nota: req.body.nota.trim(),
+            res_data_exe: req.body.data_exe.trim(),
+            res_cidade: req.body.cidade.trim(),
+            res_data_cri: dataAtualISO,
+            res_status_asbuilt: 'Pendente', // Status inicial padrão
+            res_resp_add: req.body.resp ? req.body.resp.trim() : 'Não especificado'
+        };
+
+        console.log('📋 Dados da obra preparados:', dadosObra);
+        /* =========================
+           Inserção no banco de dados
+        ========================== */
+        console.log('💾 Inserindo no banco de dados...');
+        const result = await inserirNovo('table_obras', dadosObra);
+
+        console.log('✅ Nova obra criada com sucesso! ID:', result.id);
+
+        /* =========================
+           Resposta de sucesso
+        ========================== */
+        return res.status(201).json({
+            status: 'success',
+            message: 'Obra criada com sucesso',
+            data: {
+                id: result.id
+            },
+            timestamp: dataAtualISO,
+            metadata: {
+                versao: '1.0',
+                ambiente: process.env.NODE_ENV || 'development'
+            }
+        });
+
+    } catch (error) {
+        console.error('🔥 Erro crítico ao criar obra:', error);
+        
+        // Determinar código de status baseado no erro
+        let statusCode = 500;
+        let errorMessage = 'Erro interno do servidor ao criar obra';
+        
+        if (error.code === 'ER_DUP_ENTRY') {
+            statusCode = 409;
+            errorMessage = 'Já existe um registro com esta nota';
+        } else if (error.code === 'ER_NO_REFERENCED_ROW') {
+            statusCode = 400;
+            errorMessage = 'Referência inválida (chave estrangeira)';
+        } else if (error.code === 'ER_DATA_TOO_LONG') {
+            statusCode = 400;
+            errorMessage = 'Dados muito longos para o campo';
+        } else if (error.message.includes('resultado inválido')) {
+            statusCode = 500;
+            errorMessage = error.message;
+        }
+
+        // Log detalhado para desenvolvimento
+        if (process.env.NODE_ENV === 'development') {
+            console.error('🔍 Detalhes do erro:', {
+                message: error.message,
+                code: error.code,
+                stack: error.stack
+            });
+        }
+
+        return res.status(statusCode).json({
+            status: 'error',
+            message: errorMessage,
+            error: process.env.NODE_ENV === 'development' ? {
+                message: error.message,
+                code: error.code,
+                // Não incluir stack em produção
+            } : undefined,
+            timestamp: new Date().toISOString(),
+            sugestao: statusCode === 500 
+                ? 'Tente novamente mais tarde ou contate o suporte'
+                : 'Verifique os dados enviados e tente novamente'
+        });
+    }
+});
+
+app.post('/getObras', autenticarToken, async (req, res) => {
+    try {
+        const data = await buscarDados(
+            'table_obras',   // tabela
+            'id',          // campo chave
+            'all',         // filtro
+            999,           // limite
+            false,         // paginação
+            'res_data_cri' // ordenação
+        );
+
+        console.log('Dados Obras:', data);
+        res.json(data);
+
+    } catch (error) {
+        console.error('Erro ao buscar dados IOP:', error);
+        res.status(500).json({
+            error: 'Erro ao buscar dados IOP'
+        });
+    }
+});
+
+
+app.post('/atualizar_obras', autenticarToken, (req, res) => {
+    // Lógica para atualizar IOP
+
+    atualizarDados('table_obras', req.body, 'id', req.body.id)
+        .then(() => {
+            res.json({
+                success: true,
+                message: 'Dados atualizados com sucesso'
+            })
+        })
+        .catch((error) => {
+            res.json({
+                success: false,
+                message: 'Erro ao atualizar dados'
+            })
+        });
 });
 
 // ------------------------------- ping ----------------------------------------------
