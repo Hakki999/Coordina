@@ -62,9 +62,12 @@ app.get('/controle/iop/lista_iop', autenticarToken, (req, res) => {
     res.sendFile(__dirname + "/public/controle/IOP/lista_iop/index.html");
 });
 
-
 app.get('/controle/obras/add', autenticarToken, (req, res) => {
     res.sendFile(__dirname + "/public/controle/obras/add/index.html");
+});
+
+app.get('/controle/obras/obras', autenticarToken, (req, res) => {
+    res.sendFile(__dirname + "/public/controle/obras/obras/index.html");
 });
 
 // ------------------------------- Solicitações ---------------------------------------
@@ -429,17 +432,13 @@ app.post('/createNewIOP', autenticarToken, async (req, res) => {
 
         console.log('📋 Dados do IOP preparados:', dadosIOP);
 
-        /* =========================
-           Verificação de duplicidade
-        ========================== */
-        // const iopExistente = await verificarExistente('table_iop', {
-        //   res_nota: dadosIOP.res_nota
-        // });
+        let iopExistente = await buscarDados('table_iop', 'res_nota',  dadosIOP.res_nota, 1, true);
 
-        const iopExistente = false;
+        const iopPorOC = await buscarDados('table_iop', 'res_oc',  dadosIOP.res_oc, 1, true);
 
-        if (iopExistente) {
-            console.log('⚠️ IOP já existe com nota:', dadosIOP.res_nota);
+        console.log("----------------------");
+        if (iopExistente.length > 0 && iopPorOC.length > 0) {
+            console.log('⚠️ IOP já existe com nota:', req.body.nota.trim());
             return res.status(409).json({
                 status: 'error',
                 message: 'Já existe um IOP com esta nota',
@@ -650,11 +649,25 @@ app.post('/createNewObras', autenticarToken, async (req, res) => {
         if (dataExecucao > hoje) {
             console.log('⚠️ Data de execução é futura:', dataExe);
             // Retorne um erro se não permitir datas futuras
-            // return res.status(400).json({
-            //     status: 'error',
-            //     message: 'Data de execução não pode ser futura'
-            // });
+            return res.status(400).json({
+                status: 'error',
+                message: 'Data de execução não pode ser futura'
+            });
         }
+
+        const iopExistente = await buscarDados('table_obras', 'res_nota',  req.body.nota.trim(), 1, true);
+        console.log("----------------------");
+        console.log(iopExistente);
+        console.log("----------------------");
+        if (iopExistente.length > 0) {
+            console.log('⚠️ IOP já existe com nota:', req.body.nota.trim());
+            return res.status(409).json({
+                status: 'error',
+                message: 'Já existe um IOP com esta nota',
+                iopExistente: iopExistente.id
+            });
+        }
+
 
         /* =========================
            Preparação dos dados

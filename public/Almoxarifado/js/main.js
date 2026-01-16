@@ -1163,6 +1163,7 @@ function exportTab() {
         tempExport.push([
             item.id ||  "",
             item.Projeto || "",
+            item.Cidade || "",
             formatarData(item.DataExe) || "",
             formatarData(item.DataSol) || "",
             item.Solicitante || "",
@@ -1185,6 +1186,7 @@ function exportTab() {
         head: [
             'id',
             'projeto',
+            'Cidade',
             'dataExe',
             'dataSol',
             'solicitante',
