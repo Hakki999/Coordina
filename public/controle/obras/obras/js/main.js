@@ -262,6 +262,56 @@ optionNav.forEach(option => {
     })
 })
 
+function formatarDataBR(dataISO) {
+    const [ano, mes, dia] = dataISO.split("-");
+    return `${dia}/${mes}/${ano}`;
+}
+
+function calcularDiferencaDatas(dataInicio, dataFim) {
+    const inicio = new Date(dataInicio + "T12:40:58.883Z");
+    const fim = new Date(dataFim);
+
+    const diff = fim - inicio;
+
+    const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const horas = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutos = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+    return { dias, horas, minutos };
+}
+
+
+
+//input 2025-10-07
+function calculateTempoResposta(dataISO, lastUpdatedISO, attUpdatedStatus) {
+    const now = new Date();
+    const dataInicial = new Date(dataISO + "T00:00:00"); // garante horário 00:00
+    const diff = now - dataInicial;
+
+    let dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+    let horas = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    let minutos = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+
+
+    if ((attUpdatedStatus == "Concluido V2" || attUpdatedStatus == "Concluido V1") && !lastUpdatedISO) {
+        dias = 0;
+        horas = 0;
+        minutos = 0;
+        return { dias, horas, minutos };
+    }
+    
+    if ((attUpdatedStatus == "Concluido V2" || attUpdatedStatus == "Concluido V1") && lastUpdatedISO) {
+        console.warn("-----");
+        console.log(calcularDiferencaDatas(dataISO, lastUpdatedISO.time));
+        
+        return calcularDiferencaDatas(dataISO, lastUpdatedISO.time);
+    }
+
+    return { dias, horas, minutos };
+}
+
+
 const tableBody = document.querySelector("#tableBody");
 
 function ordenarDados(dados) {
@@ -356,8 +406,12 @@ function render_dados() {
         <option value="Aguardando Evidências" ${item.res_status_asbuilt === 'Aguardando Evidências' ? 'selected' : ''}>Aguardando Evidências</option>
         <option value="Ir em campo" ${item.res_status_asbuilt === 'Ir em campo' ? 'selected' : ''}>Ir em campo</option>
     </select>
+
           <td>${cidades.find(cidade => cidade.value === item.res_cidade)?.label || item.res_cidade || ''}</td>
-          <td>${item.res_data_exe || ''}</td>
+
+          <td>${formatarDataBR(item.res_data_exe) || ''}</td>
+
+          <td>${calculateTempoResposta(item.res_data_exe, item.res_last_updated, item.res_status_asbuilt).dias || ''}<span style="opacity: 0.5; font-size: 0.8em"> dias</span></td>
           <td>
     <select class="opex-select" data-id="${item.id || ''}" ${item.readonly ? 'disabled' : ''}>
         <option value="" ${!item.res_opex ? 'selected' : ''} disabled>Selecione</option>
@@ -533,7 +587,14 @@ tableBody.addEventListener("change", evt => {
             if (respSelect) item.res_resp_asbuilt = respSelect.value;
             if (statusSelect) item.res_status_asbuilt = statusSelect.value;
         }
-        
+        console.warn('Item atualizado:', item);
+
+        item.res_last_updated = {
+            time: new Date().toISOString(),
+            user: localStorage.getItem('nome'),
+            status: item.res_status_asbuilt
+        }
+
         // Atualiza a tabela
         atualizarDadosTabela(item);
     } else {
