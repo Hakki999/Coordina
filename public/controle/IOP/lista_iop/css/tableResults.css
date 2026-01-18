@@ -257,7 +257,8 @@
     background-color: transparent;
     border: none;
     cursor: pointer;
-    filter: invert(1);
+    /* Azul ciano */
+    filter: invert(38%) sepia(90%) saturate(600%) hue-rotate(165deg) brightness(100%) contrast(95%);
 }
 
 .padd {
@@ -270,19 +271,20 @@
     background-color: transparent;
     border: none;
     cursor: pointer;
-    filter: invert(1);
+    /* Azul ciano */
+    filter: invert(38%) sepia(90%) saturate(600%) hue-rotate(165deg) brightness(100%) contrast(95%);
 }
 
 .copyinfo {
     width: 15px;
     height: 15px;
     color: transparent;
-    background-image: url('/controle/IOP/lista_iop/icons/padd.png');
+    background-image: url('/controle/IOP/lista_iop/icons/copy.png');
     background-repeat: no-repeat;
     background-size: cover;
     background-color: transparent;
     border: none;
     cursor: pointer;
-    filter: invert(1);
-    background-color: red;
+    /* Azul ciano */
+    filter: invert(38%) sepia(90%) saturate(600%) hue-rotate(165deg) brightness(100%) contrast(95%);
 }

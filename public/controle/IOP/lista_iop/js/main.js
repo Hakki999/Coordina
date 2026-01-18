@@ -251,6 +251,29 @@ const cidades = [
     { label: "Vila Propício", value: "VIP" }
 ]
 
+function formatarDataBR(dataISO) {
+  const data = new Date(dataISO);
+
+  if (isNaN(data)) return "Data inválida";
+
+  const dia = String(data.getDate()).padStart(2, '0');
+  const mes = String(data.getMonth() + 1).padStart(2, '0');
+  const ano = data.getFullYear();
+
+  // Verifica se tem hora na string original
+  const temHora = dataISO.includes('T');
+
+  if (temHora) {
+    const hora = String(data.getHours()).padStart(2, '0');
+    const minuto = String(data.getMinutes()).padStart(2, '0');
+    return `${dia}/${mes}/${ano} ${hora}:${minuto}`;
+  }
+
+  return `${dia}/${mes}/${ano}`;
+}
+
+
+
 optionNav.forEach(option => {
     option.addEventListener("click", evt => {
 
@@ -263,6 +286,59 @@ optionNav.forEach(option => {
 })
 
 const tableBody = document.querySelector("#tableBody");
+
+function copyInfos(id){
+    const item = dadosTable.find(item => item.id == id);
+   if (item) {
+       let info = `
+<====> PROJETO IOP <====>
+Cidade: ${item.res_cidade}
+Data de Criação: ${item.res_data_cri}
+Data de Execução: ${formatarDataBR(item.res_data_exe)}
+Nome da Obra: ${item.res_nome_obra}
+Nota: ${item.res_nota}
+OC: ${item.res_oc}
+Opex: ${item.res_opex}
+Responsável: ${item.res_resp}
+       `;
+
+       if (item.parcelas_adicionais) {
+           pa = JSON.parse(item.parcelas_adicionais.replace(/'/g, '"'))[0];
+           console.warn(pa);
+           
+           info += `
+<====> PARCELA ADD <====>
+Acionamento: ${formatarDataBR(pa.res_acionamento)}
+Finalização: ${formatarDataBR(pa.res_finalizacao)}
+Qtd. Hora: ${pa.res_qtd_horas}hrs
+Qtd. voz: ${pa.res_qtd_voz}hrs
+Tipo: ${pa.res_tipo_parcela}
+`
+
+
+       }
+       navigator.clipboard.writeText(info).then(() => {
+           console.log('Informações copiadas para a área de transferência:');
+           console.log(info);
+           criarMensagem(true, 'Informações copiadas para a área de transferência');
+       }).catch(err => {
+           console.error('Erro ao copiar informações:', err);
+           criarMensagem(false, 'Erro ao copiar informações');
+       });
+   } else {
+       console.warn('Item não encontrado:', id);
+       criarMensagem(false, 'Item não encontrado');
+   }
+}
+
+function initializeCopyButtons() {
+    document.querySelectorAll(".copyinfo").forEach(button => {
+        button.addEventListener("click", () => {
+            const id = button.getAttribute("data-id");
+            copyInfos(id);
+        });
+    });
+}
 
 function buscar_dados() {
     fetch('/getIOP', {
@@ -325,12 +401,12 @@ function render_dados() {
         
         row.innerHTML = `
           <th style="display: flex; gap: 15px; align-items: center; justify-content: center; padding: 8px;">
-            <button class="editButton" data-id="${item.id}">Edit</button>
+            <button class="editButton" data-id="${item.id}" title="Editar">Edit</button>
             <button class="padd" data-id="${item.id}" onclick="openParcelaModal(${item.id})" 
                     title="${tooltipText}">
               ${totalParcelas > 0 ? `Parcelas (${totalParcelas})` : 'Parcela adicional'}
             </button>
-            <button class="copyinfo" data-id="${item.id}">Copy Info</button>
+            <button class="copyinfo" data-id="${item.id}" title="Copiar informações">Copy Info</button>
           </th>
           <td>${item.res_nota || ''}</td>
           <td>${item.res_status || ''}</td>
@@ -351,8 +427,9 @@ function render_dados() {
             abrirEdicao(item);
         });
     });
-}
 
+    initializeCopyButtons();
+}
 
 function exportTableToCSV() {
     console.log(dadosTable);
@@ -409,3 +486,4 @@ function openParcelaModal(parcelaId) {
 
     console.warn(dadosTable.find(item => item.id == parcelaId));
 }
+
