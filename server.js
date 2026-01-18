@@ -608,8 +608,7 @@ app.post('/createNewObras', autenticarToken, async (req, res) => {
             'nota',
             'cidade',
             'data_exe',
-            'resp',
-            'last_updated'
+            'resp'
         ];
 
         const camposFaltantes = camposObrigatorios.filter(
