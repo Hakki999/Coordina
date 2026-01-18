@@ -1,0 +1,99 @@
+/* Responsividade */
+@media (max-width: 800px) {
+
+    body{
+        display: flex;
+        flex-direction: column;
+    }
+    #navBar {
+        width: 100%;
+        max-height: 80px;
+        min-width: auto;
+        height: auto;
+        position: fixed;
+        animation: slideInUp 0.4s ease-out;
+    }
+    
+    @keyframes slideInUp {
+        from {
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+    
+    .menu {
+        margin: 10px;
+    }
+
+    .mobile-open{
+        background-color: var(--primaryColor) !important;
+        margin: 0px !important;
+    }
+    
+    .optionNav {
+        padding: 12px 0;
+    }
+
+    .listMaterials{
+        display: none;
+        max-width: calc(100vw - 40px);
+        left: 20px;
+        border-radius: 20px;
+    }
+
+    .listMaterials tbody{
+        min-height: 100% !important;
+        min-width: 100% !important;
+    }
+
+    #displayMain{
+        margin-top: 90px;
+        height: calc(100vh - 300px);
+    }
+
+    .nextMobile{
+        width: calc(100vw - 40px);
+        display: block !important;
+        position: fixed;
+        bottom: 0;
+        left: 20px;
+        height: 60px;
+        font-size: 1rem;
+        border-radius: 15px 15px 0px 0px;
+        background-color: var(--emphasisColor);
+        color: var(--fontColor);
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    .nextMobile:hover{
+        background-color: var(--emphasisColor) !important;
+    }
+
+    .listMaterials{
+        top: 90px;
+        
+    }
+
+    #formMaterials{
+        position: absolute;
+        width: 100%;
+        height: calc(100vh - 90px);
+        top: 70px;
+        left: 9%;
+
+        animation: none;
+    }
+    #tabelaResposta{
+        position: absolute;
+        width: 100vw;
+        height: auto !important;
+        left: 0px;
+        top: 80%;
+    }
+
+
+}

@@ -165,7 +165,7 @@ function buildMaterialsInterface(opcs) {
  */
 function buildMaterialsHeader() {
     return `
-        <div style="width: 40%; display: flex; align-items: center; justify-content: space-around; padding: 10px 0px;">
+        <div class="materials-header" style="width: 40%; display: flex; align-items: center; justify-content: space-around; padding: 10px 0px;">
             <h2>Material</h2>
             <h2>Qtd.</h2>
         </div>
@@ -519,6 +519,7 @@ function renderRecebidos(filtro = "/solicitacoesRecentes", valor = 9999) {
             dadosTable = data.data;
             console.log('📦 Dados recebidos:', data);
             renderizarTabelaComFiltros(data.data || data);
+            document.getElementsByClassName('nextMobile')[0].remove()
         })
         .catch(error => {
             console.error('❌ Erro ao buscar solicitações:', error);
@@ -619,7 +620,7 @@ function generateSolicitacoesTableBody(dados) {
         }
 
         return `
-            <tr class="tableRowRecebidos" ondblclick="dbclickRow(${item.id || index})" id="row-${item.id || index}">
+            <tr class="tableRowRecebidos" onclick="dbclickRow(${item.id || index})" id="row-${item.id || index}">
                 <td>${item.Solicitante || 'N/A'}</td>
                 <td>${item.equipe || 'N/A'}</td>
                 <td>${item.Projeto || 'N/A'}</td>
