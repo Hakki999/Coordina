@@ -262,6 +262,7 @@
         color-mix(in srgb, var(--secundaryColor) 95%, transparent),
         color-mix(in srgb, var(--secundaryColor) 85%, transparent));
     border: 1.5px solid color-mix(in srgb, var(--emphasisColor) 20%, transparent);
+
     color: var(--fontColor);
     font-family: "Open Sans", sans-serif;
     font-size: 12px;
@@ -269,7 +270,6 @@
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
     box-sizing: border-box;
-    appearance: none;
     position: relative;
     z-index: 5;
     box-shadow: 
@@ -279,13 +279,6 @@
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
-}
-
-/* Seta customizada para todos os selects */
-#tableBody select {
-    border-color: color-mix(in srgb, var(--emphasisColor) 50%, transparent);
-    background-size: 10px;
-    padding-right: 28px;
 }
 
 /* Estados de hover - mais sutil na tabela */
@@ -329,6 +322,19 @@
     transform: none !important;
     box-shadow: none;
 }
+
+#tableBody tr {
+    transition: background-color 0.3s ease, padding-left 0.3s ease;
+    transition: 0.3s ease-in-out;
+}
+
+#tableBody tr:hover {
+    background-color: color-mix(in srgb, var(--emphasisColor) 10%, transparent);
+    padding-left: 10px;
+    border-left: 5px solid var(--emphasisColor);
+    
+}
+
 
 /* ============================================
    ESTILIZAÇÃO DAS OPTIONS
@@ -653,41 +659,7 @@
     }
 }
 
-/* ============================================
-   ESTILOS PARA DARK/LIGHT MODE
-   ============================================ */
 
-/* Dark mode nativo */
-@media (prefers-color-scheme: dark) {
-    #tableBody select {
-        background: linear-gradient(145deg, 
-            color-mix(in srgb, var(--secundaryColor) 90%, transparent),
-            color-mix(in srgb, var(--secundaryColor) 80%, transparent));
-    }
-    
-    #tableBody select option {
-        background-color: color-mix(in srgb, var(--primaryColor) 95%, transparent);
-    }
-}
-
-/* Light mode nativo */
-@media (prefers-color-scheme: light) {
-    #tableBody select {
-        background: linear-gradient(145deg, 
-            color-mix(in srgb, white 95%, transparent),
-            color-mix(in srgb, #f5f5f5 95%, transparent));
-        border-color: color-mix(in srgb, var(--emphasisColor) 30%, transparent);
-    }
-    
-    #tableBody select option {
-        background-color: white;
-        color: #333;
-    }
-}
-
-/* ============================================
-   ESTILOS PARA SCROLLBAR DO DROPDOWN
-   ============================================ */
 
 /* Webkit (Chrome, Safari, Edge) */
 #tableBody select::-webkit-scrollbar {

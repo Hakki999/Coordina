@@ -17,6 +17,19 @@
     justify-content: center;
 }
 
+.tableResults tr {
+    transition: background-color 0.3s ease, padding-left 0.3s ease;
+    transition: 0.3s ease-in-out;
+}
+
+.tableResults tr:hover {
+    background-color: color-mix(in srgb, var(--emphasisColor) 10%, transparent) !important;
+    padding-left: 10px;
+    border-left: 5px solid var(--emphasisColor);
+    
+}
+
+
 
 
 .tableResults thead tr {
