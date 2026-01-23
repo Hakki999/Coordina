@@ -92,14 +92,14 @@ app.post('/login', async (req, res) => {
         const token = jwt.sign(
             { userId: resultado.data.user.id },
             process.env.JWT_SECRET,
-            { expiresIn: '300m' }
+            { expiresIn: '600m' }
         );
 
         res.cookie('token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
-            maxAge: 700 * 60 * 1000
+            maxAge: 1400 * 60 * 1000
         }).json({
             success: true,
             message: "Login bem-sucedido",
