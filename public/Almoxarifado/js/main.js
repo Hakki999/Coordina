@@ -754,7 +754,7 @@ function aplicarFiltros() {
         })
         .then(data => {
             console.log("dados = filtro");
-            
+
             const dadosFiltrados = filterSolicitacoes(dadosTable, filtros);
             dadosTable = dadosFiltrados;
             console.log(`🎯 ${dadosFiltrados.length} solicitações após filtro`);
@@ -932,7 +932,7 @@ async function listarMateriais() {
         const response = await fetch('/listarMateriais');
         console.log('📨 Response object:', response);
         console.warn('-------');
-        
+
         const data = await response.json();
         console.log('📦 Dados extraídos:');
         console.log(data);
@@ -1121,6 +1121,12 @@ function getFiltroIntevaloData() {
             if (dados.data && dados.data.length > 0) {
                 displayMain.innerHTML = '';
                 document.getElementById('tabelaRespostaBody').innerHTML = generateSolicitacoesTableBody(dados.data);
+
+                document.getElementById("listamateriais").addEventListener("dblclick", function (evt) {
+                    if (acess.imprimir) gerarPDFListaMateriais();
+                });
+                setupTableRowEventsLibDev();
+                setupTableRowEvents()
                 criarMensagem(true, `Filtro aplicado! ${dados.data.length} registros encontrados.`);
             } else {
                 criarMensagem(false, "Nenhum registro encontrado para o período selecionado.");
@@ -1154,7 +1160,7 @@ function exportTab() {
 
         item.Materiais.forEach(material => {
             console.warn(material);
-            
+
             materiaisDist.push(material.item.replace('.', ',') || "err");
             libDist.push(material.lib || 0);
             qtdDist.push(material.qtd || 0);
@@ -1162,7 +1168,7 @@ function exportTab() {
         })
 
         tempExport.push([
-            item.id ||  "",
+            item.id || "",
             item.Projeto || "",
             item.Cidade || "",
             formatarData(item.DataExe) || "",
