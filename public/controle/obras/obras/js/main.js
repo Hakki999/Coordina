@@ -317,11 +317,11 @@ const tableBody = document.querySelector("#tableBody");
 function ordenarDados(dados) {
     const prioridades = new Map([
         ['Pendente', 0],
-        ['Concluido V1', 1],
-        ['Concluido V2', 2],
+        ['Aguardando Evidências', 1],
+        ['Ir em campo', 2],
         ['Problema Sistemico', 3],
-        ['Aguardando Evidências', 4],
-        ['Ir em campo', 5]
+        ['Concluido V1', 4],
+        ['Concluido V2', 5]
     ]);
 
     // Filtrar e ordenar em uma única operação
