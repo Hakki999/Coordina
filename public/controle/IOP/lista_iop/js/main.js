@@ -487,3 +487,58 @@ function openParcelaModal(parcelaId) {
     console.warn(dadosTable.find(item => item.id == parcelaId));
 }
 
+function formatarDataPtBR(dataISO) {
+    if (!dataISO || typeof dataISO !== 'string') return '';
+    
+    // Remove espaços extras
+    const dataString = dataISO.trim();
+    
+    // Verifica se está no formato esperado
+    if (!dataString.includes('T')) {
+        console.warn('Formato não suportado (sem "T"):', dataISO);
+        return dataISO;
+    }
+    
+    try {
+        // Divide a string em data e hora
+        const partes = dataString.split('T');
+        const dataParte = partes[0]; // "2026-01-27"
+        const horaParte = partes[1]; // "17:01"
+        
+        if (!dataParte || !horaParte) {
+            return dataISO;
+        }
+        
+        // Extrai ano, mês e dia
+        const [ano, mes, dia] = dataParte.split('-').map(num => parseInt(num, 10));
+        
+        // Extrai hora e minuto (pode ter timezone depois, ex: "17:01:00" ou "17:01-03:00")
+        const horaMinutoParte = horaParte.split(/[:\-\+Z]/)[0]; // Pega apenas "17:01"
+        const [hora, minuto] = horaMinutoParte.split(':').map(num => parseInt(num, 10));
+        
+        // Valida os valores
+        if (
+            isNaN(ano) || isNaN(mes) || isNaN(dia) ||
+            isNaN(hora) || isNaN(minuto) ||
+            mes < 1 || mes > 12 ||
+            dia < 1 || dia > 31 ||
+            hora < 0 || hora > 23 ||
+            minuto < 0 || minuto > 59
+        ) {
+            console.warn('Valores de data inválidos:', dataISO);
+            return dataISO;
+        }
+        
+        // Formata no padrão pt-BR
+        const diaFormatado = String(dia).padStart(2, '0');
+        const mesFormatado = String(mes).padStart(2, '0');
+        const horaFormatada = String(hora).padStart(2, '0');
+        const minutoFormatado = String(minuto).padStart(2, '0');
+        
+        return `${diaFormatado}/${mesFormatado}/${ano} ${horaFormatada}:${minutoFormatado}`;
+        
+    } catch (error) {
+        console.error('Erro ao formatar data:', dataISO, error);
+        return dataISO;
+    }
+}

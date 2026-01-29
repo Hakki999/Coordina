@@ -371,89 +371,8 @@ if (typeof formatarMoeda === 'undefined') {
     }
 }
 
-// Função para calcular uma parcela específica (se não existir)
-if (typeof calcularEstaParcela === 'undefined') {
-    function calcularEstaParcela(elemento) {
-        const parcelaItem = elemento.closest('.parcela-item');
-        if (!parcelaItem) return;
-        
-        const index = parseInt(parcelaItem.getAttribute('data-index'));
-        
-        // Obter valores dos inputs
-        const acionamento = parcelaItem.querySelector('.acionamentoData')?.value;
-        const chegada = parcelaItem.querySelector('.chegadaData')?.value;
-        const finalizacao = parcelaItem.querySelector('.finalizacaoData')?.value;
-        const tipoParcela = parseFloat(parcelaItem.querySelector('.tipoParcela')?.value) || 0;
-        const valorOrcado = parseFloat(parcelaItem.querySelector('.valorOrcado')?.value) || 0;
-        
-        // Calcular horas
-        let horasTrabalhadas = 0;
-        if (acionamento && finalizacao) {
-            const inicio = new Date(acionamento);
-            const fim = new Date(finalizacao);
-            const diferencaMs = Math.abs(fim - inicio);
-            horasTrabalhadas = (diferencaMs / (1000 * 60 * 60)).toFixed(2);
-        }
-        
-        // Calcular valor
-        const valorCalculado = (horasTrabalhadas * tipoParcela) - valorOrcado;
-        const qtdVoz = tipoParcela > 0 ? (valorCalculado / tipoParcela).toFixed(2) : 0;
-        
-        // Atualizar display
-        const horasElement = parcelaItem.querySelector('.quantidadeHoras');
-        const valorElement = parcelaItem.querySelector('.valorCalculado');
-        const vozElement = parcelaItem.querySelector('.quantidadeVoz');
-        
-        if (horasElement) horasElement.textContent = horasTrabalhadas;
-        if (valorElement) valorElement.textContent = formatarMoeda(valorCalculado);
-        if (vozElement) vozElement.textContent = qtdVoz;
-        
-        // Atualizar ou adicionar ao array
-        const parcelaData = {
-            res_acionamento: acionamento || null,
-            res_chegada: chegada || null,
-            res_finalizacao: finalizacao || null,
-            res_qtd_horas: parseFloat(horasTrabalhadas) || 0,
-            res_tipo_parcela: tipoParcela,
-            res_valor_orcado: valorOrcado,
-            res_calculo: valorCalculado,
-            res_qtd_voz: parseFloat(qtdVoz) || 0,
-            res_obs: parcelaItem.querySelector('.observacoes')?.value || null
-        };
-        
-        if (parcelasAtuais[index]) {
-            parcelasAtuais[index] = parcelaData;
-        } else {
-            parcelasAtuais.push(parcelaData);
-        }
-        
-        // Atualizar totais
-        calcularTotais();
-    }
-}
 
-// Função para calcular totais (se não existir)
-if (typeof calcularTotais === 'undefined') {
-    function calcularTotais() {
-        let totalHoras = 0;
-        let totalValor = 0;
-        let totalVoz = 0;
-        
-        parcelasAtuais.forEach(parcela => {
-            totalHoras += parcela.res_qtd_horas || 0;
-            totalValor += parcela.res_calculo || 0;
-            totalVoz += parcela.res_qtd_voz || 0;
-        });
-        
-        const totalHorasElement = document.getElementById('totalHoras');
-        const totalValorElement = document.getElementById('totalValor');
-        const totalVozElement = document.getElementById('totalVoz');
-        
-        if (totalHorasElement) totalHorasElement.textContent = totalHoras.toFixed(2);
-        if (totalValorElement) totalValorElement.textContent = formatarMoeda(totalValor);
-        if (totalVozElement) totalVozElement.textContent = totalVoz.toFixed(2);
-    }
-}
+
 
 // Função para remover parcela (se não existir)
 if (typeof removerParcela === 'undefined') {
@@ -496,4 +415,76 @@ if (typeof reindexarParcelas === 'undefined') {
             }
         });
     }
+}
+
+function dataFormat(dataISO){
+    dataISO = dataISO.replace('T', '-');
+    dataISO = dataISO.split('-');
+    dataISO = dataISO[2] + '/' + dataISO[1] + '/' + dataISO[0] + ' ' + dataISO[3];
+
+    return dataISO;
+}
+
+function gerarRelatorioPADD() {
+    let relatorio = [];
+
+    dadosTable.forEach(dado => {
+        if(dado.parcelas_adicionais) {
+            try {
+                let parcelasAdicionais;
+                
+                // Verifica o tipo dos dados
+                if (typeof dado.parcelas_adicionais === 'string') {
+                    parcelasAdicionais = JSON.parse(dado.parcelas_adicionais);
+                } else {
+                    parcelasAdicionais = dado.parcelas_adicionais;
+                }
+                
+                // Garante que é um array
+                if (!Array.isArray(parcelasAdicionais)) {
+                    parcelasAdicionais = [parcelasAdicionais];
+                }
+                
+                // Processa cada parcela
+                parcelasAdicionais.forEach(parcela => {
+                    // Mapeia os campos conforme sua estrutura de dados
+                    relatorio.push([
+                        dado.res_nota || '',
+                        dado.res_cidade || '',
+                        dataFormat(parcela.res_acionamento) || '',
+                        dataFormat(parcela.res_chegada) || '',
+                        dataFormat(parcela.res_finalizacao) || '',
+                        parcela.res_qtd_horas || 0,
+                        String(parcela.res_tipo_parcela).replace('.', '') || '',
+                        formatarMoeda(parcela.res_valor_orcado) || '',
+                        formatarMoeda(parcela.res_calculo) || 0,
+                        parcela.res_qtd_voz || 0,
+                        parcela.res_obs || ''
+                    ]);
+                });
+                
+            } catch (error) {
+                console.error(`Erro ao processar parcelas para nota ${dado.res_nota}:`, error);
+            }
+        }
+    });
+
+    console.warn('Relatório PADD:', relatorio);
+
+       exportCSV({
+        head: [
+            'Nota',
+            'Cidade',
+            'Acionamento',
+            'Chegada',
+            'Finalização',
+            'Horas Trabalhadas',
+            'Tipo de Parcela',
+            'Valor Orçado',
+            'Valor Calculado',
+            'Quantidade de Voz',
+            'Observações'
+        ],
+        body: relatorio
+    }, 'Relatório de Parcela Adicional');
 }

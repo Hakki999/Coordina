@@ -28,6 +28,8 @@ function expandirLinhas(linha) {
 }
 
 function exportCSV(dados, nomeArquivo = 'export.csv') {
+    console.log(dados);
+    
     // Expandir as linhas que contêm arrays
     const linhasExpandidas = [];
     dados.body.forEach(linha => {
