@@ -4,10 +4,91 @@
 let parcelasAtuais = [];
 let iopIdAtual = null;
 
+// Função para calcular uma parcela específica
+function calcularEstaParcela(elemento) {
+    const parcelaItem = elemento.closest('.parcela-item');
+    if (!parcelaItem) return;
+
+    const index = parseInt(parcelaItem.getAttribute('data-index'));
+
+    // Obter valores dos inputs
+    const acionamento = parcelaItem.querySelector('.acionamentoData')?.value;
+    const chegada = parcelaItem.querySelector('.chegadaData')?.value;
+    const finalizacao = parcelaItem.querySelector('.finalizacaoData')?.value;
+    const tipoParcela = parseFloat(parcelaItem.querySelector('.tipoParcela')?.value) || 0;
+    const valorOrcado = parseFloat(parcelaItem.querySelector('.valorOrcado')?.value) || 0;
+
+    // Calcular horas
+    let horasTrabalhadas = 0;
+    if (acionamento && finalizacao) {
+        const inicio = new Date(acionamento);
+        const fim = new Date(finalizacao);
+        const diferencaMs = Math.abs(fim - inicio);
+        horasTrabalhadas = (diferencaMs / (1000 * 60 * 60)).toFixed(2);
+    }
+
+    // Calcular valor
+    const valorCalculado = (horasTrabalhadas * tipoParcela) - valorOrcado;
+    const qtdVoz = tipoParcela > 0 ? (valorCalculado / tipoParcela).toFixed(2) : 0;
+
+    // Atualizar display
+    const horasElement = parcelaItem.querySelector('.quantidadeHoras');
+    const valorElement = parcelaItem.querySelector('.valorCalculado');
+    const vozElement = parcelaItem.querySelector('.quantidadeVoz');
+
+    if (horasElement) horasElement.textContent = horasTrabalhadas;
+    if (valorElement) valorElement.textContent = formatarMoeda(valorCalculado);
+    if (vozElement) vozElement.textContent = qtdVoz;
+
+    // Atualizar ou adicionar ao array
+    const parcelaData = {
+        res_acionamento: acionamento || null,
+        res_chegada: chegada || null,
+        res_finalizacao: finalizacao || null,
+        res_qtd_horas: parseFloat(horasTrabalhadas) || 0,
+        res_tipo_parcela: tipoParcela,
+        res_valor_orcado: valorOrcado,
+        res_calculo: valorCalculado,
+        res_qtd_voz: parseFloat(qtdVoz) || 0,
+        res_obs: parcelaItem.querySelector('.observacoes')?.value || null
+    };
+
+    if (parcelasAtuais[index]) {
+        parcelasAtuais[index] = parcelaData;
+    } else {
+        parcelasAtuais.push(parcelaData);
+    }
+
+    // Atualizar totais
+    calcularTotais();
+}
+
+// Função para calcular totais
+function calcularTotais() {
+    let totalHoras = 0;
+    let totalValor = 0;
+    let totalVoz = 0;
+
+    parcelasAtuais.forEach(parcela => {
+        totalHoras += parseFloat(parcela.res_qtd_horas) || 0;
+        totalValor += parseFloat(parcela.res_calculo) || 0;
+        totalVoz += parseFloat(parcela.res_qtd_voz) || 0;
+    });
+
+    // Atualizar elementos de total se existirem
+    const totalHorasElement = document.querySelector('.total-horas');
+    const totalValorElement = document.querySelector('.total-valor');
+    const totalVozElement = document.querySelector('.total-voz');
+
+    if (totalHorasElement) totalHorasElement.textContent = totalHoras.toFixed(2);
+    if (totalValorElement) totalValorElement.textContent = formatarMoeda(totalValor);
+    if (totalVozElement) totalVozElement.textContent = totalVoz.toFixed(2);
+}
+
 // Função para abrir modal com múltiplas parcelas (MODIFICADA)
 function openParcelaModal(parcelaId) {
     console.log('Abrindo modal para ID:', parcelaId);
-    
+
     const modal = document.querySelector('.parcela-container');
     modal.style.display = "flex";
     modal.setAttribute('data-parcela-id', parcelaId);
@@ -27,21 +108,21 @@ function openParcelaModal(parcelaId) {
         try {
             // Remover possíveis barras invertidas de escape
             let parcelasStr = item.parcelas_adicionais;
-            
+
             // Se a string começa e termina com aspas, removê-las
             if (parcelasStr.startsWith('"') && parcelasStr.endsWith('"')) {
                 parcelasStr = parcelasStr.slice(1, -1);
             }
-            
+
             // Substituir aspas simples por aspas duplas se necessário
             parcelasStr = parcelasStr.replace(/'/g, '"');
-            
+
             console.log('String de parcelas processada:', parcelasStr);
-            
+
             // Tentar parsear as parcelas_adicionais
             const parcelasParseadas = JSON.parse(parcelasStr);
             console.log('Parcelas parseadas com sucesso:', parcelasParseadas);
-            
+
             if (Array.isArray(parcelasParseadas) && parcelasParseadas.length > 0) {
                 parcelasAtuais = parcelasParseadas;
                 console.log('Parcelas carregadas no array:', parcelasAtuais);
@@ -53,7 +134,7 @@ function openParcelaModal(parcelaId) {
         } catch (error) {
             console.error('Erro ao parsear parcelas_adicionais:', error);
             console.log('String que causou erro:', item.parcelas_adicionais);
-            
+
             // Tentar alternativa: se for um objeto único, colocar em array
             try {
                 // Tentar parsear como objeto direto
@@ -69,7 +150,7 @@ function openParcelaModal(parcelaId) {
             }
         }
     }
-    
+
     // Se não houver parcelas válidas ou nenhuma parcela
     console.log('Nenhuma parcela encontrada, iniciando nova...');
     parcelasAtuais = [];
@@ -82,42 +163,42 @@ function adicionarNovaParcela() {
         console.error('Template de parcela não encontrado!');
         return;
     }
-    
+
     const clone = template.content.cloneNode(true);
     const container = document.getElementById('parcelasContainer');
     if (!container) {
         console.error('Container de parcelas não encontrado!');
         return;
     }
-    
+
     // Definir número da parcela
     const numero = parcelasAtuais.length + 1;
     const parcelaItem = clone.querySelector('.parcela-item');
     parcelaItem.setAttribute('data-index', parcelasAtuais.length);
-    
+
     // Atualizar número da parcela
     const numeroElement = clone.querySelector('.parcela-numero');
     if (numeroElement) {
         numeroElement.textContent = numero;
     }
-    
+
     // Setar data atual como padrão para acionamento
     const now = new Date();
     const acionamentoInput = clone.querySelector('.acionamentoData');
     if (acionamentoInput) {
         acionamentoInput.value = formatarParaInputDatetime(now);
     }
-    
+
     // Setar data +5 horas para finalização
     const finalizacaoDate = new Date(now.getTime() + (5 * 60 * 60 * 1000));
     const finalizacaoInput = clone.querySelector('.finalizacaoData');
     if (finalizacaoInput) {
         finalizacaoInput.value = formatarParaInputDatetime(finalizacaoDate);
     }
-    
+
     // Adicionar ao container
     container.appendChild(clone);
-    
+
     // Calcular esta parcela
     if (acionamentoInput) {
         setTimeout(() => calcularEstaParcela(acionamentoInput), 100);
@@ -135,7 +216,7 @@ function fecharModalParcelas() {
 // Função auxiliar para formatar data para input datetime-local
 function formatarParaInputDatetime(dataString) {
     if (!dataString) return '';
-    
+
     try {
         // Se já estiver no formato correto (YYYY-MM-DDTHH:MM), retornar como está
         if (typeof dataString === 'string' && dataString.includes('T')) {
@@ -145,7 +226,7 @@ function formatarParaInputDatetime(dataString) {
             }
             return dataString;
         }
-        
+
         const data = new Date(dataString);
         // Ajustar para o fuso horário local
         const tzoffset = data.getTimezoneOffset() * 60000; // offset in milliseconds
@@ -164,34 +245,34 @@ function renderizarParcelasExistentes() {
         console.error('Container de parcelas não encontrado!');
         return;
     }
-    
+
     container.innerHTML = '';
-    
+
     if (!parcelasAtuais || parcelasAtuais.length === 0) {
         console.log('Nenhuma parcela para renderizar, adicionando nova...');
         adicionarNovaParcela();
         return;
     }
-    
+
     console.log('Renderizando', parcelasAtuais.length, 'parcelas...');
-    
+
     parcelasAtuais.forEach((parcela, index) => {
         const template = document.getElementById('parcelaTemplate');
         if (!template) {
             console.error('Template de parcela não encontrado!');
             return;
         }
-        
+
         const clone = template.content.cloneNode(true);
         const parcelaItem = clone.querySelector('.parcela-item');
         parcelaItem.setAttribute('data-index', index);
-        
+
         // Atualizar número
         const numeroElement = clone.querySelector('.parcela-numero');
         if (numeroElement) {
             numeroElement.textContent = index + 1;
         }
-        
+
         // Preencher valores (formatando datas corretamente)
         const acionamentoInput = parcelaItem.querySelector('.acionamentoData');
         const chegadaInput = parcelaItem.querySelector('.chegadaData');
@@ -199,9 +280,9 @@ function renderizarParcelasExistentes() {
         const tipoParcelaInput = parcelaItem.querySelector('.tipoParcela');
         const valorOrcadoInput = parcelaItem.querySelector('.valorOrcado');
         const observacoesInput = parcelaItem.querySelector('.observacoes');
-        
+
         console.log('Parcela', index, 'dados:', parcela);
-        
+
         if (acionamentoInput && parcela.res_acionamento) {
             acionamentoInput.value = formatarParaInputDatetime(parcela.res_acionamento);
         }
@@ -220,12 +301,12 @@ function renderizarParcelasExistentes() {
         if (observacoesInput && parcela.res_obs) {
             observacoesInput.value = parcela.res_obs;
         }
-        
+
         // Atualizar displays
         const horasElement = parcelaItem.querySelector('.quantidadeHoras');
         const valorElement = parcelaItem.querySelector('.valorCalculado');
         const vozElement = parcelaItem.querySelector('.quantidadeVoz');
-        
+
         if (horasElement) {
             horasElement.textContent = parcela.res_qtd_horas ? parseFloat(parcela.res_qtd_horas).toFixed(2) : '0';
         }
@@ -235,15 +316,15 @@ function renderizarParcelasExistentes() {
         if (vozElement) {
             vozElement.textContent = parcela.res_qtd_voz ? parseFloat(parcela.res_qtd_voz).toFixed(2) : '0';
         }
-        
+
         container.appendChild(clone);
-        
+
         // Adicionar event listeners aos inputs desta parcela
         setTimeout(() => {
             const inputs = parcelaItem.querySelectorAll('input, select');
             inputs.forEach(input => {
-                if (input.classList.contains('acionamentoData') || 
-                    input.classList.contains('chegadaData') || 
+                if (input.classList.contains('acionamentoData') ||
+                    input.classList.contains('chegadaData') ||
                     input.classList.contains('finalizacaoData') ||
                     input.classList.contains('tipoParcela') ||
                     input.classList.contains('valorOrcado')) {
@@ -253,7 +334,7 @@ function renderizarParcelasExistentes() {
             });
         }, 100);
     });
-    
+
     calcularTotais();
 }
 
@@ -282,9 +363,9 @@ function salvarTodasParcelas() {
         // Converter para string JSON
         const parcelasString = JSON.stringify(parcelasAtuais);
         dadosTable[itemIndex].parcelas_adicionais = parcelasString;
-        
+
         console.log('DadosTable atualizado:', dadosTable[itemIndex]);
-        
+
         // Enviar para o servidor (mantendo sua rota atual /parcelaadd)
         fetch('/parcelaadd', {
             method: 'POST',
@@ -297,63 +378,63 @@ function salvarTodasParcelas() {
             }),
             credentials: 'include'
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Erro ${response.status}: ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Parcelas salvas com sucesso:', data);
-            
-            // Atualizar visualmente a linha da tabela
-            const linha = document.querySelector(`tr[data-id="${iopIdAtual}"]`);
-            if (linha) {
-                const botaoParcela = linha.querySelector('.padd');
-                if (botaoParcela) {
-                    const total = parcelasAtuais.reduce((sum, p) => sum + (p.res_calculo || 0), 0);
-                    botaoParcela.textContent = parcelasAtuais.length > 0 ? 
-                        `Parcelas (${parcelasAtuais.length})` : 'Parcela adicional';
-                    botaoParcela.setAttribute('title', 
-                        parcelasAtuais.length > 0 ? 
-                        `${parcelasAtuais.length} parcela(s) - Total: ${formatarMoeda(total)}` : 
-                        'Adicionar parcelas');
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Erro ${response.status}: ${response.statusText}`);
                 }
-            }
-            
-            criarMensagem(true, `${parcelasAtuais.length} parcela(s) salva(s) com sucesso!`);
-            fecharModalParcelas();
-            
-            // Opcional: recarregar os dados do servidor
-            // buscar_dados();
-        })
-        .catch(error => {
-            console.error('Erro ao salvar parcelas:', error);
-            criarMensagem(false, 'Erro ao salvar parcelas: ' + error.message);
-        });
+                return response.json();
+            })
+            .then(data => {
+                console.log('Parcelas salvas com sucesso:', data);
+
+                // Atualizar visualmente a linha da tabela
+                const linha = document.querySelector(`tr[data-id="${iopIdAtual}"]`);
+                if (linha) {
+                    const botaoParcela = linha.querySelector('.padd');
+                    if (botaoParcela) {
+                        const total = parcelasAtuais.reduce((sum, p) => sum + (p.res_calculo || 0), 0);
+                        botaoParcela.textContent = parcelasAtuais.length > 0 ?
+                            `Parcelas (${parcelasAtuais.length})` : 'Parcela adicional';
+                        botaoParcela.setAttribute('title',
+                            parcelasAtuais.length > 0 ?
+                                `${parcelasAtuais.length} parcela(s) - Total: ${formatarMoeda(total)}` :
+                                'Adicionar parcelas');
+                    }
+                }
+
+                criarMensagem(true, `${parcelasAtuais.length} parcela(s) salva(s) com sucesso!`);
+                fecharModalParcelas();
+
+                // Opcional: recarregar os dados do servidor
+                // buscar_dados();
+            })
+            .catch(error => {
+                console.error('Erro ao salvar parcelas:', error);
+                criarMensagem(false, 'Erro ao salvar parcelas: ' + error.message);
+            });
     } else {
         criarMensagem(false, 'Erro ao salvar parcelas: ID do contrato nao encontrado na tabela');
     }
 }
 
 // Adicionar event listeners quando o DOM carregar
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Event listener para o botão de fechar modal
     const fecharModalBtn = document.querySelector('.fechar-modal-parcelas');
     if (fecharModalBtn) {
         fecharModalBtn.addEventListener('click', fecharModalParcelas);
     }
-    
+
     // Event listener para o botão de salvar parcelas
     const salvarParcelasBtn = document.querySelector('#salvarParcelas');
     if (salvarParcelasBtn) {
         salvarParcelasBtn.addEventListener('click', salvarTodasParcelas);
     }
-    
+
     // Event listener para fechar modal clicando fora
     const modal = document.querySelector('.parcela-container');
     if (modal) {
-        modal.addEventListener('click', function(e) {
+        modal.addEventListener('click', function (e) {
             if (e.target === modal) {
                 fecharModalParcelas();
             }
@@ -379,17 +460,17 @@ if (typeof removerParcela === 'undefined') {
     function removerParcela(botao) {
         const parcelaItem = botao.closest('.parcela-item');
         if (!parcelaItem) return;
-        
+
         const index = parseInt(parcelaItem.getAttribute('data-index'));
-        
+
         // Remover do array
         if (parcelasAtuais[index]) {
             parcelasAtuais.splice(index, 1);
         }
-        
+
         // Remover do DOM
         parcelaItem.remove();
-        
+
         // Reindexar e recalcular
         reindexarParcelas();
         calcularTotais();
@@ -400,14 +481,14 @@ if (typeof removerParcela === 'undefined') {
 if (typeof reindexarParcelas === 'undefined') {
     function reindexarParcelas() {
         const parcelasItems = document.querySelectorAll('.parcela-item');
-        
+
         parcelasItems.forEach((item, novoIndex) => {
             item.setAttribute('data-index', novoIndex);
             const numeroElement = item.querySelector('.parcela-numero');
             if (numeroElement) {
                 numeroElement.textContent = novoIndex + 1;
             }
-            
+
             // Recalcular para atualizar array
             const acionamentoInput = item.querySelector('.acionamentoData');
             if (acionamentoInput) {
@@ -417,7 +498,7 @@ if (typeof reindexarParcelas === 'undefined') {
     }
 }
 
-function dataFormat(dataISO){
+function dataFormat(dataISO) {
     dataISO = dataISO.replace('T', '-');
     dataISO = dataISO.split('-');
     dataISO = dataISO[2] + '/' + dataISO[1] + '/' + dataISO[0] + ' ' + dataISO[3];
@@ -429,22 +510,22 @@ function gerarRelatorioPADD() {
     let relatorio = [];
 
     dadosTable.forEach(dado => {
-        if(dado.parcelas_adicionais) {
+        if (dado.parcelas_adicionais) {
             try {
                 let parcelasAdicionais;
-                
+
                 // Verifica o tipo dos dados
                 if (typeof dado.parcelas_adicionais === 'string') {
                     parcelasAdicionais = JSON.parse(dado.parcelas_adicionais);
                 } else {
                     parcelasAdicionais = dado.parcelas_adicionais;
                 }
-                
+
                 // Garante que é um array
                 if (!Array.isArray(parcelasAdicionais)) {
                     parcelasAdicionais = [parcelasAdicionais];
                 }
-                
+
                 // Processa cada parcela
                 parcelasAdicionais.forEach(parcela => {
                     // Mapeia os campos conforme sua estrutura de dados
@@ -462,7 +543,7 @@ function gerarRelatorioPADD() {
                         parcela.res_obs || ''
                     ]);
                 });
-                
+
             } catch (error) {
                 console.error(`Erro ao processar parcelas para nota ${dado.res_nota}:`, error);
             }
@@ -471,7 +552,7 @@ function gerarRelatorioPADD() {
 
     console.warn('Relatório PADD:', relatorio);
 
-       exportCSV({
+    exportCSV({
         head: [
             'Nota',
             'Cidade',
