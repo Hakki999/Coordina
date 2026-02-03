@@ -802,6 +802,30 @@ app.post('/atualizar_obras', autenticarToken, (req, res) => {
         });
 });
 
+app.patch('/atualizarStatus', autenticarToken, (req, res) => {
+    // Lógica para atualizar IOP
+console.log(req.body);
+
+let dados = {
+    id: req.body.id,
+    res_status: req.body.res_status
+};
+
+    atualizarDados(req.body.table, dados, 'id', req.body.id)
+        .then(() => {
+            res.json({
+                success: true,
+                message: 'Dados atualizados com sucesso'
+            })
+        })
+        .catch((error) => {
+            res.json({
+                success: false,
+                message: 'Erro ao atualizar dados'
+            })
+        });
+});
+
 // ------------------------------- ping ----------------------------------------------
 app.get('/ping', (req, res) => {
     res.send('pong');

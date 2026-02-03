@@ -2,8 +2,6 @@ async function lerIdsDoArquivo() {
     try {
         // Extrai IDs da tabela atual
         const ids = dadosTable.map(item => item.res_nota).filter(id => id);
-
-        console.log(`✅ Encontrados ${ids.length} IDs válidos na tabela`);
         return ids;
     } catch (error) {
         console.error('❌ Erro ao extrair IDs da tabela:', error.message);
@@ -72,6 +70,8 @@ async function pegarInfonome_obras(nome_obra) {
 async function atualizarResStatus(resultados) {
     try {
         console.log(`📊 Atualizando res_status para ${resultados.length} resultados`);
+        console.warn(resultados);
+        
         criarMensagem(true, `Atualizando res_status para ${resultados.length} resultados`);
         let atualizados = 0;
         let naoEncontrados = 0;
@@ -79,6 +79,14 @@ async function atualizarResStatus(resultados) {
         
         // Para cada resultado, atualiza o campo res_status na linha correspondente
         resultados.forEach(resultado => {
+
+            console.warn(resultado);
+            
+            atualizarStatus({
+                id: dadosTable.filter(linha => linha.res_nota === resultado.id)[0].id,
+                res_status: resultado.DescStatusNota
+            });
+
             // Encontra o índice da linha em dadosTable com o ID correspondente
             const linhaIndex = dadosTable.findIndex(linha => linha.res_nota === resultado.id);
             
