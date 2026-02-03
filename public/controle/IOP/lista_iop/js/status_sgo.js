@@ -72,7 +72,7 @@ async function pegarInfonome_obras(nome_obra) {
 async function atualizarResStatus(resultados) {
     try {
         console.log(`📊 Atualizando res_status para ${resultados.length} resultados`);
-        
+        criarMensagem(true, `Atualizando res_status para ${resultados.length} resultados`);
         let atualizados = 0;
         let naoEncontrados = 0;
         let erros = 0;
@@ -115,7 +115,8 @@ async function atualizarResStatus(resultados) {
         console.log(`   - IDs encontrados e atualizados: ${atualizados}`);
         console.log(`   - IDs não encontrados na tabela: ${naoEncontrados}`);
         console.log(`   - IDs com erro na consulta: ${erros}`);
-        
+        criarMensagem(true, `Atualização concluída: ${atualizados} atualizados, ${naoEncontrados} não encontrados, ${erros} com erro`);
+
         return {
             atualizados,
             naoEncontrados,
@@ -125,6 +126,7 @@ async function atualizarResStatus(resultados) {
         
     } catch (error) {
         console.error('❌ Erro ao atualizar res_status:', error);
+        criarMensagem(false, `Erro ao atualizar res_status: ${error.message}`);
         throw error;
     }
 }
@@ -198,7 +200,7 @@ async function atualizarStatusNotas() {
     for (let i = 0; i < ids.length; i += batchSize) {
         const batch = ids.slice(i, i + batchSize);
         console.log(`\n📦 Processando lote ${Math.floor(i/batchSize) + 1}/${Math.ceil(ids.length/batchSize)} (${batch.length} IDs)`);
-        
+        criarMensagem(true, `Processando lote ${Math.floor(i/batchSize) + 1}/${Math.ceil(ids.length/batchSize)} (${batch.length} IDs)`);
         // Processa cada ID no lote
         const batchPromises = batch.map(async (id, indexInBatch) => {
             console.log(`   [${i + indexInBatch + 1}/${ids.length}] Consultando ID: ${id}`);
@@ -288,10 +290,12 @@ async function buscarStatusIndividual(id) {
             return { sucesso: true, status: resultado.DescStatusNota };
         } else {
             console.log(`❌ Erro ou sem status na resposta`);
+            criarMensagem(false, `Erro ao buscar status para ID ${id}: ${resultado.error}`);
             return { sucesso: false, erro: resultado.error };
         }
     } else {
         console.log(`⚠️  ID ${id} não encontrado na tabela`);
+        criarMensagem(false, `ID ${id} não encontrado na tabela`);
         return { sucesso: false, erro: 'ID não encontrado na tabela' };
     }
 }
