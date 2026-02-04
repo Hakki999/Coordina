@@ -340,3 +340,11 @@ body{
     border-color: #4CAF50;
     background: rgba(76, 175, 80, 0.1);
 }
+
+.form-input:-webkit-autofill,
+.form-input:-webkit-autofill:hover,
+.form-input:-webkit-autofill:focus,
+.form-input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px var(--secundaryColor) inset !important;
+  -webkit-text-fill-color: #ffffff !important; /* 👈 ESSENCIAL */
+}

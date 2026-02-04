@@ -301,3 +301,21 @@
     /* Azul ciano */
     filter: invert(38%) sepia(90%) saturate(600%) hue-rotate(165deg) brightness(100%) contrast(95%);
 }
+
+.headTable th:hover{
+    background-color: var(--emphasisColor) !important;
+}
+
+.headTable th::after{
+    content: "🔍︎";
+    position: absolute;
+    transform: translateX(10px) translateY(50px);
+    transition: 0.1s ease-in-out;
+}
+
+.headTable th:hover::after{
+    content: "🔍︎";
+    position: absolute;
+    transform: translateX(10px) translateY(0px) !important;
+    
+}

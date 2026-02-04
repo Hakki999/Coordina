@@ -1,16 +1,44 @@
+function formatOption(dados) {
+    let temp = '';
+    dados.forEach(value => {
+        temp += `<option value="${value}">${value}</option>`;
+    });
+    return temp;
+}
 
 function filtroOpen(typeFilterB) {
     let typeInput = '';
+    let autoComplet = [];
+
     console.warn("Tipo de Filtro:", typeFilterB);
 
     switch (typeFilterB) {
-        case 'Dia':
+        case 'dataExe':
             typeInput = 'date'
             break;
+        case 'nota':
+            typeInput = 'number'
+            autoComplet = [...new Set(dadosTable.filter(item => item.res_nota).map(item => item.res_nota))];
+            autoComplet = formatOption(autoComplet);
+            break;
 
+        case 'status':
+            typeInput = 'text'
+            autoComplet = [...new Set(dadosTable.filter(item => item.res_status).map(item => item.res_status))];
+            autoComplet = formatOption(autoComplet);
+            break;
+        case 'resp':
+            typeInput = 'text'
+            autoComplet = [...new Set(dadosTable.filter(item => item.res_resp).map(item => item.res_resp))];
+            autoComplet = formatOption(autoComplet);
+            break;
+        case 'nomeObra':
+            typeInput = 'text'
+            autoComplet = [...new Set(dadosTable.filter(item => item.res_nome_obra).map(item => item.res_nome_obra))];
+            autoComplet = formatOption(autoComplet);
+            break;
         default:
             typeInput = 'text'
-            break;
     }
 
     const htmlFiltro = `
@@ -18,11 +46,16 @@ function filtroOpen(typeFilterB) {
         <div class="detailsClose" onclick="this.parentElement.remove()"></div>
         <div class="inputMensageWrapper">
             <label for="inputMensageField">${typeFilterB.toUpperCase()}</label>
-            <input type="${typeInput}"  tipo="${typeFilterB}" class="inputMensage inputFiltroSend" placeholder="${typeFilterB.toUpperCase()}" id="inputMensageField">
+            <input list="listData" type="${typeInput}"  tipo="${typeFilterB}" class="inputMensage inputFiltroSend" placeholder="${typeFilterB.toUpperCase()}" id="inputMensageField">
             <button type="submit" class="btnMensage" id="btnMensage" onclick="filtrarTabela();">Enviar</button>
+            
+<datalist id="listData">
+${autoComplet}
+</datalist>
         </div>
     </div>
     `;
+    
 
     document.body.insertAdjacentHTML('beforeend', htmlFiltro);
 
@@ -49,6 +82,7 @@ function filtrarTabela() {
         case 'resp':
             typeFilter = 'res_resp'
             break;
+        
         default:
             typeFilter = 'res_nota'
             break;
