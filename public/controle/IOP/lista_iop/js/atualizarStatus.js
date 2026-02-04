@@ -7,7 +7,8 @@ function atualizarStatus(dados) {
             body: JSON.stringify({
                 table: 'table_iop',
                 id: dados.id,
-                res_status: dados.res_status
+                res_status: dados.res_status,
+                res_sap: dados.res_sap
             }),
             credentials: 'include'
         })

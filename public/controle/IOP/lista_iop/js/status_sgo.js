@@ -33,6 +33,7 @@ async function pegarInfonome_obras(nome_obra) {
             // Se for array, retorna apenas o primeiro item
             return {
                 id: nome_obra,
+                idSap: data[0].SolicitacaoId || null,
                 DescStatusNota: data[0].DescStatusNota || null,
                 status: 'sucesso',
                 timestamp: new Date().toISOString()
@@ -41,6 +42,7 @@ async function pegarInfonome_obras(nome_obra) {
             // Se for objeto
             return {
                 id: nome_obra,
+                idSap: data[0].SolicitacaoId || null,
                 DescStatusNota: data.DescStatusNota || null,
                 status: 'sucesso',
                 timestamp: new Date().toISOString()
@@ -48,6 +50,7 @@ async function pegarInfonome_obras(nome_obra) {
         } else {
             return {
                 id: nome_obra,
+                idSap: data[0].SolicitacaoId || null,
                 DescStatusNota: null,
                 status: 'sucesso',
                 timestamp: new Date().toISOString()
@@ -84,11 +87,13 @@ async function atualizarResStatus(resultados) {
             
             atualizarStatus({
                 id: dadosTable.filter(linha => linha.res_nota === resultado.id)[0].id,
+                res_sap: resultado.idSap,
                 res_status: resultado.DescStatusNota
             });
 
             // Encontra o índice da linha em dadosTable com o ID correspondente
             const linhaIndex = dadosTable.findIndex(linha => linha.res_nota === resultado.id);
+            console.log(resultado);
             
             if (linhaIndex !== -1) {
                 // Atualiza APENAS o campo res_status
