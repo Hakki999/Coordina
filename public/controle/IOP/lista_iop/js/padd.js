@@ -442,17 +442,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-// Função para formatar moeda (se não existir)
-if (typeof formatarMoeda === 'undefined') {
-    function formatarMoeda(valor) {
-        return new Intl.NumberFormat('pt-BR', {
-            style: 'currency',
-            currency: 'BRL'
-        }).format(valor || 0);
-    }
-}
-
-
 
 
 // Função para remover parcela (se não existir)
@@ -531,7 +520,7 @@ function gerarRelatorioPADD() {
                     // Mapeia os campos conforme sua estrutura de dados
                     relatorio.push([
                         dado.res_nota || '',
-                        dado.res_cidade || '',
+                        cidades.find(cidade => cidade.value === dado.res_cidade)?.label || '',
                         dataFormat(parcela.res_acionamento) || '',
                         dataFormat(parcela.res_chegada) || '',
                         dataFormat(parcela.res_finalizacao) || '',

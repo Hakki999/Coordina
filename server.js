@@ -804,13 +804,14 @@ app.post('/atualizar_obras', autenticarToken, (req, res) => {
 
 app.patch('/atualizarStatus', autenticarToken, (req, res) => {
     // Lógica para atualizar IOP
-console.log("--> ", req.body);
 
 let dados = {
     id: req.body.id,
     res_status: req.body.res_status,
-    res_sap: req.body.res_sap
+    res_sap: req.body.res_sap,
+    res_orcamento: req.body.res_orcamento
 };
+console.log(dados);
 
     atualizarDados(req.body.table, dados, 'id', req.body.id)
         .then(() => {

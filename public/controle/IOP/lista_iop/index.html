@@ -71,8 +71,13 @@
             <ul>
                 <li onclick="exportTableToCSV()">CSV</li>
                 <li onclick="gerarRelatorioPADD()">PADD</li>
-                <li onclick="atualizarStatusNotas()">SGO</li>
+                <li onclick="main_status()">SGO</li>
                 <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li onclick="main_orcamento()" style="color: green;" id="orcamento_m">R$00</li>
             </ul>
         </nav>
         <table class="tableResults">
@@ -238,13 +243,13 @@
 </template> 
     <script src="/controle/IOP/lista_iop/js/atualizarStatus.js"></script>
     <script src="/controle/IOP/lista_iop/js/exportCSV.js"></script>
-    <script src="/controle/IOP/lista_iop/js/autoComplet.js"></script>
+    <script src="/controle/IOP/lista_iop/js/formatarMoeda.js"></script>
     <script src="/controle/IOP/lista_iop/js/mensagem.js"></script>
     <script src="/controle/IOP/lista_iop/js/filtro.js"></script>
     <script src="/controle/IOP/lista_iop/js/main.js"></script>
     <script src="/controle/IOP/lista_iop/js/editor.js"></script>
     <script src="/controle/IOP/lista_iop/js/padd.js"></script>
-    <script src="/controle/IOP/lista_iop/js/status_sgo.js"></script>
+    <script src="/controle/IOP/lista_iop/js/sgo.js"></script>
 </body>
 
 </html>

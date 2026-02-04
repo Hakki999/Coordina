@@ -429,6 +429,7 @@ function render_dados() {
     });
 
     initializeCopyButtons();
+    calculateMoney()
 }
 
 function exportTableToCSV() {
@@ -443,8 +444,8 @@ function exportTableToCSV() {
 
         tempExport.push([
             item.id || "",
-            item.res_cidade || "",
-            item.res_data_cri || "",
+            cidades.find(cidade => cidade.value === item.res_cidade)?.label || item.res_cidade || "",
+            item.res_data_cri.replace(',', '') || "",
             item.res_data_exe || "",
             item.res_nome_obra || "",
             item.res_nota || "",
@@ -453,7 +454,8 @@ function exportTableToCSV() {
             item.res_pg || "",
             item.res_resp || "",
             item.res_status || "",
-            item.res_tipo || ""
+            item.res_tipo || "",
+            item.res_orcamento?.toString().replace(".", ",") || ""
         ])
 
         console.log(tempExport);
@@ -473,7 +475,8 @@ function exportTableToCSV() {
             'PG',
             'Responsável',
             'Status',
-            'Tipo'
+            'Tipo',
+            'Valor'
         ],
         body: tempExport
     }, 'Material x Programado');
@@ -542,3 +545,14 @@ function formatarDataPtBR(dataISO) {
         return dataISO;
     }
 }
+
+function calculateMoney(){
+    let total = 0;
+
+    dadosTable.forEach(item => {
+        total += parseFloat(item.res_orcamento) || 0;
+    });
+    document.getElementById("orcamento_m").innerText = formatarMoeda(total);
+    return total;
+}
+
