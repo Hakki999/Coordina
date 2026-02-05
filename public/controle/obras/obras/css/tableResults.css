@@ -704,3 +704,21 @@
     padding-left: 20px;
     font-weight: normal;
 }
+
+.headTable th:hover{
+    background-color: var(--emphasisColor) !important;
+}
+
+.headTable th::after{
+    content: "🔍︎";
+    position: absolute;
+    transform: translateX(10px) translateY(50px);
+    transition: 0.1s ease-in-out;
+}
+
+.headTable th:hover::after{
+    content: "🔍︎";
+    position: absolute;
+    transform: translateX(10px) translateY(0px) !important;
+    
+}

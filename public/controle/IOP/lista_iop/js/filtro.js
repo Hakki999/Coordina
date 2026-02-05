@@ -15,31 +15,30 @@ function filtroOpen(typeFilterB) {
     switch (typeFilterB) {
         case 'dataExe':
             typeInput = 'date'
+            autoComplet = [...new Set(dadosTable.filter(item => item.res_data_exe).map(item => item.res_data_exe))];
             break;
         case 'nota':
             typeInput = 'number'
             autoComplet = [...new Set(dadosTable.filter(item => item.res_nota).map(item => item.res_nota))];
-            autoComplet = formatOption(autoComplet);
             break;
 
         case 'status':
             typeInput = 'text'
             autoComplet = [...new Set(dadosTable.filter(item => item.res_status).map(item => item.res_status))];
-            autoComplet = formatOption(autoComplet);
             break;
         case 'resp':
             typeInput = 'text'
             autoComplet = [...new Set(dadosTable.filter(item => item.res_resp).map(item => item.res_resp))];
-            autoComplet = formatOption(autoComplet);
             break;
         case 'nomeObra':
             typeInput = 'text'
             autoComplet = [...new Set(dadosTable.filter(item => item.res_nome_obra).map(item => item.res_nome_obra))];
-            autoComplet = formatOption(autoComplet);
             break;
         default:
             typeInput = 'text'
     }
+
+    autoComplet = formatOption(autoComplet);
 
     const htmlFiltro = `
     <div class="inputMensageContainner">
