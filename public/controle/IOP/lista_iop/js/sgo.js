@@ -29,11 +29,12 @@ async function get_status(ids) {
             }
 
             const data = await response.json();
-            
+            console.log(data);
+
             resultados.push({
                 id: id,
-                idSap: data[0]?.SolicitacaoId || null,
-                DescStatusNota: data[0]?.DescStatusNota || null,
+                res_sap: data[0]?.SolicitacaoId || null,
+                res_status: data[0]?.DescStatusNota || null,
                 status: 'sucesso',
                 timestamp: new Date().toISOString()
             });
@@ -41,8 +42,8 @@ async function get_status(ids) {
         } catch (error) {
             resultados.push({
                 id: id,
-                idSap: null,
-                DescStatusNota: null,
+                res_sap: null,
+                res_status: null,
                 error: error.message,
                 status: 'erro',
                 timestamp: new Date().toISOString()
@@ -54,8 +55,8 @@ async function get_status(ids) {
             await new Promise(resolve => setTimeout(resolve, 100));
         }
     }
-    
-    console.log(`✅ Busca concluída: ${resultados.length} resultados`);
+
+    console.log(`✅ Busca concluída: ${resultados.length} resultados: \n ${JSON.stringify(resultados, null, 2)}`);
     return resultados;
 }
 
@@ -140,6 +141,7 @@ function main_status(){
     get_status(notas).then(resultados => {
         
         resultados.forEach(resultado => {
+            console.warn(resultado);
             
             atualizarDados(resultado)
         });
