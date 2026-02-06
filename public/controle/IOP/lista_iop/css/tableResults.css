@@ -1,7 +1,6 @@
 .tableResults {
     width: 90%;
     height: 90vh;
-    /* Usando viewport height para altura fixa */
     background-color: var(--primaryColor);
     box-shadow: 0px 0px 5px var(--primaryColor);
     border-radius: 15px;
@@ -10,7 +9,6 @@
     font-family: 'Segoe UI', sans-serif;
     table-layout: fixed;
     margin-top: 60px;
-    /* Garante layout consistente */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -19,18 +17,13 @@
 
 .tableResults tr {
     transition: background-color 0.3s ease, padding-left 0.3s ease;
-    transition: 0.3s ease-in-out;
 }
 
 .tableResults tr:hover {
     background-color: color-mix(in srgb, var(--emphasisColor) 10%, transparent) !important;
     padding-left: 10px;
     border-left: 5px solid var(--emphasisColor);
-    
 }
-
-
-
 
 .tableResults thead tr {
     height: 60px;
@@ -45,7 +38,6 @@
     position: relative;
     overflow: hidden;
     padding: 8px;
-    /* Mude para 8px para combinar com o td */
     font-weight: 600;
     font-size: 14px;
     border-bottom: 2px solid color-mix(in srgb, var(--fontColor) 40%, transparent);
@@ -55,11 +47,8 @@
     display: block;
     width: 100%;
     height: calc(90vh - 60px);
-    padding: 0px !important;
+    padding: 0 !important;
     overflow-y: auto;
-    /* Scroll vertical se necessário */
-
-
 }
 
 .tableResults thead,
@@ -67,13 +56,11 @@
     display: table;
     width: 100%;
     table-layout: fixed;
-    /* Garante que as células tenham exatamente a mesma largura */
 }
 
 .tableResults th,
 .tableResults td {
     box-sizing: border-box;
-    /* Inclui padding na largura total */
 }
 
 .tableResults tbody td {
@@ -84,7 +71,6 @@
     border-bottom: 1px solid color-mix(in srgb, var(--secundaryColor) 30%, transparent);
     transition: background-color 0.2s ease;
     word-wrap: break-word;
-    /* Quebra palavras longas */
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -100,10 +86,9 @@
 }
 
 .tableRow {
-    transition: 0.1s ease-in-out;
+    transition: all 0.1s ease-in-out;
 }
 
-/* Efeito hover para melhor interação */
 .tableRow:hover {
     background-color: color-mix(in srgb, var(--thirdColor) 50%, transparent) !important;
     color: var(--fontColor);
@@ -135,11 +120,9 @@
 
 .filtroPesquisa::before {
     content: "🔍";
-
     position: absolute;
     transform: translate3d(-20px, 20px, 0) scale(0);
     transition: 0.2s ease-in-out;
-
     background: var(--fontColor);
     -webkit-background-clip: text;
     background-clip: text;
@@ -147,10 +130,9 @@
     display: inline-block;
 }
 
-.filtroPesquisa:hover:before {
-    transform: translate3d(-20px, 0px, 0) scale(1);
+.filtroPesquisa:hover::before {
+    transform: translate3d(-20px, 0, 0) scale(1);
 }
-
 
 #tableBody {
     overflow-x: hidden;
@@ -161,21 +143,18 @@
 }
 
 /* ------------------------------------------------------------------------ */
-/* ------------------------------------------------------------------------ */
-/* ------------------------------------------------------------------------ */
+/* Filtro Container */
 /* ------------------------------------------------------------------------ */
 
 .filtroCont {
     width: 100%;
     height: 100%;
-
     position: absolute;
-    top: 0px;
-    left: 0px;
+    top: 0;
+    left: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-
     background-color: color-mix(in srgb, var(--secundaryColor) 50%, transparent);
     backdrop-filter: blur(5px);
 }
@@ -183,11 +162,9 @@
 .filtro {
     width: 400px;
     height: 300px;
-
     background-color: var(--thirdColor);
     box-shadow: 0px 0px 10px var(--primaryColor);
     border-radius: 15px;
-
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -196,18 +173,16 @@
 
 .titleFiltro {
     width: 100%;
-    padding: 10px 0px;
+    padding: 10px 0;
     display: flex;
     align-items: center;
     justify-content: center;
-
     border-bottom: 1px solid color-mix(in srgb, var(--fontColor) 50%, transparent);
 }
 
 .filtroBody {
     width: 100%;
     height: 100%;
-
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -225,12 +200,10 @@
 .inputFiltro {
     width: 40%;
     height: 80%;
-
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-around;
-
     background-color: var(--primaryColor);
     border-radius: 10px;
 }
@@ -238,14 +211,10 @@
 .inputFiltro input {
     width: 90%;
     height: 50%;
-
     border-radius: 15px;
-
     background-color: var(--fontColor);
     text-align: center;
 }
-
-
 
 .filtroStyleButton {
     width: 90%;
@@ -260,62 +229,200 @@
     transform: scale(1.05);
 }
 
-.editButton {
-    width: 15px;
-    height: 15px;
-    color: transparent;
-    background-image: url('/controle/IOP/lista_iop/icons/editar.png');
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    /* Azul ciano */
-    filter: invert(38%) sepia(90%) saturate(600%) hue-rotate(165deg) brightness(100%) contrast(95%);
-}
-
-.padd {
-    width: 15px;
-    height: 15px;
-    color: transparent;
-    background-image: url('/controle/IOP/lista_iop/icons/padd.png');
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    /* Azul ciano */
-    filter: invert(38%) sepia(90%) saturate(600%) hue-rotate(165deg) brightness(100%) contrast(95%);
-}
-
+.editButton,
+.padd,
 .copyinfo {
     width: 15px;
     height: 15px;
     color: transparent;
-    background-image: url('/controle/IOP/lista_iop/icons/copy.png');
     background-repeat: no-repeat;
     background-size: cover;
     background-color: transparent;
     border: none;
     cursor: pointer;
-    /* Azul ciano */
     filter: invert(38%) sepia(90%) saturate(600%) hue-rotate(165deg) brightness(100%) contrast(95%);
 }
 
-.headTable th:hover{
+.editButton {
+    background-image: url('/controle/IOP/lista_iop/icons/editar.png');
+}
+
+.padd {
+    background-image: url('/controle/IOP/lista_iop/icons/padd.png');
+}
+
+.copyinfo {
+    background-image: url('/controle/IOP/lista_iop/icons/copy.png');
+}
+
+.headTable th:hover {
     background-color: var(--emphasisColor) !important;
 }
 
-.headTable th::after{
+.headTable th::after {
     content: "🔍︎";
     position: absolute;
-    transform: translateX(10px) translateY(50px);
+    transform: translate(10px, 50px);
     transition: 0.1s ease-in-out;
 }
 
-.headTable th:hover::after{
-    content: "🔍︎";
-    position: absolute;
-    transform: translateX(10px) translateY(0px) !important;
-    
+.headTable th:hover::after {
+    transform: translate(10px, 0) !important;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Estilos do Select */
+/* ------------------------------------------------------------------------ */
+
+#tableBody select {
+    width: 100%;
+    min-width: 120px;
+    max-width: 200px;
+    padding: 7px 12px;
+    border-radius: 10px;
+    background: linear-gradient(145deg, 
+        color-mix(in srgb, var(--secundaryColor) 95%, transparent),
+        color-mix(in srgb, var(--secundaryColor) 85%, transparent));
+    border: 1.5px solid color-mix(in srgb, var(--emphasisColor) 20%, transparent);
+    color: var(--fontColor);
+    font-family: "Open Sans", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 5;
+    box-shadow: 
+        inset 0 1px 3px rgba(0, 0, 0, 0.1),
+        0 1px 2px rgba(255, 255, 255, 0.05);
+    text-align: center;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+#tableBody select:hover {
+    border-color: color-mix(in srgb, var(--emphasisColor) 40%, transparent);
+    background: linear-gradient(145deg, 
+        color-mix(in srgb, var(--secundaryColor) 100%, transparent),
+        color-mix(in srgb, var(--secundaryColor) 90%, transparent));
+    box-shadow: 
+        inset 0 1px 3px rgba(0, 0, 0, 0.1),
+        0 2px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+    z-index: 10;
+}
+
+#tableBody select:focus {
+    outline: none;
+    border-color: var(--emphasisColor);
+    box-shadow: 
+        0 0 0 2px color-mix(in srgb, var(--emphasisColor) 25%, transparent),
+        0 4px 12px color-mix(in srgb, var(--emphasisColor) 20%, transparent),
+        inset 0 1px 3px rgba(255, 255, 255, 0.1);
+    background: var(--secundaryColor);
+    transform: translateY(-1px);
+    z-index: 20;
+}
+
+#tableBody select:active {
+    transform: translateY(0);
+    transition: transform 0.1s;
+}
+
+#tableBody select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: color-mix(in srgb, var(--secundaryColor) 60%, transparent);
+    border-color: color-mix(in srgb, var(--emphasisColor) 10%, transparent);
+    transform: none !important;
+    box-shadow: none;
+}
+
+#tableBody select option {
+    background-color: var(--primaryColor);
+    color: var(--fontColor);
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 400;
+    border-bottom: 1px solid color-mix(in srgb, var(--thirdColor) 30%, transparent);
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+#tableBody select option:checked {
+    background: linear-gradient(135deg, 
+        color-mix(in srgb, var(--emphasisColor) 30%, transparent),
+        color-mix(in srgb, var(--emphasisColor) 20%, transparent));
+    color: white;
+    font-weight: 500;
+    position: relative;
+}
+
+#tableBody select option:hover {
+    background-color: color-mix(in srgb, var(--emphasisColor) 40%, transparent);
+    color: white;
+    transform: translateX(5px);
+    box-shadow: -2px 0 0 var(--emphasisColor);
+}
+
+#tableBody select option[value=""][disabled] {
+    color: color-mix(in srgb, var(--fontColor) 50%, transparent);
+    font-style: italic;
+    background-color: var(--primaryColor);
+}
+
+#tableResults select option.default-option {
+    font-weight: 600;
+    border-left: 3px solid var(--emphasisColor);
+}
+
+/* ------------------------------------------------------------------------ */
+/* Animações e Efeitos */
+/* ------------------------------------------------------------------------ */
+
+#tableBody select.updated {
+    animation: selectUpdate 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#tableBody select:invalid:not(:focus):not(:placeholder-shown) {
+    border-color: #F44336;
+    animation: selectShake 0.5s ease;
+    box-shadow: 0 0 0 1px color-mix(in srgb, #F44336 20%, transparent);
+}
+
+#tableBody select.loading {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%230888ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 12a9 9 0 1 1-6.219-8.56'/%3E%3C/svg%3E");
+    background-position: right 10px center;
+    background-size: 12px;
+    animation: spin 1s linear infinite;
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+@keyframes selectUpdate {
+    0% { 
+        transform: scale(1);
+        background-color: inherit;
+    }
+    50% { 
+        transform: scale(1.03);
+        background-color: color-mix(in srgb, var(--emphasisColor) 20%, transparent);
+    }
+    100% { 
+        transform: scale(1);
+        background-color: inherit;
+    }
+}
+
+@keyframes selectShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-3px); }
+    75% { transform: translateX(3px); }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }

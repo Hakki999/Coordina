@@ -340,6 +340,29 @@ function initializeCopyButtons() {
     });
 }
 
+function atualizarDadosTabela(dados) {
+    fetch('/atualizar_obras', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dados),
+        credentials: 'include'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            criarMensagem(true, data.message || 'Atualizado com sucesso');
+            
+        } else {
+            criarMensagem(false, data.message || 'Erro ao atualizar');
+        }
+    })
+    .catch(error => {
+        console.error('Erro na requisição:', error);
+    });
+}
+
 function buscar_dados() {
     fetch('/getIOP', {
         method: 'POST',
@@ -410,6 +433,14 @@ function render_dados() {
           </th>
           <td>${item.res_nota || ''}</td>
           <td>${item.res_status || ''}</td>
+          <td>
+            <select class="baixa-select" data-id="${item.id || ''}" ${JSON.parse(localStorage.getItem('acesso') || '{}').edit_baixa ? '' : 'disabled'}>
+                <option value="" ${!item.res_baixa ? 'selected' : ''} disabled>Selecione</option>
+                <option value="Sem" ${item.res_baixa === 'Sem' ? 'selected' : ''}>Sem</option>
+                <option value="Parcial" ${item.res_baixa === 'Parcial' ? 'selected' : ''}>Parcial</option>
+                <option value="Total" ${item.res_baixa === 'Total' ? 'selected' : ''}>Total</option>
+            </select>
+          </td>
           <td>${cidades.find(cidade => cidade.value === item.res_cidade)?.label || item.res_cidade || ''}</td>
           <td>${item.res_nome_obra || ''}</td>
           <td>${item.res_data_exe || ''}</td>
@@ -556,3 +587,69 @@ function calculateMoney(){
     return total;
 }
 
+function atualizarDadosTabela(dados) {
+    dados.table = 'table_iop';
+    fetch('/atualizarStatus', {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dados),
+        credentials: 'include'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            criarMensagem(true, data.message || 'Atualizado com sucesso');
+            
+        } else {
+            criarMensagem(false, data.message || 'Erro ao atualizar');
+        }
+    })
+    .catch(error => {
+        console.error('Erro na requisição:', error);
+    });
+}
+
+
+tableBody.addEventListener("change", evt => {
+    // Obtém o elemento que foi alterado
+    const changedElement = evt.target;
+    
+    // Verifica se é um dos selects que queremos monitorar
+    if (
+        !changedElement.classList.contains('baixa-select')
+    ) {
+        return; // Sai se não for um dos nossos selects
+    }
+    
+    // Obtém o ID da linha/registro
+    const id = changedElement.getAttribute("data-id");
+    
+    if (!id) {
+        console.warn('Elemento sem data-id:', changedElement);
+        return;
+    }
+    
+    // Encontra o item correspondente
+    let item = dadosTable.find(item => item.id == id);
+    
+    if (item) {
+        console.log('Item encontrado:', item);
+
+        const linha = changedElement.closest('tr');
+        if (linha) {
+            const baixaSelect = linha.querySelector('.baixa-select');
+
+            if (baixaSelect) item.res_baixa = baixaSelect.value;
+
+            console.warn('Item com baixa atualizado:', baixaSelect);
+        }
+        console.warn('Item atualizado:', item);
+
+        // Atualiza a tabela
+        atualizarDadosTabela(item);
+    } else {
+        console.warn('Item não encontrado para ID:', id);
+    }
+});

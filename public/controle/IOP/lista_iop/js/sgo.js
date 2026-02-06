@@ -32,7 +32,7 @@ async function get_status(ids) {
             console.log(data);
 
             resultados.push({
-                id: id,
+                id: dadosTable.find(item => item.res_nota === id)?.id || null,
                 res_sap: data[0]?.SolicitacaoId || null,
                 res_status: data[0]?.DescStatusNota || null,
                 status: 'sucesso',
@@ -41,7 +41,7 @@ async function get_status(ids) {
             
         } catch (error) {
             resultados.push({
-                id: id,
+                id: dadosTable.find(item => item.res_nota === id)?.id || null,
                 res_sap: null,
                 res_status: null,
                 error: error.message,

@@ -407,14 +407,22 @@ function render_dados() {
         <option value="Ir em campo" ${item.res_status_asbuilt === 'Ir em campo' ? 'selected' : ''}>Ir em campo</option>
         <option value="Ir em campo" ${item.res_status_asbuilt === 'Obra parcial' ? 'selected' : ''}>Obra parcial</option>
     </select>
-
+            </td>
+            <td>
+    <select class="baixa-select" data-id="${item.id || ''}" ${JSON.parse(localStorage.getItem('acesso') || '{}').edit_baixa ? '' : 'disabled'}>
+        <option value="" ${!item.res_baixa ? 'selected' : ''} disabled>Selecione</option>
+        <option value="Sem" ${item.res_baixa === 'Sem' ? 'selected' : ''}>Sem</option>
+        <option value="Parcial" ${item.res_baixa === 'Parcial' ? 'selected' : ''}>Parcial</option>
+        <option value="Total" ${item.res_baixa === 'Total' ? 'selected' : ''}>Total</option>
+    </select>
+            </td>
           <td>${cidades.find(cidade => cidade.value === item.res_cidade)?.label || item.res_cidade || ''}</td>
 
           <td>${formatarDataBR(item.res_data_exe) || ''}</td>
 
           <td>${calculateTempoResposta(item.res_data_exe, item.res_last_updated, item.res_status_asbuilt).dias || ''}<span style="opacity: 0.5; font-size: 0.8em"> dias</span></td>
           <td>
-    <select class="opex-select" data-id="${item.id || ''}" ${item.readonly ? 'disabled' : ''}>
+    <select class="opex-select" data-id="${item.id || ''}" >
         <option value="" ${!item.res_opex ? 'selected' : ''} disabled>Selecione</option>
         <option value="Sim" ${item.res_opex === 'Sim' ? 'selected' : ''}>Sim</option>
         <option value="Não" ${item.res_opex === 'Não' ? 'selected' : ''}>Não</option>
@@ -559,7 +567,8 @@ tableBody.addEventListener("change", evt => {
     // Verifica se é um dos selects que queremos monitorar
     if (!changedElement.classList.contains('opex-select') && 
         !changedElement.classList.contains('resp-select') &&
-        !changedElement.classList.contains('status-select')
+        !changedElement.classList.contains('status-select') &&
+        !changedElement.classList.contains('baixa-select')
     ) {
         return; // Sai se não for um dos nossos selects
     }
@@ -583,10 +592,14 @@ tableBody.addEventListener("change", evt => {
             const opexSelect = linha.querySelector('.opex-select');
             const respSelect = linha.querySelector('.resp-select');
             const statusSelect = linha.querySelector('.status-select');
-            
+            const baixaSelect = linha.querySelector('.baixa-select');
+
             if (opexSelect) item.res_opex = opexSelect.value;
             if (respSelect) item.res_resp_asbuilt = respSelect.value;
             if (statusSelect) item.res_status_asbuilt = statusSelect.value;
+            if (baixaSelect) item.res_baixa = baixaSelect.value;
+
+            console.warn('Item com baixa atualizado:', baixaSelect);
         }
         console.warn('Item atualizado:', item);
 

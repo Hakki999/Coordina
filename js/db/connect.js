@@ -246,7 +246,8 @@ function getAcess(perfil) {
         console.log("====> Perfil de Almoxarifado detectado");
         return {
             editlibdev: true,
-            imprimir: true
+            imprimir: true,
+             edit_baixa: true
         }
     }
     if (perfil == "Alpha") {
@@ -254,7 +255,8 @@ function getAcess(perfil) {
 
         return {
             editlibdev: true,
-            imprimir: true
+            imprimir: true,
+            edit_baixa: true
         }
     }
 

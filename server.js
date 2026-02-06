@@ -75,7 +75,7 @@ app.get('/controle/obras/obras', autenticarToken, (req, res) => {
 app.post('/login', async (req, res) => {
     try {
         const { user, password } = req.body;
-
+        
         if (!user || !password) {
             return res.status(400).json({ error: "Dados incompletos" });
         }
@@ -809,11 +809,12 @@ let dados = {
     id: req.body.id,
     res_status: req.body.res_status,
     res_sap: req.body.res_sap,
-    res_orcamento: req.body.res_orcamento
+    res_orcamento: req.body.res_orcamento,
+    res_baixa: req.body.res_baixa
 };
 console.log(dados);
 
-    atualizarDados(req.body.table, dados, 'id', req.body.id)
+    atualizarDados(req.body.table, dados, 'id', dados.id)
         .then(() => {
             res.json({
                 success: true,
@@ -827,6 +828,8 @@ console.log(dados);
             })
         });
 });
+
+
 
 // ------------------------------- ping ----------------------------------------------
 app.get('/ping', (req, res) => {
