@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="./css/style.css">
+
+    <link rel="shortcut icon" href="./src/logoIcon.png" type="image/x-icon">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
+
+    <title>Coordina</title>
+</head>
+
+<body>
+    <nav id="navBar">
+        <div id="thead">
+            <img src="./src/logoIcon.png" alt="Coordina">
+        </div>
+        <ul class="menu">
+            <ul>
+                <li class="optionNav closeOption">Home
+                    <ul>
+                        <li class="menuSelect">Análise de Produção</li>
+                    </ul>
+                </li>
+                <li class="optionNav closeOption">Almoxarifado
+                    <ul>
+                        <li class="menuSelect" onclick="window.location.href = '/controle_almoxarifado';">Solicitação
+                        </li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle_almoxarifado';">Recebidos</li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle_almoxarifado';">Config</li>
+                        <li class="menuSelect" onclick="window.location.href = '/lista_materiais';">Lista de Materiais
+                        </li>
+                    </ul>
+                </li>
+                <li class="optionNav openOption">Controle
+                    <ul>
+                        <li class="menuSelect" onclick="window.location.href = '/controle/iop/add';">Cadastrar IOP</li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle/iop/lista_iop';">IOP</li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle/obras/add';">Cadastrar Obra</li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle/obras/obras';">Obras</li>
+                        <li class="menuSelect menuSelected" onclick="window.location.href = '/controle/producao';">Produção</li>
+                    </ul>
+                </li>
+                <li class="optionNav closeOption">Programação
+                    <ul>
+                        <li class="menuSelect" onclick="window.location.href = '/programacao';">Materiais x Programado
+                        </li>
+                    </ul>
+                </li>
+                <li class="optionNav closeOption">Dashboard
+                    <ul>
+                        <li class="menuSelect" onclick="window.location.href = '/dashboard/equipes';">Dashboard Equipes
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </ul>
+    </nav>
+
+    <main id="rootMain">
+        <div class="page-header">
+            <h1>Análise de Produção por Pessoa - IOP</h1>
+            <p>Visualização e análise da produção individual com base nos dados de obras</p>
+        </div>
+
+        <div class="summary-cards">
+            <div class="summary-card">
+                <h3>Total de Obras</h3>
+                <div class="value" id="totalObras">0</div>
+                <div class="subtext">Obras em execução</div>
+            </div>
+            <div class="summary-card">
+                <h3>Valor Total</h3>
+                <div class="value" id="valorTotal">R$ 0,00</div>
+                <div class="subtext">Orçamento total das obras</div>
+            </div>
+            <div class="summary-card">
+                <h3>Pessoas</h3>
+                <div class="value" id="totalPessoas">0</div>
+                <div class="subtext">Responsáveis por obras</div>
+            </div>
+            <div class="summary-card">
+                <h3>Média por Obra</h3>
+                <div class="value" id="mediaObra">R$ 0,00</div>
+                <div class="subtext">Valor médio por obra</div>
+            </div>
+        </div>
+
+        <div class="filters-container">
+            <h3>Filtros</h3>
+            <div class="filter-group">
+                <div class="filter-item">
+                    <label for="filterPerson">Responsável</label>
+                    <select id="filterPerson">
+                        <option value="all">Todos os responsáveis</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label for="filterCity">Cidade</label>
+                    <select id="filterCity">
+                        <option value="all">Todas as cidades</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label for="filterType">Tipo de Obra</label>
+                    <select id="filterType">
+                        <option value="all">Todos os tipos</option>
+                        <option value="RC">RC</option>
+                        <option value="RT">RT</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label for="filterDate">Data de Execução (até)</label>
+                    <input type="date" id="filterDate">
+                </div>
+                <!-- Novo filtro de data de criação do projeto -->
+                <div class="date-filter-container">
+                    <div class="date-filter-header">
+                        <h4>Data de Criação do Projeto</h4>
+                        <select id="dateFilterType" class="date-filter-select">
+                            <option value="specific">Data específica</option>
+                            <option value="range">Intervalo de datas</option>
+                        </select>
+                    </div>
+
+                    <!-- Campo para data específica -->
+                    <div id="specificDateContainer" class="date-filter-fields">
+                        <div class="date-input-group">
+                            <label for="filterSpecificDate">Data de criação</label>
+                            <input type="date" id="filterSpecificDate" class="date-input">
+                        </div>
+                    </div>
+
+                    <!-- Campos para intervalo de datas -->
+                    <div id="dateRangeContainer" class="date-filter-fields" style="display: none;">
+                        <div class="date-range-group">
+                            <div class="date-input-group">
+                                <label for="filterStartDate">Data inicial</label>
+                                <input type="date" id="filterStartDate" class="date-input">
+                            </div>
+                            <div class="date-range-separator">até</div>
+                            <div class="date-input-group">
+                                <label for="filterEndDate">Data final</label>
+                                <input type="date" id="filterEndDate" class="date-input">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="filter-buttons">
+                <button class="btn btn-primary" id="applyFilters">Aplicar Filtros</button>
+                <button class="btn btn-secondary" id="resetFilters">Limpar Filtros</button>
+                <button class="btn btn-secondary" id="exportData">Exportar Dados</button>
+            </div>
+        </div>
+
+        <div class="charts-container">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>Produção por Responsável (Valor)</h3>
+                    <select id="chartType"
+                        style="background-color: var(--thirdColor); color: var(--fontColor); padding: 5px; border-radius: 5px;">
+                        <option value="bar">Gráfico de Barras</option>
+                        <option value="pie">Gráfico de Pizza</option>
+                    </select>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="productionChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>Distribuição por Tipo de Obra</h3>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="typeChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <h3>Detalhes das Obras</h3>
+            <table class="production-table">
+                <thead>
+                    <tr>
+                        <th>Responsável</th>
+                        <th>Obra</th>
+                        <th>Cidade</th>
+                        <th>Tipo</th>
+                        <th>Data Execução</th>
+                        <th>Orçamento</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Dados serão preenchidos via JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script src="./js/graficos.js"></script>
+    <script src="./js/main.js"></script>
+
+</body>
+
+</html>

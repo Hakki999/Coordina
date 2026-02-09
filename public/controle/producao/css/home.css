@@ -1,0 +1,32 @@
+#rootMain{
+    width: calc(100% - 250px);
+    height: 100%;
+
+    position: absolute;
+    right: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: linear-gradient(45deg, var(--thirdColor) 0%, var(----primaryColor) 100%);
+    text-align: center;
+}
+
+#mainContent img{
+    width: 300px;
+    height: 300px;
+    margin-top: 100px;
+    padding: 50px;
+    border-radius: 60%;
+    background-color: var(--fontColor);
+    object-fit: contain;
+    box-shadow: 5px 5px 10px var(--thirdColor);
+    transition: all 0.3s ease-in-out;
+}
+
+#mainContent img:hover{
+    box-shadow: 8px 8px 15px var(--primaryColor);
+    transform: scale(1.05);
+    
+}

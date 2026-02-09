@@ -70,6 +70,11 @@ app.get('/controle/obras/obras', autenticarToken, (req, res) => {
     res.sendFile(__dirname + "/public/controle/obras/obras/index.html");
 });
 
+app.get('/controle/producao/', autenticarToken, (req, res) => {
+    res.sendFile(__dirname + "/public/controle/producao/index.html");
+});
+
+
 // ------------------------------- Solicitações ---------------------------------------
 
 app.post('/login', async (req, res) => {
@@ -783,7 +788,6 @@ app.post('/getObras', autenticarToken, async (req, res) => {
     }
 });
 
-
 app.post('/atualizar_obras', autenticarToken, (req, res) => {
     // Lógica para atualizar IOP
 
@@ -828,7 +832,6 @@ console.log(dados);
             })
         });
 });
-
 
 
 // ------------------------------- ping ----------------------------------------------
