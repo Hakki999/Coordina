@@ -861,13 +861,30 @@ function dbclickRow(rowId) {
  * Preenche modal com detalhes da solicitação
  */
 function preencherModalDetalhes(itemData) {
+
+    const data = new Date(itemData.DataSol);
+
+    // Subtrai 3 horas (3 * 60 * 60 * 1000 ms)
+    data.setHours(data.getHours() - 3);
+
+    // Formata em PT-BR
+    const dataFormatadaSol = data.toLocaleString("pt-BR", {
+        timeZone: "America/Sao_Paulo",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+    });
+
     // Preencher dados básicos
     document.getElementById("lmSolicitante").innerText = itemData.Solicitante || 'N/A';
     document.getElementById("lmProjeto").innerText = itemData.Projeto || 'N/A';
     document.getElementById("lmCidade").innerText = itemData.Cidade || 'N/A';
     document.getElementById("lmTensao").innerText = itemData.Tensao || 'N/A';
     document.getElementById("lmEquipe").innerText = itemData.equipe || 'N/A';
-    document.getElementById("lmDataSol").innerText = formatarData(itemData.DataSol) || 'N/A';
+    document.getElementById("lmDataSol").innerText = dataFormatadaSol || 'N/A';
     document.getElementById("lmDataExe").innerText = formatarData(itemData.DataExe) || 'N/A';
     document.getElementById("lmObs").innerText = itemData.obs || 'N/A';
 
