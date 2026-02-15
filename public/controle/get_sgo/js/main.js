@@ -1,5 +1,6 @@
 // Configuração inicial do menu
 const optionNav = document.querySelectorAll(".optionNav");
+let resRequestLength = 0;
 
 optionNav.forEach(option => {
     option.addEventListener("click", evt => {
@@ -67,11 +68,6 @@ function extrairIdsDoTextarea(texto) {
         .split('\n')
         .map(id => id.trim())
         .filter(id => id.length > 0);
-}
-
-// Função para criar mensagens visuais
-function criarMensagem(sucesso, texto) {
-    console.log(sucesso ? '✅' : '❌', texto);
 }
 
 // Função para converter data do formato .NET
@@ -472,7 +468,7 @@ function criarTabelaHTML(csv) {
 
     // Adicionar legenda
     html += '<div class="tabela-legenda">';
-    html += '<p><span class="legenda-item">📊</span> Total de linhas: ' + dados.length + '</p>';
+    html += '<p><span class="legenda-item">📊</span> Total de linhas: ' + dados.length +"/"+  resRequestLength + ' | ' + ((dados.length / resRequestLength) * 100).toFixed(2) + '%</p>';
     html += '<p><span class="legenda-item">✅</span> Clique no botão "Download CSV" para baixar o arquivo original</p>';
     html += '</div>';
 
@@ -546,6 +542,9 @@ async function sendRequest() {
         MAX_RETRIES: parseInt(document.querySelector('#tmMaxTentativas').value) || 3,
         RETRY_DELAY: 1000
     };
+
+        resRequestLength = document.querySelector('#resRequest');
+        resRequestLength = resRequestLength.value.split('\n').filter(id => id.trim() !== '').length;
 
     const ids = extrairIdsDoTextarea(resRequest.value);
 
@@ -651,8 +650,7 @@ async function sendRequest() {
         console.log(`   ❌ Erros: ${erros}`);
         console.log('='.repeat(50));
         const trLength = document.querySelectorAll('.tabela-resultados tbody tr').length;
-        let resRequestLength = document.querySelector('#resRequest');
-        resRequestLength = resRequestLength.value.split('\n').filter(id => id.trim() !== '').length;
+        
 
         document.querySelector('.tabela-legenda').innerHTML = `
             <p>📦 IDs processados: ${todosResultados.length}</p>
