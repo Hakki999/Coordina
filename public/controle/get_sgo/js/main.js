@@ -660,7 +660,7 @@ async function sendRequest() {
             <p>📋 Resultado: ${trLength}/${resRequestLength} | ${((trLength/resRequestLength)*100).toFixed(2)}%</p>
         `;
 
-
+        criarMensagem(true, 'Processamento concluído com sucesso!');
 
     } catch (error) {
         console.error('❌ Erro durante o processamento:', error);

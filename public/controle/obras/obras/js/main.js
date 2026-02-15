@@ -363,7 +363,8 @@ function render_dados() {
     tableBody.innerHTML = ""; // Clear existing rows
     data.forEach(item => {
         const row = document.createElement("tr");
-        row.setAttribute('data-id', item.id);
+        row.setAttribute('data-id', item.id)
+        row.setAttribute('ondblclick', `openModal('${item.id}')`);
 
         // Processar parcelas_adicionais para mostrar no botão
         let totalParcelas = 0;

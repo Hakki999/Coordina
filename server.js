@@ -281,7 +281,6 @@ app.post('/filtroSolicitacoes', autenticarToken, (req, res) => {
 });
 
 app.post('/changeLibDev', validationSchemas.changeLibDev, handleValidationErrors, autenticarToken, (req, res) => {
-    console.log(req.body);
 
     changeLibDev(req.body.dataTemp, req.body.id).then(data => {
         console.log('🔃Atualização realizada com sucesso🔃 id:' + req.body.id);
@@ -361,13 +360,11 @@ app.post('/getListMaterials', autenticarToken, (req, res) => {
     processLM().then(data => {
 
         console.log("✅ Materiais distrinchados enviados! - processLM()");
-        console.log(data);
 
         res.json(data)
     }).catch(err => {
 
         console.log("❌ Erro ao buscar materiais! distinchados - processLM()");
-        console.log(err);
 
     })
 })
@@ -665,7 +662,6 @@ app.post('/createNewObras', autenticarToken, async (req, res) => {
 
         const iopExistente = await buscarDados('table_obras', 'res_nota',  req.body.nota.trim(), 1, true);
         console.log("----------------------");
-        console.log(iopExistente);
         console.log("----------------------");
         if (iopExistente.length > 0) {
             console.log('⚠️ IOP já existe com nota:', req.body.nota.trim());
@@ -819,7 +815,6 @@ let dados = {
     res_orcamento: req.body.res_orcamento,
     res_baixa: req.body.res_baixa
 };
-console.log(dados);
 
     atualizarDados(req.body.table, dados, 'id', dados.id)
         .then(() => {

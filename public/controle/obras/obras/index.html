@@ -6,15 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" href="/controle/obras/obras/css/style.css">
-    <link rel="stylesheet" href="/controle/obras/obras/css/home.css">
     <link rel="stylesheet" href="/controle/obras/obras/css/tableResults.css">
     <link rel="stylesheet" href="/controle/obras/obras/css/optionsBar.css">
-    <link rel="stylesheet" href="/controle/obras/obras/css/details.css">
     <link rel="stylesheet" href="/controle/obras/obras/css/filter.css">
-    <link rel="stylesheet" href="/controle/obras/obras/css/editor.css">
-    <link rel="stylesheet" href="/controle/obras/obras/css/padd.css">
+    <link rel="stylesheet" href="/controle/obras/obras/css/workDetails.css">
     <link rel="shortcut icon" href="/controle/obras/obras/icons/logoIcon.png" type="image/x-icon">
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <title>Coordina</title>
 </head>
 
@@ -49,8 +46,8 @@
                         </li>
                         <li class="menuSelect menuSelected" onclick="window.location.href = '/controle/obras/obras';">
                             Obras</li>
-                            <li class="menuSelect" onclick="window.location.href = '/controle/producao';">Produção</li>
-                            <li class="menuSelect" onclick="window.location.href = '/controle/get_sgo';">Get SGO</li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle/producao';">Produção</li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle/get_sgo';">Get SGO</li>
                     </ul>
                 </li>
                 <li class="optionNav closeOption">Programação
@@ -95,10 +92,30 @@
             </tbody>
         </table>
     </main>
+
+    <div class="workDetailsContainer" id-open="" >
+        <div class="closeButton" onclick="closeModal()"></div>
+        <div class="workDetails">
+            <table class="workDetailsTable">
+                <thead id="workDetailsHeader"></thead>
+                <tbody id="workDetailsBody"></tbody>
+            </table>
+            <div class="workConfig">
+                <input type="file" placeholder=" ">
+                <div class="workInfo">
+                    <p>Valor dos serviços:</p>
+                    <p>Quantidade de serviço:</p>
+                </div>
+                <button id="btnProcessar">Processar</button>
+            </div>
+        </div>
+    </div>
+    <script src="/controle/obras/obras/js/formatarMoeda.js"></script>
     <script src="/controle/obras/obras/js/main.js"></script>
     <script src="/controle/obras/obras/js/exportCSV.js"></script>
     <script src="/controle/obras/obras/js/mensagem.js"></script>
     <script src="/controle/obras/obras/js/filtro.js"></script>
+    <script src="/controle/obras/obras/js/workDetails.js"></script>
 
 </body>
 
