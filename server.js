@@ -74,6 +74,9 @@ app.get('/controle/producao/', autenticarToken, (req, res) => {
     res.sendFile(__dirname + "/public/controle/producao/index.html");
 });
 
+app.get('/controle/get_sgo/', autenticarToken, (req, res) => {
+    res.sendFile(__dirname + "/public/controle/get_sgo/index.html");
+});
 
 // ------------------------------- Solicitações ---------------------------------------
 

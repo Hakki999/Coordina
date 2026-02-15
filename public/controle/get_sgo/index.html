@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/sgo.css">
+    <link rel="shortcut icon" href="./src/logoIcon.png" type="image/x-icon">
+
+    <title>Coordina</title>
+</head>
+
+<body>
+    <nav id="navBar">
+        <div id="thead">
+            <img src="./src/logoIcon.png" alt="Coordina">
+        </div>
+        <ul class="menu">
+            <ul>
+                <li class="optionNav closeOption">Home
+                    <ul>
+                        <li class="menuSelect">Home</li>
+                    </ul>
+                </li>
+                <li class="optionNav closeOption">Almoxarifado
+                    <ul>
+                        <li class="menuSelect"  onclick="window.location.href = '/controle_almoxarifado';" >Solicitação</li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle_almoxarifado';" >Recebidos</li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle_almoxarifado';">Config</li>
+                        <li class="menuSelect" onclick="window.location.href = '/lista_materiais';">Lista de Materiais</li>
+                    </ul>
+                </li>
+                <li class="optionNav openOption">Controle
+                    <ul>
+                        <li class="menuSelect" onclick="window.location.href = '/controle/iop/add';">Cadastrar IOP</li>
+                        <li class="menuSelect " onclick="window.location.href = '/controle/iop/lista_iop';">IOP</li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle/obras/add';">Cadastrar Obra</li>
+                        <li class="menuSelect " onclick="window.location.href = '/controle/obras/obras';">Obras</li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle/producao';">Produção</li>
+                        <li class="menuSelect menuSelected" onclick="window.location.href = '/controle/get_sgo';">Get SGO</li>
+                    </ul>
+                </li>
+               <li class="optionNav closeOption">Programação
+                    <ul>
+                        <li class="menuSelect" onclick="window.location.href = '/programacao';">Materiais x Programado</li>
+                    </ul>
+                </li>
+                <li class="optionNav closeOption">Dashboard
+                    <ul>
+                        <li class="menuSelect" onclick="window.location.href = '/dashboard/equipes';">Dashboard Equipes</li>
+                    </ul>
+                </li>
+            </ul>
+        </ul>
+    </nav>
+
+    <main id="rootMain">
+        <div class="headInput">
+            <select id="typeSol">
+                <option value="Notas">Obter Notas</option>
+                <option value="NomeObra">Obter Notas por nome de obra</option>
+                <option value="NPEP">Obter Numero PEP</option>
+                <option value="FluxoNota">Obter Fluxo do projeto</option>
+                <option value="OrcamentoNota">Obter Orçamento Projeto</option>
+            </select>
+            <div class="config">
+                <label for="tmLote">Tamanho do lote:</label>
+                <select name="tmLote" id="tmLote">
+                    <option value="10" selected>10</option>
+                    <option value="5">5</option>
+                    <option value="20">20</option>
+                </select>
+                <label for="tmDelay">Delay:</label>
+                <select name="tmDelay" id="tmDelay">
+                    <option value="500" selected>500ms</option>
+                    <option value="1000">1000ms</option>
+                    <option value="2000">2000ms</option>
+                </select>
+                <label for="tmMaxTentativas">Máx. Tentativas:</label>
+                <select name="tmMaxTentativas" id="tmMaxTentativas">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3" selected>3</option>
+                </select>
+                <label for="tmTimeout">Timeout:</label>
+                <select name="tmTimeout" id="tmTimeout">
+                    <option value="10000" selected>10s</option>
+                    <option value="20000">20s</option>
+                    <option value="30000">30s</option>
+                </select>
+            </div>
+            <button id="sendReq" onclick="sendRequest()">Enviar</button>
+        </div>
+        <div class="bodyReqRes">
+            <div class="reqInput inputContainer">
+                <textarea  id="resRequest" placeholder="Cole os IDs nesse lugar..."></textarea>
+            </div>
+            <div class="resInput inputContainer">
+                <textarea  id="resResponse" placeholder="Aguarde a resposta..."></textarea>
+            </div>
+        </div>
+    </main>
+    <script src="./js/mensagem.js"></script>
+    <script src="./js/main.js"></script>
+</body>
+
+</html>

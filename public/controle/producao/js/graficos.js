@@ -5,6 +5,39 @@ let filteredData = [...dadosTable];
 let productionChart = null;
 let dailyProductionChart = null;
 
+function parseBrazilianDate(dateString) {
+    if (!dateString) return null;
+    
+    // Tentar diferentes formatos
+    try {
+        // Formato 1: "02/02/2026, 16:14:27"
+        if (dateString.includes('/') && dateString.includes(',')) {
+            const [datePart, timePart] = dateString.split(', ');
+            const [day, month, year] = datePart.split('/').map(Number);
+            const [hours, minutes, seconds] = timePart.split(':').map(Number);
+            
+            return new Date(year, month - 1, day, hours, minutes, seconds);
+        }
+        
+        // Formato 2: "dd/MM/yyyy"
+        if (dateString.includes('/') && dateString.split('/').length === 3) {
+            const [day, month, year] = dateString.split('/').map(Number);
+            return new Date(year, month - 1, day);
+        }
+        
+        // Formato 3: ISO string (yyyy-MM-dd)
+        const date = new Date(dateString);
+        if (!isNaN(date.getTime())) {
+            return date;
+        }
+        
+        return null;
+    } catch (e) {
+        console.error('Erro ao converter data:', dateString, e);
+        return null;
+    }
+}
+
 // Função para formatar valores monetários
 function formatCurrency(value) {
     if (value === null || value === undefined) return 'R$ 0,00';
@@ -118,6 +151,7 @@ function populateFilters() {
 }
 
 // Função para aplicar filtros
+// Função para aplicar filtros
 function applyFilters() {
     const selectedPerson = document.getElementById('filterPerson').value;
     const selectedCity = document.getElementById('filterCity').value;
@@ -152,8 +186,37 @@ function applyFilters() {
             }
         }
 
-        // Filtro por data de criação (nova funcionalidade)
-        const creationDate = getDateOnly(item.res_data_criacao || item.res_data_exe);
+        // Filtro por data de criação (corrigido)
+        const creationDateRaw = item.res_data_criacao || item.res_data_cri;
+        
+        // Verificar se há data de criação disponível
+        if (!creationDateRaw) {
+            // Se não há data de criação e algum filtro de data foi especificado, excluir item
+            if (dateFilterType === 'specific' && specificDate) {
+                return false;
+            }
+            if (dateFilterType === 'range' && (startDate || endDate)) {
+                return false;
+            }
+            return true; // Item sem data passa se não houver filtro de data
+        }
+
+        // Parsear a data de criação usando a função parseBrazilianDate
+        const creationDateFormatted = parseBrazilianDate(creationDateRaw);
+        
+        // Se o parse falhar, tratar como data inválida
+        if (!creationDateFormatted) {
+            if (dateFilterType === 'specific' && specificDate) {
+                return false;
+            }
+            if (dateFilterType === 'range' && (startDate || endDate)) {
+                return false;
+            }
+            return true;
+        }
+
+        // Obter apenas a parte da data (YYYY-MM-DD)
+        const creationDate = getDateOnly(creationDateFormatted);
         
         if (dateFilterType === 'specific' && specificDate) {
             // Filtro por data específica
