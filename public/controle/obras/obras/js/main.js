@@ -406,7 +406,7 @@ function render_dados() {
         <option value="Problema Sistemico" ${item.res_status_asbuilt === 'Problema Sistemico' ? 'selected' : ''}>Problema Sistemico</option>
         <option value="Aguardando Evidências" ${item.res_status_asbuilt === 'Aguardando Evidências' ? 'selected' : ''}>Aguardando Evidências</option>
         <option value="Ir em campo" ${item.res_status_asbuilt === 'Ir em campo' ? 'selected' : ''}>Ir em campo</option>
-        <option value="Ir em campo" ${item.res_status_asbuilt === 'Obra parcial' ? 'selected' : ''}>Obra parcial</option>
+        <option value="Obra parcial" ${item.res_status_asbuilt === 'Obra parcial' ? 'selected' : ''}>Obra parcial</option>
     </select>
             </td>
             <td>

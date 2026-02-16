@@ -1083,7 +1083,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             
             .auto-preenchido {
-                background-color: #e8f5e8 !important;
+                background-color: #e8f5e813 !important;
                 position: relative;
             }
             
