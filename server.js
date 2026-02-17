@@ -1,7 +1,7 @@
 // ------------------------------- Requisição ----------------------------------------
 const express = require('express')
 const bodyParser = require('body-parser');
-const { jwt, autenticarToken, gotoHome } = require('./js/middleware/JWT_mid');
+const { jwt, autenticarToken, gotoHome,VerifyAcess } = require('./js/middleware/JWT_mid');
 const cookieParser = require('cookie-parser');
 const { validarLogin, buscarMateriais, enviarOrcamento, solicitacoesRecentes, filtroSolicitacoes, changeLibDev, getAcess, buscarDados, inserirNovo, atualizarDados} = require("./js/db/connect");
 const { sendMSG } = require(__dirname + '/js/WhatsAppSession/whatsAppRest');
@@ -24,7 +24,7 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.json());
-app.use(express.static(__dirname + "/public/"));
+
 app.use(cookieParser());
 app.use(compression());
 
@@ -34,15 +34,15 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + "/public/login/index.html");
 })
 
-app.get('/controle_almoxarifado', autenticarToken, (req, res) => {
+app.get('/controle_almoxarifado', autenticarToken, VerifyAcess('Alpha', 'Programacão', 'Controle', 'Almoxarifado'), (req, res) => {
     res.sendFile(__dirname + "/public/Almoxarifado/index.html")
 })
 
-app.get('/lista_materiais', autenticarToken, (req, res) => {
+app.get('/lista_materiais', autenticarToken, VerifyAcess('Alpha', 'Programacão', 'Controle', 'Almoxarifado'), (req, res) => {
     res.sendFile(__dirname + "/public/lista_materiais/")
 })
 
-app.get('/programacao', autenticarToken, (req, res) => {
+app.get('/programacao', autenticarToken, VerifyAcess('Alpha', 'Programacão', 'Controle', 'Almoxarifado'), (req, res) => {
     res.sendFile(__dirname + "/public/programacao/index.html")
 })
 
@@ -50,31 +50,31 @@ app.get('/home', autenticarToken, (req, res) => {
     res.sendFile(__dirname + "/public/home/index.html")
 })
 
-app.get('/dashboard/equipes', autenticarToken, (req, res) => {
+app.get('/dashboard/equipes', autenticarToken, VerifyAcess('Alpha', 'Programacão', 'Controle', 'Almoxarifado'), (req, res) => {
     res.sendFile(__dirname + "/public/dashboard/dashboardEquipes/index.html")
 });
 
-app.get('/controle/iop/add', autenticarToken, (req, res) => {
+app.get('/controle/iop/add', autenticarToken, VerifyAcess('Alpha', 'Programacão', 'Controle', 'Almoxarifado'), (req, res) => {
     res.sendFile(__dirname + "/public/controle/IOP/add/index.html");
 });
 
-app.get('/controle/iop/lista_iop', autenticarToken, (req, res) => {
+app.get('/controle/iop/lista_iop', autenticarToken, VerifyAcess('Alpha', 'Programacão', 'Controle', 'Almoxarifado', "EQTL"), (req, res) => {
     res.sendFile(__dirname + "/public/controle/IOP/lista_iop/index.html");
 });
 
-app.get('/controle/obras/add', autenticarToken, (req, res) => {
+app.get('/controle/obras/add', autenticarToken, VerifyAcess('Alpha', 'Programacão', 'Controle', 'Almoxarifado'), (req, res) => {
     res.sendFile(__dirname + "/public/controle/obras/add/index.html");
 });
 
-app.get('/controle/obras/obras', autenticarToken, (req, res) => {
+app.get('/controle/obras/obras', autenticarToken, VerifyAcess('Alpha', 'Programacão', 'Controle', 'Almoxarifado'), (req, res) => {
     res.sendFile(__dirname + "/public/controle/obras/obras/index.html");
 });
 
-app.get('/controle/producao/', autenticarToken, (req, res) => {
+app.get('/controle/producao/', autenticarToken, VerifyAcess('Alpha', 'Programacão', 'Controle', 'Almoxarifado'), (req, res) => {
     res.sendFile(__dirname + "/public/controle/producao/index.html");
 });
 
-app.get('/controle/get_sgo/', autenticarToken, (req, res) => {
+app.get('/controle/get_sgo/', autenticarToken, VerifyAcess('Alpha', 'Programacão', 'Controle', 'Almoxarifado'), (req, res) => {
     res.sendFile(__dirname + "/public/controle/get_sgo/index.html");
 });
 
@@ -98,7 +98,10 @@ app.post('/login', async (req, res) => {
         }
 
         const token = jwt.sign(
-            { userId: resultado.data.user.id },
+            { 
+                userId: resultado.data.user,
+                role: resultado.data.function
+            },
             process.env.JWT_SECRET,
             { expiresIn: '600m' }
         );
@@ -526,7 +529,7 @@ app.post('/getIOP', autenticarToken, async (req, res) => {
     }
 });
 
-app.post('/atualizar_iop', autenticarToken, (req, res) => {
+app.post('/atualizar_iop', autenticarToken, VerifyAcess('Alpha', 'Programacão', 'Controle', 'Almoxarifado'), (req, res) => {
     // Lógica para atualizar IOP
 
     atualizarDados('table_iop', req.body, 'id', req.body.id)
@@ -544,7 +547,7 @@ app.post('/atualizar_iop', autenticarToken, (req, res) => {
         });
 });
 
-app.post('/parcelaadd', autenticarToken, (req, res) => {
+app.post('/parcelaadd', autenticarToken, VerifyAcess('Alpha', 'Programacão', 'Controle', 'Almoxarifado'), (req, res) => {
     const dados = req.body;
     
     console.log('Dados recebidos:', dados);
@@ -828,6 +831,7 @@ app.get('/ping', (req, res) => {
     res.send('pong');
 })
 // ------------------------------- Abertura do Servidor -------------------------------
+app.use(express.static(__dirname + "/public/"));
 // Cria servidor HTTP manual com keep-alive otimizado
 const server = http.createServer(app);
 

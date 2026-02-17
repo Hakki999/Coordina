@@ -20,7 +20,7 @@ function autenticarToken(req, res, next) {
     jwt.verify(finalToken, process.env.JWT_SECRET, (err, user) => {
         if (err) return res.redirect('/');
         console.log("🟢Token válido. Acesso concedido.");
-        
+        console.log("TOKEN DECODIFICADO:", user); 
         req.user = user;
         next();
     });
@@ -54,4 +54,17 @@ function gotoHome(req, res, next) {
     });
 }
 
-module.exports = { autenticarToken, jwt, gotoHome}
+function VerifyAcess(...rolesPermitidas) {
+    
+    
+  return (req, res, next) => {
+    if (!rolesPermitidas.includes(req.user.role)) {
+      return res.status(403).redirect('/home').json({ error: "Acesso negado" });
+    }
+    console.log("🟢Acesso autorizado a rota por perfil:", req.user.role);
+    next();
+  };
+}
+
+
+module.exports = { autenticarToken, jwt, gotoHome, VerifyAcess }
