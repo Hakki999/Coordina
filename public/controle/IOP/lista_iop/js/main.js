@@ -300,7 +300,7 @@ Nota: ${item.res_nota}
 OC: ${item.res_oc }
 Opex: ${item.res_opex || 'Não'}
 Responsável: ${item.res_resp}
-       `;
+.`;
 
        if (item.parcelas_adicionais) {
            pa = JSON.parse(item.parcelas_adicionais.replace(/'/g, '"'))[0];
