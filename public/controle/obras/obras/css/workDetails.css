@@ -29,6 +29,7 @@
 .workDetails {
     width: 90%;
     max-width: 1200px;
+    min-height: 0;
     height: 85%;
     max-height: 800px;
     
@@ -53,7 +54,9 @@
     flex: 1; /* Ocupa o espaço disponível */
     width: auto;
     min-width: 60%;
-    height: 100%;
+
+    min-height: 0px;
+    max-height: 500px !important;
     
     border: none;
     outline: none;
@@ -66,24 +69,11 @@
     font-size: 14px;
     line-height: 1.6;
     
-    overflow-y: scroll; /* Permite rolagem se necessário */
+    overflow-y: auto; /* Permite rolagem se necessário */
     scrollbar-width: thin;
     scrollbar-color: var(--emphasisColor) transparent;
 }
 
-/* Estilização da scrollbar para WebKit */
-.workDetailsTable::-webkit-scrollbar {
-    width: 8px;
-}
-
-.workDetailsTable::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.workDetailsTable::-webkit-scrollbar-thumb {
-    background-color: var(--emphasisColor);
-    border-radius: 4px;
-}
 
 /* Configurações da obra (área lateral direita) */
 .workConfig {

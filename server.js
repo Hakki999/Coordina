@@ -329,14 +329,6 @@ app.post('/buscarFiltro', validationSchemas.buscarFiltro, handleValidationErrors
     const minValue = req.body.minValue || null;
     const maxValue = req.body.maxValue || null;
 
-    console.log('-------------------------------------');
-
-    console.log({
-        coluna,
-        orderCamp
-    });
-
-
     console.log(`🔍 Buscando dados em ${tabela} onde ${coluna} = ${valor}...`)
     buscarDados(tabela, coluna, valor, qtdLimite, orderBy, orderCamp, minValue, maxValue).then(data => {
         console.log(`✅ ${data.length} registros encontrados e enviados!`)
@@ -776,7 +768,6 @@ app.post('/getObras', autenticarToken, async (req, res) => {
             'res_data_cri' // ordenação
         );
 
-        console.log('Dados Obras:', data);
         res.json(data);
 
     } catch (error) {

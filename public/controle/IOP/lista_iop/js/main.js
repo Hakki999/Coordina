@@ -292,13 +292,13 @@ function copyInfos(id){
    if (item) {
        let info = `
 <====> PROJETO IOP <====>
-Cidade: ${item.res_cidade}
+Cidade: ${cidades.find(cidade => cidade.value === item.res_cidade)?.label || item.res_cidade || 'Não informado'}
 Data de Criação: ${item.res_data_cri}
 Data de Execução: ${formatarDataBR(item.res_data_exe)}
 Nome da Obra: ${item.res_nome_obra}
 Nota: ${item.res_nota}
-OC: ${item.res_oc}
-Opex: ${item.res_opex}
+OC: ${item.res_oc }
+Opex: ${item.res_opex || 'Não'}
 Responsável: ${item.res_resp}
        `;
 

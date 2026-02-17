@@ -105,3 +105,4 @@ function criarMensagem(tipo, mensagem) {
         }
     }, 3000);
 }
+
