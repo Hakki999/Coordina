@@ -70,7 +70,7 @@ app.get('/controle/obras/obras', autenticarToken, VerifyAcess('Alpha', 'Programa
     res.sendFile(__dirname + "/public/controle/obras/obras/index.html");
 });
 
-app.get('/controle/producao/', autenticarToken, VerifyAcess('Alpha', 'Programação', 'Controle', 'Almoxarifado'), (req, res) => {
+app.get('/controle/producao/', autenticarToken, VerifyAcess('Alpha'), (req, res) => {
     res.sendFile(__dirname + "/public/controle/producao/index.html");
 });
 
