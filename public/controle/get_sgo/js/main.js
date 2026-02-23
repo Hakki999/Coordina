@@ -590,6 +590,11 @@ async function sendRequest() {
                 uri: "http://10.204.8.68:8083/Service/OrcamentoSap.svc/rest/GetOrcamentoSapBySolicitacaoId",
                 body: "{ID}" // Caso especial: apenas o ID como string
             };
+        case 'ObterFluxoArquivos':
+            requestData = {
+                uri: "http://10.204.8.68:8083/Service/FileUploadServ.svc/rest/GetArquivoFluxoSol",
+                body: JSON.stringify({solId: parseInt("{ID}"), status: "CONS"})
+            };
             break;
         default:
             criarMensagem(false, 'Tipo de solicitação inválido');
