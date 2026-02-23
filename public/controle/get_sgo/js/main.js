@@ -121,7 +121,8 @@ async function fazerRequisicaoComRetry(id, requestData, tentativa = 1) {
             "method": "POST",
             "signal": controller.signal
         });
-
+        console.log(body);
+        
         clearTimeout(timeoutId);
 
         if (!response.ok) {
@@ -593,7 +594,7 @@ async function sendRequest() {
         case 'ObterFluxoArquivos':
             requestData = {
                 uri: "http://10.204.8.68:8083/Service/FileUploadServ.svc/rest/GetArquivoFluxoSol",
-                body: JSON.stringify({solId: parseInt("{ID}"), status: "CONS"})
+                body: JSON.stringify({solId: "{ID}", status: "CONS"})
             };
             break;
         default:
