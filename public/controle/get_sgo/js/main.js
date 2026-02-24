@@ -561,6 +561,8 @@ async function sendRequest() {
     let requestData = {};
 
     // Configurar requestData baseado no tipo selecionado
+    console.log(`   Tipo de Solicitação: ${typeSol}`);
+
     switch (typeSol) {
         case 'Notas':
             requestData = {
@@ -591,6 +593,7 @@ async function sendRequest() {
                 uri: "http://10.204.8.68:8083/Service/OrcamentoSap.svc/rest/GetOrcamentoSapBySolicitacaoId",
                 body: "{ID}" // Caso especial: apenas o ID como string
             };
+            break;
         case 'ObterFluxoArquivos':
             requestData = {
                 uri: "http://10.204.8.68:8083/Service/FileUploadServ.svc/rest/GetArquivoFluxoSol",
