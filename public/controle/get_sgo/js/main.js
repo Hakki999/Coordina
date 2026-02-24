@@ -585,7 +585,7 @@ async function sendRequest() {
         case 'FluxoNota':
             requestData = {
                 uri: "http://10.204.8.68:8083/Service/LogFluxo.svc/rest/GetListLogFluxoBySliId",
-                body: JSON.stringify({ "soliciatacaoid": parseInt("{ID}") })
+                body: JSON.stringify({ "soliciatacaoid": "{ID}" })
             };
             break;
         case 'OrcamentoNota':
