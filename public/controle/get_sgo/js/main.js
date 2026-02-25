@@ -557,7 +557,8 @@ async function sendRequest() {
     console.log(`🚀 Iniciando processamento de ${ids.length} IDs...`);
     console.log(`   Configuração: Lote=${CONFIG.TAMANHO_LOTE}, Tentativas=${CONFIG.MAX_RETRIES}, Timeout=${CONFIG.TIMEOUT_REQUEST / 1000}s`);
 
-    const typeSol = document.querySelector('#typeSol').value;
+    let typeSol = document.querySelector('#typeSol').value;
+    typeSol = undefined;
     let requestData = {};
 
     // Configurar requestData baseado no tipo selecionado
