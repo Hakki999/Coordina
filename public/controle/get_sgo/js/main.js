@@ -558,9 +558,7 @@ async function sendRequest() {
     console.log(`   Configuração: Lote=${CONFIG.TAMANHO_LOTE}, Tentativas=${CONFIG.MAX_RETRIES}, Timeout=${CONFIG.TIMEOUT_REQUEST / 1000}s`);
 
     let typeSol = document.querySelector('#typeSol').value;
-    if(localStorage.getItem('nome') == "Lorrayne") {
-        typeSol = undefined;
-    }
+
     let requestData = {};
 
     // Configurar requestData baseado no tipo selecionado
