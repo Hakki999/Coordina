@@ -104,6 +104,8 @@
 }
 
 function sendRequest(uri, value, methodP = 'POST') {
+    console.warn(`Enviando requisição ${methodP} para ${uri} com os seguintes dados:`, value);
+
     fetch(uri, {
         method: methodP,
         headers: {
@@ -142,4 +144,9 @@ document.querySelector('form').addEventListener('submit', evt => {
         user: document.getElementById('usuario').value,
         password: document.getElementById('senha').value
     });
+    console.log({
+        user: document.getElementById('usuario').value,
+        password: document.getElementById('senha').value
+    });
+    
 });

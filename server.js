@@ -83,11 +83,14 @@ app.get('/controle/get_sgo/', autenticarToken, VerifyAcess('Alpha', 'ProgramaÃ§Ã
 app.post('/login', async (req, res) => {
     try {
         const { user, password } = req.body;
+        console.log(`Tentativa de login: ${user}`);
+        console.log(`Tentativa de login: ${password}`);
+        console.log(req.body);
         
         if (!user || !password) {
             return res.status(400).json({ error: "Dados incompletos" });
         }
-
+        
         const resultado = (await validarLogin(user, password));
 
         console.log(resultado);
