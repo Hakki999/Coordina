@@ -21,7 +21,7 @@ console.log("🚀 Iniciando servidor...");
 require('dotenv').config()
 const port = process.env.PORT;
 const app = express();
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.json());
 

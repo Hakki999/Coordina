@@ -300,11 +300,11 @@ function calculateTempoResposta(dataISO, lastUpdatedISO, attUpdatedStatus) {
         minutos = 0;
         return { dias, horas, minutos };
     }
-    
+
     if ((attUpdatedStatus == "Concluido V2" || attUpdatedStatus == "Concluido V1") && lastUpdatedISO) {
         console.warn("-----");
         console.log(calcularDiferencaDatas(dataISO, lastUpdatedISO.time));
-        
+
         return calcularDiferencaDatas(dataISO, lastUpdatedISO.time);
     }
 
@@ -346,7 +346,7 @@ function buscar_dados() {
             // Process the response data
             console.log(data);
             console.warn();
-            
+
             dadosTable = ordenarDados(data);
             render_dados();
         })
@@ -454,24 +454,24 @@ function render_dados() {
         });
     });
 
-    
+
     const selects = document.querySelectorAll('#tableBody select');
-    
+
     selects.forEach(select => {
         // Adiciona classe baseada no valor atual
         updateSelectClass(select);
-        
+
         // Adiciona evento de change
-        select.addEventListener('change', function() {
+        select.addEventListener('change', function () {
             updateSelectClass(this);
-            
+
             // Animação de atualização
             this.classList.add('updated');
             setTimeout(() => {
                 this.classList.remove('updated');
             }, 500);
         });
-        
+
         // Adiciona tooltip se o texto for muito longo
         if (select.options[select.selectedIndex]) {
             const selectedText = select.options[select.selectedIndex].text;
@@ -532,6 +532,8 @@ function exportTableToCSV() {
 }
 
 function openParcelaModal(parcelaId) {
+
+
     parcelaContainer.style.display = "flex";
     parcelaContainer.setAttribute('data-parcela-id', parcelaId);
 
@@ -547,44 +549,44 @@ function atualizarDadosTabela(dados) {
         body: JSON.stringify(dados),
         credentials: 'include'
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            criarMensagem(true, data.message || 'Atualizado com sucesso');
-            
-        } else {
-            criarMensagem(false, data.message || 'Erro ao atualizar');
-        }
-    })
-    .catch(error => {
-        console.error('Erro na requisição:', error);
-    });
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                criarMensagem(true, data.message || 'Atualizado com sucesso');
+
+            } else {
+                criarMensagem(false, data.message || 'Erro ao atualizar');
+            }
+        })
+        .catch(error => {
+            console.error('Erro na requisição:', error);
+        });
 }
 
 tableBody.addEventListener("change", evt => {
     // Obtém o elemento que foi alterado
     const changedElement = evt.target;
-    
+
     // Verifica se é um dos selects que queremos monitorar
-    if (!changedElement.classList.contains('opex-select') && 
+    if (!changedElement.classList.contains('opex-select') &&
         !changedElement.classList.contains('resp-select') &&
         !changedElement.classList.contains('status-select') &&
         !changedElement.classList.contains('baixa-select')
     ) {
         return; // Sai se não for um dos nossos selects
     }
-    
+
     // Obtém o ID da linha/registro
     const id = changedElement.getAttribute("data-id");
-    
+
     if (!id) {
         console.warn('Elemento sem data-id:', changedElement);
         return;
     }
-    
+
     // Encontra o item correspondente
     let item = dadosTable.find(item => item.id == id);
-    
+
     if (item) {
         console.log('Item encontrado:', item);
 
@@ -601,17 +603,42 @@ tableBody.addEventListener("change", evt => {
             if (baixaSelect) item.res_baixa = baixaSelect.value;
 
             console.warn('Item com baixa atualizado:', baixaSelect);
+
+            if (statusSelect.value == "Concluido V1") {
+                // Lógica adicional para status "Concluido V1"
+
+                openModal(item.id);
+
+                linha.querySelector('.status-select').value = "Pendente";
+
+                document.querySelector("#btnProcessar").addEventListener("click", function () {
+                    console.log("Processar:", item.id);
+
+                    item.res_last_updated = {
+                        time: new Date().toISOString(),
+                        user: localStorage.getItem('nome'),
+                        status: item.res_status_asbuilt
+                    }
+
+                    // Atualiza a tabela
+                    linha.querySelector('.status-select').value = "Concluido V1";
+                    atualizarDadosTabela(item);
+                });
+
+                console.warn('Item com status "Concluido V1" encontrado:', item);
+            } else {
+                item.res_last_updated = {
+                    time: new Date().toISOString(),
+                    user: localStorage.getItem('nome'),
+                    status: item.res_status_asbuilt
+                }
+
+                // Atualiza a tabela
+                atualizarDadosTabela(item);
+            }
         }
         console.warn('Item atualizado:', item);
 
-        item.res_last_updated = {
-            time: new Date().toISOString(),
-            user: localStorage.getItem('nome'),
-            status: item.res_status_asbuilt
-        }
-
-        // Atualiza a tabela
-        atualizarDadosTabela(item);
     } else {
         console.warn('Item não encontrado para ID:', id);
     }
@@ -620,10 +647,10 @@ tableBody.addEventListener("change", evt => {
 function updateSelectClass(select) {
     // Remove todas as classes de estado
     select.classList.remove('sim-selected', 'nao-selected', 'pendente-selected');
-    
+
     const value = select.value.toLowerCase();
     const classes = select.className;
-    
+
     // Adiciona classe baseada no tipo e valor
     if (select.classList.contains('opex-select')) {
         if (value.includes('sim')) select.classList.add('sim-selected');
