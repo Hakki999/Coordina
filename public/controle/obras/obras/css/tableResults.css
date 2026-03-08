@@ -258,9 +258,9 @@
     max-width: 200px;
     padding: 7px 12px;
     border-radius: 10px;
-    background: linear-gradient(145deg, 
-        color-mix(in srgb, var(--secundaryColor) 95%, transparent),
-        color-mix(in srgb, var(--secundaryColor) 85%, transparent));
+    background: linear-gradient(145deg,
+            color-mix(in srgb, var(--secundaryColor) 95%, transparent),
+            color-mix(in srgb, var(--secundaryColor) 85%, transparent));
     border: 1.5px solid color-mix(in srgb, var(--emphasisColor) 20%, transparent);
 
     color: var(--fontColor);
@@ -272,7 +272,7 @@
     box-sizing: border-box;
     position: relative;
     z-index: 5;
-    box-shadow: 
+    box-shadow:
         inset 0 1px 3px rgba(0, 0, 0, 0.1),
         0 1px 2px rgba(255, 255, 255, 0.05);
     text-align: center;
@@ -284,27 +284,29 @@
 /* Estados de hover - mais sutil na tabela */
 #tableBody select:hover {
     border-color: color-mix(in srgb, var(--emphasisColor) 40%, transparent);
-    background: linear-gradient(145deg, 
-        color-mix(in srgb, var(--secundaryColor) 100%, transparent),
-        color-mix(in srgb, var(--secundaryColor) 90%, transparent));
-    box-shadow: 
+    background: linear-gradient(145deg,
+            color-mix(in srgb, var(--secundaryColor) 100%, transparent),
+            color-mix(in srgb, var(--secundaryColor) 90%, transparent));
+    box-shadow:
         inset 0 1px 3px rgba(0, 0, 0, 0.1),
         0 2px 8px rgba(0, 0, 0, 0.15);
     transform: translateY(-1px);
-    z-index: 10; /* Eleva o select em hover */
+    z-index: 10;
+    /* Eleva o select em hover */
 }
 
 /* Estado de foco - destaque visível */
 #tableBody select:focus {
     outline: none;
     border-color: var(--emphasisColor);
-    box-shadow: 
+    box-shadow:
         0px 0px 0px 2px color-mix(in srgb, var(--emphasisColor) 25%, transparent),
         0px 4px 12px color-mix(in srgb, var(--emphasisColor) 20%, transparent),
         inset 0 1px 3px rgba(255, 255, 255, 0.1);
     background: var(--secundaryColor);
     transform: translateY(-1px);
-    z-index: 20; /* Eleva ainda mais em foco */
+    z-index: 20;
+    /* Eleva ainda mais em foco */
 }
 
 /* Estado ativo (clicado) */
@@ -328,11 +330,12 @@
     transition: 0.3s ease-in-out;
 }
 
+
 #tableBody tr:hover {
     background-color: color-mix(in srgb, var(--emphasisColor) 10%, transparent);
     padding-left: 10px;
     border-left: 5px solid var(--emphasisColor);
-    
+
 }
 
 
@@ -354,9 +357,9 @@
 
 /* Option quando selecionada */
 #tableBody select option:checked {
-    background: linear-gradient(135deg, 
-        color-mix(in srgb, var(--emphasisColor) 30%, transparent),
-        color-mix(in srgb, var(--emphasisColor) 20%, transparent));
+    background: linear-gradient(135deg,
+            color-mix(in srgb, var(--emphasisColor) 30%, transparent),
+            color-mix(in srgb, var(--emphasisColor) 20%, transparent));
     color: white;
     font-weight: 500;
     position: relative;
@@ -414,23 +417,23 @@
 
 /* Classes dinâmicas para OPEX */
 #tableBody select.opex-select.sim-selected {
-    background: linear-gradient(145deg, 
-        color-mix(in srgb, #4CAF50 15%, transparent),
-        color-mix(in srgb, #4CAF50 10%, transparent));
+    background: linear-gradient(145deg,
+            color-mix(in srgb, #4CAF50 15%, transparent),
+            color-mix(in srgb, #4CAF50 10%, transparent));
     border-color: color-mix(in srgb, #4CAF50 40%, transparent);
 }
 
 #tableBody select.opex-select.nao-selected {
-    background: linear-gradient(145deg, 
-        color-mix(in srgb, #F44336 15%, transparent),
-        color-mix(in srgb, #F44336 10%, transparent));
+    background: linear-gradient(145deg,
+            color-mix(in srgb, #F44336 15%, transparent),
+            color-mix(in srgb, #F44336 10%, transparent));
     border-color: color-mix(in srgb, #F44336 40%, transparent);
 }
 
 #tableBody select.opex-select.pendente-selected {
-    background: linear-gradient(145deg, 
-        color-mix(in srgb, #FF9800 15%, transparent),
-        color-mix(in srgb, #FF9800 10%, transparent));
+    background: linear-gradient(145deg,
+            color-mix(in srgb, #FF9800 15%, transparent),
+            color-mix(in srgb, #FF9800 10%, transparent));
     border-color: color-mix(in srgb, #FF9800 40%, transparent);
 }
 
@@ -504,15 +507,17 @@
 }
 
 @keyframes selectUpdate {
-    0% { 
+    0% {
         transform: scale(1);
         background-color: inherit;
     }
-    50% { 
+
+    50% {
         transform: scale(1.03);
         background-color: color-mix(in srgb, var(--emphasisColor) 20%, transparent);
     }
-    100% { 
+
+    100% {
         transform: scale(1);
         background-color: inherit;
     }
@@ -526,9 +531,19 @@
 }
 
 @keyframes selectShake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-3px); }
-    75% { transform: translateX(3px); }
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-3px);
+    }
+
+    75% {
+        transform: translateX(3px);
+    }
 }
 
 /* Efeito de loading */
@@ -542,8 +557,13 @@
 }
 
 @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* ============================================
@@ -553,17 +573,17 @@
 /* Quando a linha está com hover */
 .tableRow:hover select {
     border-color: color-mix(in srgb, var(--emphasisColor) 50%, transparent);
-    background: linear-gradient(145deg, 
-        color-mix(in srgb, var(--secundaryColor) 100%, transparent),
-        color-mix(in srgb, var(--secundaryColor) 95%, transparent));
+    background: linear-gradient(145deg,
+            color-mix(in srgb, var(--secundaryColor) 100%, transparent),
+            color-mix(in srgb, var(--secundaryColor) 95%, transparent));
     z-index: 15;
 }
 
 /* Quando a linha está selecionada */
 .tableRow.selected select {
-    background: linear-gradient(145deg, 
-        color-mix(in srgb, var(--emphasisColor) 20%, transparent),
-        color-mix(in srgb, var(--emphasisColor) 15%, transparent));
+    background: linear-gradient(145deg,
+            color-mix(in srgb, var(--emphasisColor) 20%, transparent),
+            color-mix(in srgb, var(--emphasisColor) 15%, transparent));
     border-color: var(--emphasisColor);
     color: white;
     font-weight: 500;
@@ -595,7 +615,7 @@
     font-size: 11px;
     white-space: nowrap;
     z-index: 1000;
-    box-shadow: 
+    box-shadow:
         0 4px 12px rgba(0, 0, 0, 0.3),
         0 0 0 1px color-mix(in srgb, var(--emphasisColor) 30%, transparent);
     pointer-events: none;
@@ -607,13 +627,14 @@
 }
 
 @keyframes tooltipFadeIn {
-    from { 
-        opacity: 0; 
-        transform: translateX(-50%) translateY(10px); 
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(10px);
     }
-    to { 
-        opacity: 1; 
-        transform: translateX(-50%) translateY(0); 
+
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
     }
 }
 
@@ -642,7 +663,7 @@
         background-position: right 6px center;
         background-size: 8px;
     }
-    
+
     #tableBody select option {
         padding: 8px 10px;
         font-size: 12px;
@@ -683,8 +704,7 @@
 /* Firefox */
 #tableBody select {
     scrollbar-width: thin;
-    scrollbar-color: color-mix(in srgb, var(--emphasisColor) 40%, transparent) 
-                     color-mix(in srgb, var(--primaryColor) 90%, transparent);
+    scrollbar-color: color-mix(in srgb, var(--emphasisColor) 40%, transparent) color-mix(in srgb, var(--primaryColor) 90%, transparent);
 }
 
 /* ============================================
@@ -705,20 +725,42 @@
     font-weight: normal;
 }
 
-.headTable th:hover{
+.headTable th:hover {
     background-color: var(--emphasisColor) !important;
 }
 
-.headTable th::after{
+.headTable th::after {
     content: "🔍︎";
     position: absolute;
     transform: translateX(10px) translateY(50px);
     transition: 0.1s ease-in-out;
 }
 
-.headTable th:hover::after{
+.headTable th:hover::after {
     content: "🔍︎";
     position: absolute;
     transform: translateX(10px) translateY(0px) !important;
-    
+
+}
+
+.on_data {
+    width: 10px;
+    height: 10px;
+
+    margin-top: auto;
+    margin-bottom: auto;
+
+    background-color: greenyellow;
+    border-radius: 180%;
+}
+
+.off_data {
+    width: 10px;
+    height: 10px;
+
+    margin-top: auto;
+    margin-bottom: auto;
+
+    background-color: rgb(255, 47, 47);
+    border-radius: 180%;
 }

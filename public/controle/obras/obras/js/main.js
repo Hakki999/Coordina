@@ -396,7 +396,10 @@ function render_dados() {
         }
 
         row.innerHTML = `
-          <td>${item.res_nota || ''}</td>
+          <td class="nota_cont"> <div class="${item.res_lista_ext || String(item.res_nota).startsWith("4")
+                ? "on_data"
+                : "off_data"
+            }"></div><p>${item.res_nota || ''}</p></td>
                     <td>
     <select class="status-select" data-id="${item.id || ''}" ${item.readonly ? 'disabled' : ''}>
         <option value="" ${!item.res_status_asbuilt ? 'selected' : ''} disabled>Selecione</option>

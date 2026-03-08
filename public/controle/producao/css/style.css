@@ -163,7 +163,7 @@
             margin-left: 15%;
             min-width: 250px;
             padding: 20px;
-            width: calc(100% - 15%);
+            width: calc(100% - 15%) !important;
             min-height: 100vh;
             background-color: color-mix(in srgb, var(--thirdColor) 95%, white);
             animation: fadeIn 0.5s ease-out;
@@ -440,11 +440,6 @@
                     transform: translateY(0);
                     opacity: 1;
                 }
-            }
-
-            #rootMain {
-                margin-left: 0;
-                width: 100%;
             }
 
             .summary-cards {
