@@ -58,15 +58,37 @@ function formatDate(dateString) {
     }
 }
 
-// Função para obter data no formato YYYY-MM-DD
+// Função para obter data no formato YYYY-MM-DD (SEM fuso horário)
 function getDateOnly(dateString) {
     if (!dateString) return '';
     try {
         const date = new Date(dateString);
-        return date.toISOString().split('T')[0];
+        // Criar data no formato YYYY-MM-DD considerando apenas a data local
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
     } catch (e) {
         return '';
     }
+}
+
+// Função para obter data de criação formatada (CORRIGIDA para evitar diferença de 1 dia)
+function getCreationDate(item) {
+    // Tentar diferentes campos que podem conter a data de criação
+    const creationDateRaw = item.res_data_criacao || item.res_data_cri;
+    
+    if (!creationDateRaw) return null;
+    
+    const parsedDate = parseBrazilianDate(creationDateRaw);
+    if (!parsedDate) return null;
+    
+    // CORREÇÃO: Usar a data local sem ajustes de fuso
+    const year = parsedDate.getFullYear();
+    const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
+    const day = String(parsedDate.getDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
 }
 
 // Função para atualizar os cards de resumo
@@ -94,6 +116,7 @@ function populateFilters() {
     // Limpar filtros existentes
     filterPerson.innerHTML = '<option value="all">Todos os responsáveis</option>';
     filterCity.innerHTML = '<option value="all">Todas as cidades</option>';
+    filterType.innerHTML = '<option value="all">Todos os tipos</option>';
 
     // Popular filtro de pessoas
     pessoas.forEach(pessoa => {
@@ -109,6 +132,14 @@ function populateFilters() {
         option.value = cidade;
         option.textContent = cidade;
         filterCity.appendChild(option);
+    });
+
+    // Popular filtro de tipos
+    tipos.forEach(tipo => {
+        const option = document.createElement('option');
+        option.value = tipo;
+        option.textContent = tipo;
+        filterType.appendChild(option);
     });
 
     // Configurar datas máximas para hoje
@@ -127,7 +158,7 @@ function populateFilters() {
     // Configurar data mínima baseada nos dados disponíveis
     if (dadosTable.length > 0) {
         const dates = dadosTable
-            .map(item => item.res_data_criacao || item.res_data_exe)
+            .map(item => getCreationDate(item))
             .filter(Boolean)
             .map(date => new Date(date));
         
@@ -150,7 +181,6 @@ function populateFilters() {
     toggleDateFilterFields();
 }
 
-// Função para aplicar filtros
 // Função para aplicar filtros
 function applyFilters() {
     const selectedPerson = document.getElementById('filterPerson').value;
@@ -186,12 +216,11 @@ function applyFilters() {
             }
         }
 
-        // Filtro por data de criação (corrigido)
-        const creationDateRaw = item.res_data_criacao || item.res_data_cri;
+        // Filtro por data de criação
+        const creationDate = getCreationDate(item);
         
-        // Verificar se há data de criação disponível
-        if (!creationDateRaw) {
-            // Se não há data de criação e algum filtro de data foi especificado, excluir item
+        // Se não há data de criação e algum filtro de data foi especificado, excluir item
+        if (!creationDate) {
             if (dateFilterType === 'specific' && specificDate) {
                 return false;
             }
@@ -200,27 +229,10 @@ function applyFilters() {
             }
             return true; // Item sem data passa se não houver filtro de data
         }
-
-        // Parsear a data de criação usando a função parseBrazilianDate
-        const creationDateFormatted = parseBrazilianDate(creationDateRaw);
-        
-        // Se o parse falhar, tratar como data inválida
-        if (!creationDateFormatted) {
-            if (dateFilterType === 'specific' && specificDate) {
-                return false;
-            }
-            if (dateFilterType === 'range' && (startDate || endDate)) {
-                return false;
-            }
-            return true;
-        }
-
-        // Obter apenas a parte da data (YYYY-MM-DD)
-        const creationDate = getDateOnly(creationDateFormatted);
         
         if (dateFilterType === 'specific' && specificDate) {
             // Filtro por data específica
-            if (!creationDate || creationDate !== specificDate) {
+            if (creationDate !== specificDate) {
                 return false;
             }
         } else if (dateFilterType === 'range') {
@@ -228,13 +240,13 @@ function applyFilters() {
             let passesDateFilter = true;
             
             if (startDate) {
-                if (!creationDate || creationDate < startDate) {
+                if (creationDate < startDate) {
                     passesDateFilter = false;
                 }
             }
             
             if (endDate) {
-                if (!creationDate || creationDate > endDate) {
+                if (creationDate > endDate) {
                     passesDateFilter = false;
                 }
             }
@@ -271,7 +283,7 @@ function resetFilters() {
     updateTable();
 }
 
-// Adicione esta função para alternar entre os campos de data
+// Função para alternar entre os campos de data
 function toggleDateFilterFields() {
     const dateFilterType = document.getElementById('dateFilterType').value;
     const specificDateContainer = document.getElementById('specificDateContainer');
@@ -293,6 +305,7 @@ function exportData() {
         Obra: item.res_nome_obra || '',
         Cidade: item.res_cidade || '',
         Tipo: item.res_tipo || '',
+        'Data Criação': item.res_data_criacao || item.res_data_cri || '',
         'Data Execução': item.res_data_exe || '',
         Orçamento: item.res_orcamento || 0,
         Status: item.res_status || ''
@@ -334,26 +347,11 @@ function updateCharts() {
         if (!acc[pessoa]) {
             acc[pessoa] = {
                 total: 0,
-                count: 0,
-                dailyData: {}
+                count: 0
             };
         }
         acc[pessoa].total += item.res_orcamento || 0;
         acc[pessoa].count += 1;
-
-        // Agrupar por data para produção diária
-        const dateKey = getDateOnly(item.res_data_exe);
-        if (dateKey) {
-            if (!acc[pessoa].dailyData[dateKey]) {
-                acc[pessoa].dailyData[dateKey] = {
-                    total: 0,
-                    count: 0
-                };
-            }
-            acc[pessoa].dailyData[dateKey].total += item.res_orcamento || 0;
-            acc[pessoa].dailyData[dateKey].count += 1;
-        }
-
         return acc;
     }, {});
 
@@ -377,12 +375,6 @@ function updateCharts() {
     if (!productionCtx || !dailyCtx) {
         console.error('Elementos canvas não encontrados');
         return;
-    }
-
-    // Atualizar título do segundo gráfico
-    const chart2Title = document.querySelector('.chart-card:nth-child(2) h3');
-    if (chart2Title) {
-        chart2Title.textContent = 'Produção Diária';
     }
 
     // Configurar cores
@@ -540,46 +532,60 @@ function updateCharts() {
         });
     }
 
-    // Calcular dados para gráfico de produção diária (agora usando todos os dados, não por pessoa)
+    // CALCULAR DADOS PARA GRÁFICO DE PRODUÇÃO DIÁRIA USANDO DATA DE CRIAÇÃO
     const dailyProductionData = filteredData.reduce((acc, item) => {
-        const dateKey = getDateOnly(item.res_data_exe);
+        // USAR DATA DE CRIAÇÃO
+        const dateKey = getCreationDate(item);
+        
         if (!dateKey) return acc;
         
         if (!acc[dateKey]) {
             acc[dateKey] = {
                 total: 0,
                 count: 0,
-                pessoas: new Set()
+                projetos: []
             };
         }
         acc[dateKey].total += item.res_orcamento || 0;
         acc[dateKey].count += 1;
-        if (item.res_resp) {
-            acc[dateKey].pessoas.add(item.res_resp);
-        }
+        acc[dateKey].projetos.push(item.res_nome_obra || 'Sem nome');
         
         return acc;
     }, {});
 
-    // Ordenar datas
+    // Ordenar datas cronologicamente
     const sortedDates = Object.keys(dailyProductionData).sort();
     
     if (sortedDates.length === 0) {
-        // Se não houver datas, mostrar mensagem
         dailyCtx.parentElement.innerHTML = '<p style="color: #ffffff; text-align: center; padding: 40px;">Sem dados diários para exibir</p>';
         return;
     }
     
+    // DEBUG: Mostrar contagem por dia no console
+    console.log('📊 CONTAGEM DE PROJETOS POR DIA (DATA DE CRIAÇÃO):');
+    sortedDates.forEach(date => {
+        console.log(`${date}: ${dailyProductionData[date].count} projeto(s) - Valor: ${formatCurrency(dailyProductionData[date].total)}`);
+    });
+
+    // Atualizar título do segundo gráfico
+    const chart2Title = document.querySelector('.chart-card:nth-child(2) h3');
+    if (chart2Title) {
+        chart2Title.textContent = `Produção Diária por Data de Criação (${sortedDates.length} dias)`;
+    }
+
     // Preparar dados para o gráfico
     const dailyLabels = sortedDates.map(date => {
-        const d = new Date(date);
-        return d.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' });
+        const d = new Date(date + 'T12:00:00'); // Adicionar meio-dia para evitar problemas de fuso
+        return d.toLocaleDateString('pt-BR', { 
+            day: '2-digit', 
+            month: '2-digit' 
+        });
     });
     
     const dailyValues = sortedDates.map(date => dailyProductionData[date].total);
     const dailyCounts = sortedDates.map(date => dailyProductionData[date].count);
 
-    // Criar gráfico de produção diária (linha)
+    // Criar gráfico de produção diária
     dailyProductionChart = new Chart(dailyCtx.getContext('2d'), {
         type: 'line',
         data: {
@@ -596,9 +602,9 @@ function updateCharts() {
                     yAxisID: 'y'
                 },
                 {
-                    label: 'Obras por Dia',
+                    label: 'Projetos por Dia',
                     data: dailyCounts,
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.7)',
                     borderColor: colors[1],
                     borderWidth: 2,
                     type: 'bar',
@@ -613,7 +619,10 @@ function updateCharts() {
                 legend: {
                     position: 'top',
                     labels: {
-                        color: '#ffffff'
+                        color: '#ffffff',
+                        font: {
+                            size: 12
+                        }
                     }
                 },
                 tooltip: {
@@ -625,12 +634,28 @@ function updateCharts() {
                             if (label) {
                                 label += ': ';
                             }
+                            
+                            const dateKey = sortedDates[context.dataIndex];
+                            const dayData = dailyProductionData[dateKey];
+                            
                             if (context.datasetIndex === 0) {
                                 label += formatCurrency(context.raw);
+                                if (dayData && dayData.count > 0) {
+                                    const media = dayData.total / dayData.count;
+                                    label += ` (média: ${formatCurrency(media)}/projeto)`;
+                                }
                             } else {
-                                label += context.raw + ' obra(s)';
+                                label += context.raw + ' projeto(s)';
                             }
                             return label;
+                        },
+                        afterBody: function(context) {
+                            const dateKey = sortedDates[context[0].dataIndex];
+                            const dayData = dailyProductionData[dateKey];
+                            if (dayData && context[0].datasetIndex === 1) {
+                                return [`Total no dia: ${formatCurrency(dayData.total)}`];
+                            }
+                            return [];
                         }
                     }
                 }
@@ -638,10 +663,17 @@ function updateCharts() {
             scales: {
                 x: {
                     ticks: {
-                        color: '#ffffff'
+                        color: '#ffffff',
+                        maxRotation: 45,
+                        minRotation: 30
                     },
                     grid: {
                         color: 'rgba(255, 255, 255, 0.1)'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Data de Criação',
+                        color: '#ffffff'
                     }
                 },
                 y: {
@@ -668,7 +700,14 @@ function updateCharts() {
                     display: true,
                     position: 'right',
                     ticks: {
-                        color: '#ffffff'
+                        color: '#ffffff',
+                        stepSize: 1,
+                        callback: function(value) {
+                            if (Number.isInteger(value)) {
+                                return value + ' projetos';
+                            }
+                            return '';
+                        }
                     },
                     grid: {
                         drawOnChartArea: false
@@ -685,6 +724,9 @@ function updateCharts() {
 
     // Adicionar métricas de produção diária
     updateDailyMetrics(dailyProductionData);
+    
+    // Adicionar tabela de resumo com botão mostrar/ocultar
+    addDailyCountSummary(sortedDates, dailyProductionData);
 }
 
 // Função para atualizar métricas de produção diária
@@ -705,11 +747,13 @@ function updateDailyMetrics(dailyData) {
     // Encontrar dia com maior produção
     let maxValueDay = '';
     let maxValue = 0;
+    let maxCount = 0;
     
     dates.forEach(date => {
         if (dailyData[date].total > maxValue) {
             maxValue = dailyData[date].total;
             maxValueDay = date;
+            maxCount = dailyData[date].count;
         }
     });
     
@@ -741,24 +785,128 @@ function updateDailyMetrics(dailyData) {
         <div class="metric-card" style="background: rgba(54, 162, 235, 0.2); padding: 15px; border-radius: 8px; color: #ffffff;">
             <div style="font-size: 12px; opacity: 0.8;">MÉDIA DIÁRIA</div>
             <div style="font-size: 24px; font-weight: bold;">${formatCurrency(avgDailyValue)}</div>
-            <div style="font-size: 14px;">${avgDailyCount.toFixed(1)} obras/dia</div>
+            <div style="font-size: 14px;">${avgDailyCount.toFixed(1)} projetos/dia</div>
         </div>
         <div class="metric-card" style="background: rgba(255, 99, 132, 0.2); padding: 15px; border-radius: 8px; color: #ffffff;">
             <div style="font-size: 12px; opacity: 0.8;">MELHOR DIA</div>
             <div style="font-size: 20px; font-weight: bold;">${formatCurrency(maxValue)}</div>
-            <div style="font-size: 14px;">${formatDate(maxValueDay)}</div>
+            <div style="font-size: 14px;">${formatDate(maxValueDay)} (${maxCount} projetos)</div>
         </div>
         <div class="metric-card" style="background: rgba(75, 192, 192, 0.2); padding: 15px; border-radius: 8px; color: #ffffff;">
             <div style="font-size: 12px; opacity: 0.8;">TOTAL PERÍODO</div>
             <div style="font-size: 20px; font-weight: bold;">${formatCurrency(totalDailyValue)}</div>
-            <div style="font-size: 14px;">${totalDailyCount} obras</div>
+            <div style="font-size: 14px;">${totalDailyCount} projetos</div>
         </div>
         <div class="metric-card" style="background: rgba(255, 206, 86, 0.2); padding: 15px; border-radius: 8px; color: #ffffff;">
             <div style="font-size: 12px; opacity: 0.8;">DIAS ANALISADOS</div>
             <div style="font-size: 24px; font-weight: bold;">${totalDays}</div>
-            <div style="font-size: 14px;">dias com produção</div>
+            <div style="font-size: 14px;">dias com criação</div>
         </div>
     `;
+}
+
+// Função para adicionar tabela de resumo diário com botão mostrar/ocultar
+function addDailyCountSummary(sortedDates, dailyProductionData) {
+    // Verificar se já existe o container
+    let summaryContainer = document.getElementById('dailyCountSummary');
+    
+    if (!summaryContainer) {
+        summaryContainer = document.createElement('div');
+        summaryContainer.id = 'dailyCountSummary';
+        summaryContainer.className = 'daily-count-summary';
+        summaryContainer.style.cssText = `
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        `;
+        
+        // Inserir após o gráfico
+        const chartCard = document.querySelector('.chart-card:nth-child(2)');
+        if (chartCard) {
+            chartCard.appendChild(summaryContainer);
+        }
+    }
+    
+    // Criar cabeçalho com botão
+    const isVisible = summaryContainer.getAttribute('data-visible') !== 'false';
+    
+    let tableHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h4 style="color: #ffffff; margin: 0; font-size: 16px;">📋 Detalhamento por Data de Criação</h4>
+            <button id="toggleSummaryBtn" style="
+                background: rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                color: #ffffff;
+                padding: 8px 16px;
+                border-radius: 20px;
+                cursor: pointer;
+                font-size: 13px;
+                font-weight: 500;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            ">
+                <span id="toggleSummaryIcon">${isVisible ? '▼' : '▶'}</span>
+                <span id="toggleSummaryText">${isVisible ? 'Ocultar' : 'Mostrar'}</span>
+            </button>
+        </div>
+        <div id="summaryTableContainer" style="overflow-x: auto; ${isVisible ? 'display: block;' : 'display: none;'}">
+            <table style="width: 100%; border-collapse: collapse; color: #ffffff; font-size: 14px;">
+                <thead>
+                    <tr style="border-bottom: 2px solid rgba(255, 255, 255, 0.2);">
+                        <th style="padding: 8px; text-align: left;">Data</th>
+                        <th style="padding: 8px; text-align: center;">Projetos</th>
+                        <th style="padding: 8px; text-align: right;">Valor Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    sortedDates.forEach(date => {
+        const dayData = dailyProductionData[date];
+        const formattedDate = new Date(date + 'T12:00:00').toLocaleDateString('pt-BR');
+        tableHTML += `
+            <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                <td style="padding: 8px; text-align: left;">${formattedDate}</td>
+                <td style="padding: 8px; text-align: center; font-weight: bold; color: ${dayData.count > 0 ? '#ff99cc' : '#ffffff'};">${dayData.count}</td>
+                <td style="padding: 8px; text-align: right;">${formatCurrency(dayData.total)}</td>
+            </tr>
+        `;
+    });
+    
+    tableHTML += `
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    summaryContainer.innerHTML = tableHTML;
+    
+    // Adicionar evento ao botão
+    const toggleBtn = document.getElementById('toggleSummaryBtn');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', function() {
+            const tableContainer = document.getElementById('summaryTableContainer');
+            const icon = document.getElementById('toggleSummaryIcon');
+            const text = document.getElementById('toggleSummaryText');
+            
+            if (tableContainer.style.display === 'none') {
+                tableContainer.style.display = 'block';
+                icon.textContent = '▼';
+                text.textContent = 'Ocultar';
+                summaryContainer.setAttribute('data-visible', 'true');
+            } else {
+                tableContainer.style.display = 'none';
+                icon.textContent = '▶';
+                text.textContent = 'Mostrar';
+                summaryContainer.setAttribute('data-visible', 'false');
+            }
+        });
+    }
 }
 
 // Função para atualizar tabela
@@ -771,7 +919,7 @@ function updateTable() {
     if (filteredData.length === 0) {
         tableBody.innerHTML = `
             <tr>
-                <td colspan="7" style="text-align: center; padding: 20px; color: #ffffff;">
+                <td colspan="8" style="text-align: center; padding: 20px; color: #ffffff;">
                     Nenhuma obra encontrada com os filtros aplicados
                 </td>
             </tr>
@@ -779,15 +927,19 @@ function updateTable() {
         return;
     }
 
-    // Ordenar dados por data de execução (mais recente primeiro)
+    // Ordenar dados por data de criação (mais recente primeiro)
     const sortedData = [...filteredData].sort((a, b) => {
-        const dateA = new Date(a.res_data_exe || 0);
-        const dateB = new Date(b.res_data_exe || 0);
-        return dateB - dateA;
+        const dateA = getCreationDate(a);
+        const dateB = getCreationDate(b);
+        if (!dateA && !dateB) return 0;
+        if (!dateA) return 1;
+        if (!dateB) return -1;
+        return dateB.localeCompare(dateA);
     });
 
     sortedData.forEach(item => {
         const row = document.createElement('tr');
+        const creationDate = getCreationDate(item);
         
         row.innerHTML = `
             <td>${item.res_resp || 'Não informado'}</td>
@@ -798,6 +950,7 @@ function updateTable() {
                     ${item.res_tipo || '-'}
                 </span>
             </td>
+            <td>${creationDate ? formatDate(creationDate) : '-'}</td>
             <td>${formatDate(item.res_data_exe)}</td>
             <td>${formatCurrency(item.res_orcamento)}</td>
             <td>
@@ -899,10 +1052,7 @@ function start() {
     }
 }
 
-
-
-// Adicione CSS para os novos elementos
-// Adicione CSS para os novos elementos
+// Função para adicionar estilos CSS
 function addStyles() {
     const style = document.createElement('style');
     style.textContent = `
@@ -946,7 +1096,7 @@ function addStyles() {
             transform: translateY(-5px);
         }
         
-        /* Estilos para os novos filtros de data - AJUSTADOS */
+        /* Estilos para os filtros de data */
         .date-filter-container {
             background: rgba(255, 255, 255, 0.05);
             padding: 15px;
@@ -1093,7 +1243,6 @@ function addStyles() {
             }
         }
         
-        /* Estilos para os inputs de data customizados */
         .date-input::-webkit-calendar-picker-indicator {
             filter: invert(1);
             opacity: 0.7;
@@ -1108,12 +1257,10 @@ function addStyles() {
             background: rgba(255, 255, 255, 0.1);
         }
         
-        /* Placeholder para inputs de data */
         .date-input::placeholder {
             color: rgba(255, 255, 255, 0.4);
         }
         
-        /* Responsividade para telas pequenas */
         @media (max-width: 767px) {
             .date-filter-container {
                 padding: 12px;
@@ -1136,12 +1283,10 @@ function addStyles() {
             }
         }
         
-        /* Animações suaves para troca de filtros */
         .date-filter-fields {
             transition: all 0.3s ease;
         }
         
-        /* Adicionar ícone de calendário para inputs de data */
         .date-input-group {
             position: relative;
         }
@@ -1166,6 +1311,12 @@ function addStyles() {
         
         .date-input-group:focus-within::after {
             opacity: 0.8;
+        }
+
+        /* Estilo para o botão de toggle */
+        #toggleSummaryBtn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
         }
     `;
     document.head.appendChild(style);

@@ -1,23 +1,23 @@
 // Função simplificada para buscar status das notas
 async function get_status(ids) {
     console.log('🚀 Iniciando busca de status...');
-    
+
     if (!Array.isArray(ids)) {
         ids = [ids]; // Converte para array se for único
     }
-    
+
     const resultados = [];
-    
+
     for (let i = 0; i < ids.length; i++) {
         const id = ids[i];
-        console.log(`📋 [${i+1}/${ids.length}] Buscando status para: ${id}`);
-        criarMensagem(true, `Buscando status para a nota ${id}... <br> 📋 [${i+1}/${ids.length}]`);
+        console.log(`📋 [${i + 1}/${ids.length}] Buscando status para: ${id}`);
+        criarMensagem(true, `Buscando status para a nota ${id}... <br> 📋 [${i + 1}/${ids.length}]`);
         try {
             const response = await fetch("http://10.204.8.68:8083/Service/SolicitacaoInvestimentoService.svc/rest/ListarSolicitacaoInvestimentoPorNota", {
                 "headers": {
                     "accept": "application/json, text/plain, */*",
                     "accept-language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
-                    "authorization": "Basic SjQwODIxNDQ5OnNITGg3M2xTZlh2M1VRM1FuVTRPIw",
+                    "authorization": "Basic SjQwODIxNDQ5OjEwUDx5KWMiYlhUJncwXnQtU159",
                     "content-type": "application/json;charset=UTF-8"
                 },
                 "body": JSON.stringify({ "Nota": id }),
@@ -38,7 +38,7 @@ async function get_status(ids) {
                 status: 'sucesso',
                 timestamp: new Date().toISOString()
             });
-            
+
         } catch (error) {
             resultados.push({
                 id: dadosTable.find(item => item.res_nota === id)?.id || null,
@@ -49,7 +49,7 @@ async function get_status(ids) {
                 timestamp: new Date().toISOString()
             });
         }
-        
+
         // Delay pequeno entre requisições
         if (i < ids.length - 1) {
             await new Promise(resolve => setTimeout(resolve, 100));
@@ -63,23 +63,23 @@ async function get_status(ids) {
 // Função simplificada para buscar orçamento SAP
 async function get_orcamento(res_sap_ids) {
     console.log('💰 Iniciando busca de orçamentos SAP...');
-    
+
     if (!Array.isArray(res_sap_ids)) {
         res_sap_ids = [res_sap_ids]; // Converte para array se for único
     }
-    
+
     const resultados = [];
-    
+
     for (let i = 0; i < res_sap_ids.length; i++) {
         const sapId = res_sap_ids[i];
-        console.log(`📊 [${i+1}/${res_sap_ids.length}] Buscando orçamento para ID SAP: ${sapId}`);
-        criarMensagem(true, `Buscando orçamento para o ID SAP ${sapId}... <br> � [${i+1}/${res_sap_ids.length}]`);
+        console.log(`📊 [${i + 1}/${res_sap_ids.length}] Buscando orçamento para ID SAP: ${sapId}`);
+        criarMensagem(true, `Buscando orçamento para o ID SAP ${sapId}... <br> � [${i + 1}/${res_sap_ids.length}]`);
         try {
             const response = await fetch("http://10.204.8.68:8083/Service/OrcamentoSap.svc/rest/GetOrcamentoSapBySolicitacaoId", {
                 "headers": {
                     "accept": "application/json, text/plain, */*",
                     "accept-language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
-                    "authorization": "Basic SjQwODIxNDQ5OnNITGg3M2xTZlh2M1VRM1FuVTRPIw",
+                    "authorization": "Basic SjQwODIxNDQ5OjEwUDx5KWMiYlhUJncwXnQtU159",
                     "content-type": "application/json;charset=UTF-8"
                 },
                 "body": sapId.toString(),
@@ -91,7 +91,7 @@ async function get_orcamento(res_sap_ids) {
             }
 
             const data = await response.json();
-            
+
             resultados.push({
                 res_sap: sapId,
                 res_orcamento: data.MoTotal,
@@ -99,8 +99,8 @@ async function get_orcamento(res_sap_ids) {
                 timestamp: new Date().toISOString()
             });
             console.log(data);
-            
-            
+
+
         } catch (error) {
             resultados.push({
                 res_sap: sapId,
@@ -110,13 +110,13 @@ async function get_orcamento(res_sap_ids) {
                 timestamp: new Date().toISOString()
             });
         }
-        
+
         // Delay pequeno entre requisições
         if (i < res_sap_ids.length - 1) {
             await new Promise(resolve => setTimeout(resolve, 100));
         }
     }
-    
+
     console.log(`✅ Busca de orçamentos concluída: ${resultados.length} resultados`);
     return resultados;
 }
@@ -135,20 +135,20 @@ async function get_orcamento(res_sap_ids) {
 // 4. Buscar orçamento de vários IDs SAP:
 // get_orcamento(['210839', '210840', '210841']).then(resultados => console.log(resultados));
 
-function main_status(){
+function main_status() {
     let notas = dadosTable.map(item => item.res_nota);
     console.log(notas);
     get_status(notas).then(resultados => {
-        
+
         resultados.forEach(resultado => {
             console.warn(resultado);
-            
+
             atualizarDados(resultado)
         });
     });
 }
 
-function main_orcamento(){
+function main_orcamento() {
     let sapIds = dadosTable.map(item => item.res_sap);
     get_orcamento(sapIds).then(resultados => {
         resultados.forEach(resultado => {
