@@ -8,6 +8,8 @@ if (role == 'STC') {
 
     document.getElementById("notaGroup").remove();
     document.getElementById("obraGroup").remove();
+    document.querySelector('#tipo').setAttribute("required", "false");
+    document.querySelector('#pg').setAttribute("required", "false");
     uri = '/create_backlog_iop';
 }
 

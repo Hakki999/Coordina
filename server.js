@@ -30,7 +30,7 @@ app.use(compression());
 
 // ------------------------------- Rotas ---------------------------------------------
 
-app.get('/', (req, res) => {
+app.get('/', gotoHome, (req, res) => {
     res.sendFile(__dirname + "/public/login/index.html");
 })
 
