@@ -496,19 +496,17 @@ function exportTableToCSV() {
         console.log(item);
 
         tempExport.push([
-            item.id || "",
-            item.res_cidade || "",
-            item.res_data_cri || "",
-            item.res_data_exe || "",
-            item.res_nome_obra || "",
-            item.res_nota || "",
-            item.res_oc || "",
-            item.res_pep || "",
-            item.res_pg || "",
-            item.res_resp || "",
-            item.res_status || "",
-            item.res_tipo || ""
-        ])
+    item.id                || "", // ID
+    item.res_nota          || "", // Nota
+    item.res_cidade        || "", // Cidade
+    item.res_data_cri      || "", // Data de criação
+    item.res_data_exe      || "", // Data de execução
+    item.res_lista_ext     || "", // Lista extraida
+    item.res_resp_asbuilt  || "", // Responsável AsBuilt
+    item.res_resp_add      || "", // Responsável por adicionar
+    item.res_status_asbuilt|| "", // Status AsBuilt
+    String(item.res_vlr_obra).replace(/\./g, ',') || ""  // Valor da obra
+]);
 
         console.log(tempExport);
 
@@ -516,18 +514,16 @@ function exportTableToCSV() {
 
     exportCSV({
         head: [
-            'ID',
-            'Cidade',
-            'Data de Criação',
-            'Data de Execução',
-            'Nome da Obra',
-            'Nota',
-            'OC',
-            'PEP',
-            'PG',
-            'Responsável',
-            'Status',
-            'Tipo'
+            "ID",
+            "Nota",
+            "Cidade",
+            "Data de Criação",
+            "Data de Execução",
+            "Lista Extraida",
+            "Responsável AsBuilt",
+            "Responsável por Adicionar",
+            "Status AsBuilt",
+            "Valor da Obra"
         ],
         body: tempExport
     }, 'Material x Programado');
