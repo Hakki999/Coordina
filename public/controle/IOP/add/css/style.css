@@ -1,54 +1,78 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
 
-:root{
+:root {
     --primaryColor: #000814;
     --secundaryColor: #002855;
     --thirdColor: #1b263b;
     --emphasisColor: #0888ff;
     --fontColor: #f8f9fa;
+    
+    --successColor: #28a745;
+    --warningColor: #ffc107;
+    --dangerColor: #dc3545;
+    --infoColor: #17a2b8;
+    --borderRadius: 8px;
+    --transition: all 0.3s ease;
+    --boxShadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-*{
-    margin: 0px;
-    padding: 0px;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-body{
+body {
     width: 100vw;
     height: 100vh;
-    background: linear-gradient(-45deg, var(--thirdColor), var(--primaryColor));
+    background: linear-gradient(135deg, var(--thirdColor) 0%, var(--primaryColor) 100%);
     color: var(--fontColor);
-
     font-family: "Open Sans", sans-serif;
+    overflow: hidden;
+    position: relative;
 }
 
-#navBar{
+#rootMain::-webkit-scrollbar{
+    display: none;
+}
+
+/* Navbar Styles - Mantido exatamente igual */
+#navBar {
     width: 15%;
     min-width: 250px;
-    height: 100%;
+    height: 100vh;
     position: fixed;
-    left: 0px;
-    top: 0px;
+    left: 0;
+    top: 0;
     background-color: var(--primaryColor);
-    box-shadow: 1px 0px 10px var(--primaryColor);
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
     animation: slideInLeft 0.5s ease-out;
     font-size: 13px;
+    overflow-y: auto;
+    z-index: 1000;
+    border-right: 1px solid color-mix(in srgb, var(--emphasisColor) 20%, transparent);
 }
 
-#thead{
+#thead {
     height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-bottom: 1px solid color-mix(in srgb, var(--fontColor) 50%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--fontColor) 30%, transparent);
+    background: color-mix(in srgb, var(--primaryColor) 95%, white);
 }
 
-#thead img{
+#thead img {
     height: 40px;
     width: auto;
+    transition: transform 0.3s ease;
 }
 
-.menu{
+#thead img:hover {
+    transform: scale(1.1);
+}
+
+.menu {
     margin-top: 20px;
     margin-left: 20px;
 }
@@ -64,7 +88,6 @@ body{
     padding-left: 10px;
 }
 
-/* ITENS PRINCIPAIS DO MENU */
 .optionNav {
     list-style: none;
     cursor: pointer;
@@ -72,15 +95,14 @@ body{
     position: relative;
     transition: all 0.3s ease;
     margin-bottom: 5px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
 }
 
-
-/* Estados do submenu */
 .optionNav.closeOption > ul {
     display: none;
 }
 
-/* Animação de fechamento do submenu */
 .optionNav.closing > ul {
     animation: slideUp 0.3s ease forwards;
 }
@@ -98,27 +120,24 @@ body{
     }
 }
 
-/* Efeitos hover nos itens principais */
 .optionNav:hover {
     color: var(--emphasisColor);
     transform: translateX(5px);
 }
 
-/* ITENS DO SUBMENU */
 .menu ul ul li {
     list-style: none;
     cursor: pointer;
-    padding: 6px 0;
-    padding-left: 15px;
+    padding: 6px 0 6px 15px;
     margin: 2px 0;
     border-left: 2px solid transparent;
     transition: all 0.2s ease;
     animation: fadeInLeft 0.3s ease forwards;
     opacity: 0;
     transform: translateX(-10px);
+    font-size: 12px;
 }
 
-/* Animação em cascata para itens do submenu */
 .optionNav.openOption > ul li:nth-child(1) { animation-delay: 0.05s; }
 .optionNav.openOption > ul li:nth-child(2) { animation-delay: 0.1s; }
 .optionNav.openOption > ul li:nth-child(3) { animation-delay: 0.15s; }
@@ -132,16 +151,15 @@ body{
     }
 }
 
-/* Efeitos hover nos itens do submenu */
 .menu ul ul li:hover {
     color: var(--emphasisColor);
     border-left-color: var(--emphasisColor);
     transform: translateX(5px);
-    background: color-mix(in srgb, var(--emphasisColor) 10%, transparent);
+    background: color-mix(in srgb, var(--emphasisColor) 15%, transparent);
     border-radius: 4px;
+    padding-left: 20px;
 }
 
-/* Indicador visual para itens ativos */
 .optionNav::after {
     content: '';
     position: absolute;
@@ -160,7 +178,6 @@ body{
     height: 60%;
 }
 
-/* Animação de entrada da navbar */
 @keyframes slideInLeft {
     from {
         transform: translateX(-100%);
@@ -172,7 +189,6 @@ body{
     }
 }
 
-/* Efeito de pulso para itens ativos */
 .optionNav.active {
     animation: pulse 2s infinite;
 }
@@ -189,42 +205,10 @@ body{
     }
 }
 
-/* Transições suaves */
 .menu * {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Responsividade */
-@media (max-width: 768px) {
-    #navBar {
-        width: 100%;
-        min-width: auto;
-        height: auto;
-        position: relative;
-        animation: slideInUp 0.4s ease-out;
-    }
-    
-    @keyframes slideInUp {
-        from {
-            transform: translateY(-100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateY(0);
-            opacity: 1;
-        }
-    }
-    
-    .menu {
-        margin: 10px;
-    }
-    
-    .optionNav {
-        padding: 12px 0;
-    }
-}
-
-/* Melhorias de acessibilidade */
 .optionNav:focus {
     outline: 2px solid var(--emphasisColor);
     outline-offset: 2px;
@@ -235,27 +219,537 @@ body{
     outline-offset: 1px;
 }
 
-/* Smooth scrolling para toda a página */
+.menuSelected {
+    color: var(--emphasisColor);
+    border-left-color: var(--emphasisColor);
+    transform: translateX(5px);
+    background: color-mix(in srgb, var(--emphasisColor) 15%, transparent);
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+#rootMain {
+    width: calc(100% - 250px);
+    height: 100vh;
+    position: fixed;
+    right: 0;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+#rootMainContainer {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    padding: 20px;
+}
+
+#rootMainContent {
+    flex: 1;
+    max-width: 500px;
+    min-width: 350px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Backlog Styles - Centralizado e ajustado */
+.backlogRoot {
+    flex: 1;
+    max-width: 550px;
+    min-width: 400px;
+    height: 650px;
+    background: color-mix(in srgb, var(--primaryColor) 90%, transparent);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    border: 1px solid color-mix(in srgb, var(--emphasisColor) 20%, transparent);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin: 0 auto;
+}
+
+.backlogRoot:hover {
+    box-shadow: 0 15px 35px rgba(0, 136, 255, 0.25);
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--emphasisColor) 40%, transparent);
+}
+
+.backlogHeader {
+    padding: 18px 22px;
+    border-bottom: 1px solid color-mix(in srgb, var(--fontColor) 15%, transparent);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: color-mix(in srgb, var(--primaryColor) 95%, black);
+}
+
+.backlogHeader h3 {
+    color: var(--emphasisColor);
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin: 0;
+}
+
+.backlogHeader .badge {
+    background: color-mix(in srgb, var(--emphasisColor) 20%, transparent);
+    color: var(--emphasisColor);
+    padding: 5px 12px;
+    border-radius: 25px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid color-mix(in srgb, var(--emphasisColor) 40%, transparent);
+}
+
+.tableContainer {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 18px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--emphasisColor) var(--primaryColor);
+}
+
+.tableContainer::-webkit-scrollbar {
+    width: 6px;
+}
+
+.tableContainer::-webkit-scrollbar-track {
+    background: color-mix(in srgb, var(--primaryColor) 80%, transparent);
+    border-radius: 10px;
+}
+
+.tableContainer::-webkit-scrollbar-thumb {
+    background: var(--emphasisColor);
+    border-radius: 10px;
+    border: 1px solid color-mix(in srgb, var(--emphasisColor) 50%, transparent);
+}
+
+.tableContainer::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--emphasisColor) 80%, white);
+}
+
+.backlogTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.backlogTable th {
+    position: sticky;
+    top: 0;
+    background: color-mix(in srgb, var(--primaryColor) 98%, black);
+    color: var(--emphasisColor);
+    font-weight: 600;
+    text-align: left;
+    padding: 18px 10px 12px 10px;
+    border-bottom: 2px solid color-mix(in srgb, var(--emphasisColor) 40%, transparent);
+    letter-spacing: 0.3px;
+    z-index: 10;
+    font-size: 13px;
+    text-transform: uppercase;
+}
+
+.backlogTable td {
+    padding: 14px 10px;
+    border-bottom: 1px solid color-mix(in srgb, var(--fontColor) 10%, transparent);
+    transition: background-color 0.2s ease;
+}
+
+.backlogTable tbody tr {
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.backlogTable tbody tr:hover {
+    background: color-mix(in srgb, var(--emphasisColor) 8%, transparent);
+    transform: scale(1.01);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.backlogTable tbody tr:hover td {
+    color: color-mix(in srgb, var(--fontColor) 95%, var(--emphasisColor));
+}
+
+/* Status badges */
+.status {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 25px;
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+    min-width: 90px;
+    letter-spacing: 0.3px;
+}
+
+.status.completed {
+    background: color-mix(in srgb, var(--successColor) 15%, transparent);
+    color: var(--successColor);
+    border: 1px solid color-mix(in srgb, var(--successColor) 30%, transparent);
+}
+
+.status.pending {
+    background: color-mix(in srgb, var(--warningColor) 15%, transparent);
+    color: var(--warningColor);
+    border: 1px solid color-mix(in srgb, var(--warningColor) 30%, transparent);
+}
+
+.status.progress {
+    background: color-mix(in srgb, var(--infoColor) 15%, transparent);
+    color: var(--infoColor);
+    border: 1px solid color-mix(in srgb, var(--infoColor) 30%, transparent);
+}
+
+.backlogFooter {
+    padding: 18px 22px;
+    border-top: 1px solid color-mix(in srgb, var(--fontColor) 15%, transparent);
+    text-align: center;
+    background: color-mix(in srgb, var(--primaryColor) 95%, black);
+}
+
+.viewAllBtn {
+    background: transparent;
+    color: var(--emphasisColor);
+    border: 1px solid var(--emphasisColor);
+    padding: 10px 25px;
+    border-radius: 25px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    max-width: 220px;
+    letter-spacing: 0.5px;
+    margin: 0 auto;
+    display: block;
+}
+
+.viewAllBtn:hover {
+    background: var(--emphasisColor);
+    color: var(--fontColor);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px color-mix(in srgb, var(--emphasisColor) 40%, transparent);
+}
+
+.viewAllBtn:active {
+    transform: translateY(0);
+}
+
+/* Formulário agora é filho direto do container */
+#formAdd {
+    flex: 1;
+    max-width: 500px;
+    min-width: 350px;
+    padding: 35px 30px;
+    background: color-mix(in srgb, var(--primaryColor) 85%, transparent);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    border: 1px solid color-mix(in srgb, var(--emphasisColor) 15%, transparent);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin: 0; /* Remove qualquer margem automática */
+    align-self: center; /* Garante alinhamento vertical */
+    transform: translateY(0px) !important;
+}
+
+#formAdd:hover {
+    box-shadow: 0 15px 35px rgba(0, 136, 255, 0.2);
+    transform: translateY(-3px) !important;
+    border-color: color-mix(in srgb, var(--emphasisColor) 30%, transparent);
+}
+
+#headForm {
+    text-align: center;
+    margin-bottom: 30px;
+    color: var(--emphasisColor);
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+#headForm::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--emphasisColor), transparent);
+    border-radius: 3px;
+}
+
+.form-group {
+    margin-bottom: 22px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: color-mix(in srgb, var(--fontColor) 90%, transparent);
+    font-size: 14px;
+    letter-spacing: 0.3px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid color-mix(in srgb, var(--fontColor) 20%, transparent);
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--primaryColor) 95%, white);
+    color: var(--fontColor);
+    font-size: 14px;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: var(--emphasisColor);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--emphasisColor) 20%, transparent);
+    background: color-mix(in srgb, var(--primaryColor) 90%, white);
+}
+
+.form-group input:hover,
+.form-group select:hover {
+    border-color: var(--emphasisColor);
+}
+
+.form-group input::placeholder {
+    color: color-mix(in srgb, var(--fontColor) 40%, transparent);
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, var(--emphasisColor) 0%, color-mix(in srgb, var(--emphasisColor) 80%, blue) 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-submit::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+}
+
+.btn-submit:hover {
+    background: linear-gradient(135deg, color-mix(in srgb, var(--emphasisColor) 90%, black) 0%, var(--emphasisColor) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px color-mix(in srgb, var(--emphasisColor) 40%, transparent);
+}
+
+.btn-submit:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn-submit:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--emphasisColor) 30%, transparent);
+}
+
+/* Responsive Styles - Mantendo centralização */
+@media (max-width: 1200px) {
+    #rootMainContainer {
+        gap: 25px;
+        padding: 15px;
+    }
+    
+    .backlogRoot {
+        max-width: 500px;
+        min-width: 350px;
+        height: 600px;
+    }
+    
+    #rootMainContent {
+        max-width: 450px;
+        min-width: 300px;
+    }
+}
+
+@media (max-width: 992px) {
+    #rootMainContainer {
+        flex-direction: column;
+        gap: 25px;
+    }
+    
+    .backlogRoot {
+        max-width: 550px;
+        width: 100%;
+        height: 500px;
+    }
+    
+    #rootMainContent {
+        max-width: 550px;
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    #navBar {
+        width: 100%;
+        min-width: auto;
+        height: auto;
+        position: relative;
+        animation: slideInUp 0.4s ease-out;
+    }
+
+    @keyframes slideInUp {
+        from {
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .menu {
+        margin: 10px;
+    }
+
+    .optionNav {
+        padding: 12px 0;
+    }
+
+    #rootMain {
+        width: 100%;
+        position: relative;
+        height: auto;
+        padding: 20px;
+    }
+
+    #rootMainContainer {
+        padding: 10px;
+        gap: 20px;
+    }
+
+    #rootMainContent {
+        min-width: 280px;
+    }
+
+    .backlogRoot {
+        min-width: 280px;
+        height: 450px;
+    }
+
+    #formAdd {
+        padding: 25px 20px;
+    }
+    
+    .backlogTable {
+        font-size: 13px;
+    }
+    
+    .status {
+        min-width: 80px;
+        padding: 4px 10px;
+        font-size: 10px;
+    }
+    
+    .backlogHeader h3 {
+        font-size: 16px;
+    }
+}
+
+/* Centralização vertical e horizontal para telas muito pequenas */
+@media (max-width: 480px) {
+    #rootMainContainer {
+        padding: 5px;
+    }
+    
+    .backlogRoot {
+        height: 400px;
+    }
+    
+    .backlogTable th,
+    .backlogTable td {
+        padding: 10px 8px;
+        font-size: 12px;
+    }
+    
+    .status {
+        min-width: 70px;
+        padding: 3px 8px;
+    }
+}
+
+/* Animações */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#rootMain {
+    animation: fadeIn 0.5s ease-out;
+}
+
+.backlogTable tbody tr {
+    animation: fadeIn 0.3s ease-out;
+    animation-fill-mode: both;
+}
+
+.backlogTable tbody tr:nth-child(1) { animation-delay: 0.05s; }
+.backlogTable tbody tr:nth-child(2) { animation-delay: 0.1s; }
+.backlogTable tbody tr:nth-child(3) { animation-delay: 0.15s; }
+.backlogTable tbody tr:nth-child(4) { animation-delay: 0.2s; }
+.backlogTable tbody tr:nth-child(5) { animation-delay: 0.25s; }
+
 html {
     scroll-behavior: smooth;
 }
 
-.menuSelected{
-    color: var(--emphasisColor);
-    border-left-color: var(--emphasisColor);
-    transform: translateX(5px);
-    background: color-mix(in srgb, var(--emphasisColor) 10%, transparent);
-    border-radius: 4px;
+.transpor-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    filter: invert(100%) sepia(100%) grayscale(100%);
 }
 
-#rootMain{
-    width: calc(100% - 250px);
-    height: 100%;
-
-    position: fixed;
-    right: 0px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.transpor-button:hover {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    transform: scale(1.1);
+    filter: invert(50%);
 }

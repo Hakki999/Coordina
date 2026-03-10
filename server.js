@@ -30,7 +30,7 @@ app.use(compression());
 
 // ------------------------------- Rotas ---------------------------------------------
 
-app.get('/', gotoHome, (req, res) => {
+app.get('/', (req, res) => {
     res.sendFile(__dirname + "/public/login/index.html");
 })
 
@@ -54,7 +54,7 @@ app.get('/dashboard/equipes', autenticarToken, VerifyAcess('Alpha', 'Programaç�
     res.sendFile(__dirname + "/public/dashboard/dashboardEquipes/index.html")
 });
 
-app.get('/controle/iop/add', autenticarToken, VerifyAcess('Alpha', 'Programação', 'Controle', 'Almoxarifado'), (req, res) => {
+app.get('/controle/iop/add', autenticarToken, VerifyAcess('Alpha', 'Programação', 'Controle', 'Almoxarifado', 'STC'), (req, res) => {
     res.sendFile(__dirname + "/public/controle/IOP/add/index.html");
 });
 
@@ -120,7 +120,8 @@ app.post('/login', async (req, res) => {
             nome: resultado.data.user,
             redirect: '/home',
             acesso: getAcess(resultado.data.function),
-            tel: resultado.data.Celular
+            tel: resultado.data.Celular,
+            role: resultado.data.function
         });
 
     } catch (error) {
@@ -420,6 +421,7 @@ app.post('/createNewIOP', autenticarToken, async (req, res) => {
             timeStyle: 'medium'
         });
 
+        const res_id_backlog = req.body.idback || null;
         const dadosIOP = {
             res_nota: req.body.nota.trim(),
             res_status: 'pendente',
@@ -430,7 +432,7 @@ app.post('/createNewIOP', autenticarToken, async (req, res) => {
             res_oc: req.body.oc.trim(),
             res_data_exe: req.body.dataExecucao,
             res_data_cri: dataAtual,
-            res_resp: req.body.resp || 'Sistema'
+            res_resp: req.body.resp || 'Sistema',
         };
 
         console.log('📋 Dados do IOP preparados:', dadosIOP);
@@ -462,21 +464,15 @@ app.post('/createNewIOP', autenticarToken, async (req, res) => {
         console.log('✅ Novo IOP criado com sucesso! ID:', result.id);
 
         /* =========================
-           Notificação (opcional)
-        ========================== */
-        if (process.env.ENABLE_NOTIFICATIONS === 'true') {
-            await enviarNotificacao({
-                tipo: 'novo_iop',
-                iop_id: result.id,
-                nota: dadosIOP.res_nota,
-                obra: dadosIOP.res_nome_obra,
-                criado_por: dadosIOP.res_resp
-            });
-        }
-
-        /* =========================
            Resposta final
         ========================== */
+
+        if (res_id_backlog) {
+            console.log('✅ Atualizando backlog IOP FEITO com ID:', res_id_backlog);
+
+            await atualizarDados('backlog_iop', { feito: 'sim' }, 'id', res_id_backlog);
+        }
+
         return res.status(201).json({
             status: 'success',
             message: 'IOP criado com sucesso',
@@ -828,6 +824,123 @@ let dados = {
         });
 });
 
+app.post('/create_backlog_iop', autenticarToken, VerifyAcess('STC'), async (req, res) => {
+    try {
+        console.log('📝 Tentativa de criação de novo IOP:', req.body);
+
+        /* =========================
+           Validação de campos
+        ========================== */
+        const camposObrigatorios = [
+            'cidade',
+            'dataExecucao',
+            'tipo',
+            'oc',
+            'pg',
+            'resp'
+        ];
+
+        const camposFaltantes = camposObrigatorios.filter(
+            campo => !req.body[campo]
+        );
+
+        if (camposFaltantes.length > 0) {
+            console.log('❌ Campos obrigatórios faltando:', camposFaltantes);
+            return res.status(400).json({
+                status: 'error',
+                message: 'Campos obrigatórios não preenchidos',
+                camposFaltantes
+            });
+        }
+
+        /* =========================
+           Validação da data
+        ========================== */
+        const dataExecucao = new Date(req.body.dataExecucao);
+
+        if (isNaN(dataExecucao.getTime())) {
+            console.log('❌ Data de execução inválida:', req.body.dataExecucao);
+            return res.status(400).json({
+                status: 'error',
+                message: 'Data de execução inválida'
+            });
+        }
+
+        /* =========================
+           Preparação dos dados
+        ========================== */
+        const now = new Date();
+        const dataAtual = now.toLocaleString('pt-BR', {
+            timeZone: 'America/Sao_Paulo',
+            dateStyle: 'short',
+            timeStyle: 'medium'
+        });
+
+        const dadosIOP = {
+            res_cidade: req.body.cidade.trim(),
+            res_pg: req.body.pg.trim(),
+            res_tipo: req.body.tipo.trim(),
+            res_oc: req.body.oc.trim(),
+            res_data_exe: req.body.dataExecucao,
+            res_resp: req.body.resp || 'Sistema'
+        };
+
+        console.log('📋 Dados do IOP preparados:', dadosIOP);
+
+        const iopPorOC = await buscarDados('backlog_iop', 'res_oc',  dadosIOP.res_oc, 1, true);
+
+        console.log("----------------------");
+        if (iopPorOC.length > 0) {
+            console.log('⚠️ IOP já existe com nota:', req.body.nota.trim());
+            return res.status(409).json({
+                status: 'error',
+                message: 'Já existe um IOP com esta nota',
+            });
+        }
+
+        /* =========================
+           Inserção no banco
+        ========================== */
+        const result = await inserirNovo('backlog_iop', dadosIOP);
+
+        if (!result) {
+            console.error('❌ Erro ao criar novo IOP - resultado inválido:', result);
+            throw new Error('Falha na criação do IOP');
+        }
+
+        console.log('✅ Novo IOP criado com sucesso! ID:', result.id);
+
+        /* =========================
+           Resposta final
+        ========================== */
+        return res.status(201).json({
+            status: 'success',
+            message: 'IOP criado com sucesso',
+            data: {
+                id: result.id
+            },
+            timestamp: new Date().toISOString()
+        });
+
+    } catch (error) {
+        console.error('🔥 Erro crítico ao criar IOP:', error);
+
+        const statusCode = error.code === 'ER_DUP_ENTRY' ? 409 : 500;
+
+        return res.status(statusCode).json({
+            status: 'error',
+            message:
+                error.code === 'ER_DUP_ENTRY'
+                    ? 'Já existe um registro com esta nota'
+                    : 'Erro interno do servidor ao criar IOP',
+            error:
+                process.env.NODE_ENV === 'development'
+                    ? error.message
+                    : undefined,
+            timestamp: new Date().toISOString()
+        });
+    }
+});
 
 // ------------------------------- ping ----------------------------------------------
 app.get('/ping', (req, res) => {

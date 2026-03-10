@@ -7,6 +7,7 @@
 
     <link rel="stylesheet" href="/controle/IOP/add/css/style.css">
     <link rel="stylesheet" href="/controle/IOP/add/css/form.css">
+    <link rel="stylesheet" href="/controle/IOP/add/css/backlog.css">
     <link rel="shortcut icon" href="/controle/IOP/add/src/logoIcon.png" type="image/x-icon">
 
     <title>Coordina</title>
@@ -21,13 +22,13 @@
             <ul>
                 <li class="optionNav closeOption">Home
                     <ul>
-                        <li class="menuSelect " onclick="window.location.href = '/home';">Home</li>
+                        <li class="menuSelect" onclick="window.location.href = '/home';">Home</li>
                     </ul>
                 </li>
                 <li class="optionNav closeOption">Almoxarifado
                     <ul>
-                        <li class="menuSelect"  onclick="window.location.href = '/controle_almoxarifado';" >Solicitação</li>
-                        <li class="menuSelect" onclick="window.location.href = '/controle_almoxarifado';" >Recebidos</li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle_almoxarifado';">Solicitação</li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle_almoxarifado';">Recebidos</li>
                         <li class="menuSelect" onclick="window.location.href = '/controle_almoxarifado';">Config</li>
                         <li class="menuSelect" onclick="window.location.href = '/lista_materiais';">Lista de Materiais</li>
                     </ul>
@@ -35,14 +36,14 @@
                 <li class="optionNav openOption">Controle
                     <ul>
                         <li class="menuSelect menuSelected" onclick="window.location.href = '/controle/iop/add';">Cadastrar IOP</li>
-                        <li class="menuSelect " onclick="window.location.href = '/controle/iop/lista_iop';">IOP</li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle/iop/lista_iop';">IOP</li>
                         <li class="menuSelect" onclick="window.location.href = '/controle/obras/add';">Cadastrar Obra</li>
-                        <li class="menuSelect " onclick="window.location.href = '/controle/obras/obras';">Obras</li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle/obras/obras';">Obras</li>
                         <li class="menuSelect" onclick="window.location.href = '/controle/producao';">Produção</li>
                         <li class="menuSelect" onclick="window.location.href = '/controle/get_sgo';">Get SGO</li>
                     </ul>
                 </li>
-               <li class="optionNav closeOption">Programação
+                <li class="optionNav closeOption">Programação
                     <ul>
                         <li class="menuSelect" onclick="window.location.href = '/programacao';">Materiais x Programado</li>
                     </ul>
@@ -57,28 +58,27 @@
     </nav>
 
     <main id="rootMain">
-    <div id="rootMain">
-        <form id="formAdd" action="/cadastrar_nova_obra" method="post">
-            <h1 id="headForm">Cadastrar novo IOP</h1>
-            
-            <div class="form-group">
-                <label for="nota">Número da Nota</label>
-                <input type="number" id="nota" name="nota" placeholder="Digite o número da nota" value="oi">
-            </div>
-                
-            <div class="form-group">
-                <label for="cidade">Cidade</label>
-                <select type="text" id="cidade" name="cidade" placeholder="Digite a cidade">
-                    
-                </select>
-            </div>
-            
-                <div class="form-group">
+        <div id="rootMainContainer">
+            <!-- FORMULÁRIO DIRETO NO CONTAINER, SEM O rootMainContent -->
+            <form id="formAdd" action="/cadastrar_nova_obra" method="post">
+                <h1 id="headForm">Cadastrar novo IOP</h1>
+
+                <div class="form-group" id="notaGroup">
+                    <label for="nota">Número da Nota</label>
+                    <input type="number" id="nota" name="nota" placeholder="Digite o número da nota" value="oi">
+                </div>
+
+                <div class="form-group" id="cidadeGroup">
+                    <label for="cidade">Cidade</label>
+                    <select type="text" id="cidade" name="cidade" placeholder="Digite a cidade"></select>
+                </div>
+
+                <div class="form-group" id="dataGroup">
                     <label for="dataexe">Data de Execução</label>
                     <input type="date" id="dataexe" name="dataexe" value="21/11/2025">
                 </div>
-                
-                <div class="form-group">
+
+                <div class="form-group" id="tipoGroup">
                     <label for="tipo">Abrangência</label>
                     <select id="tipo" name="tipo">
                         <option value="">...</option>
@@ -87,33 +87,57 @@
                         <option value="RF">RECAPACITAÇÃO DE CFA, CFU E PR</option>
                         <option value="RP">RECAPACITAÇÃO DE POSTES</option>
                         <option value="RT">RECAPACITAÇÃO DE TRANSFORMADOR DE RD</option>
-
                     </select>
                 </div>
-            
-            <div class="form-group">
-                <label for="oc">OC</label>
-                <input type="text" id="oc" name="oc" placeholder="Número da OC" value="">
-            </div>
 
-            <div class="form-group">
-                <label for="pg">Ponto Geográfico</label>
-                <input type="text" id="pg" name="pg" placeholder="Número do Ponto Geográfico" value="">
-            </div>
+                <div class="form-group" id="ocGroup">
+                    <label for="oc">OC</label>
+                    <input type="text" id="oc" name="oc" placeholder="Número da OC" value="">
+                </div>
 
-            <div class="form-group">
-                <label for="nome_obra">Nome Obra</label>
-                <input type="text" id="nome_obra" name="nome_obra" placeholder="Nome da Obra" value="">
-            </div>
+                <div class="form-group" id="pgGroup">
+                    <label for="pg">Ponto Geográfico</label>
+                    <input type="text" id="pg" name="pg" placeholder="Número do Ponto Geográfico" value="">
+                </div>
 
-            <button type="submit" class="btn-submit">Cadastrar Obra</button>
-        </form>
-    </div>
+                <div class="form-group" id="obraGroup">
+                    <label for="nome_obra">Nome Obra</label>
+                    <input type="text" id="nome_obra" name="nome_obra" placeholder="Nome da Obra" value="">
+                </div>
+
+                <button type="submit" class="btn-submit">Cadastrar Obra</button>
+            </form>
+
+            <div class="backlogRoot">
+                <div class="backlogHeader">
+                    <h3>Backlog IOP</h3>
+                    <span class="badge"></span>
+                </div>
+                <div class="tableContainer">
+                    <table class="backlogTable">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Cidade</th>
+                                <th>Data</th>
+                                <th>Tipo</th>
+                                <th>OC</th>
+                                <th>PG</th>
+                            </tr>
+                        </thead>
+                        <tbody id="backlogTableBody">
+                        
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </main>
 
     <script src="/controle/IOP/add/js/mensagem.js"></script>
     <script src="/controle/IOP/add/js/main.js"></script>
     <script src="/controle/IOP/add/js/cidadesOption.js"></script>
+    <script src="/controle/IOP/add/js/backlog.js"></script>
 </body>
 
 </html>

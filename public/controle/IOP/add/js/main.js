@@ -1,5 +1,15 @@
 
 const optionNav = document.querySelectorAll(".optionNav");
+const role = localStorage.getItem('role');
+let idBacklog = undefined;
+let uri = '/createNewIOP';
+
+if (role == 'STC') {
+    
+    document.getElementById("notaGroup").remove();
+    document.getElementById("obraGroup").remove();
+    uri = '/create_backlog_iop';
+}
 
 optionNav.forEach(option => {
     option.addEventListener("click", evt => {
@@ -20,20 +30,30 @@ const tipo = document.querySelector('#tipo');
 const oc = document.querySelector('#oc');
 const pg = document.querySelector('#pg');
 
+function updateNomeObra() {
+     nome_obra.value = `NR-${oc.value}-${tipo.value}-PG-${pg.value}-${cidade.value}`;
+}
+
 document.querySelector('#formAdd').addEventListener('change', function() {
-    nome_obra.value = `NR-${oc.value}-${tipo.value}-PG-${pg.value}-${cidade.value}`;
+    if (role != 'STC') updateNomeObra();
 });
 
 document.querySelector('#formAdd').addEventListener('submit', function (evt) {
     evt.preventDefault();
 
-    fetch('/createNewIOP', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
+    let payLoad = '';
+
+    if (role == 'STC') {
+        payLoad = JSON.stringify({
+            cidade: cidade.value,
+            dataExecucao: dataexe.value,
+            tipo: tipo.value,
+            oc: oc.value,
+            pg: pg.value,
+            resp: localStorage.getItem('nome')
+        });
+    }else{
+        payLoad = JSON.stringify({
             nota: nota.value,
             nome_obra: nome_obra.value,
             cidade: cidade.value,
@@ -41,8 +61,20 @@ document.querySelector('#formAdd').addEventListener('submit', function (evt) {
             tipo: tipo.value,
             oc: oc.value,
             pg: pg.value,
-            resp: localStorage.getItem('nome')
+            resp: localStorage.getItem('nome'),
+            idback: idBacklog || "Não"
         })
+    }
+
+    console.warn('Payload a ser enviado:', payLoad);
+
+    fetch(uri, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: payLoad
     }).then(response => {
         
         if (response.ok) {
@@ -60,3 +92,4 @@ document.querySelector('#formAdd').addEventListener('submit', function (evt) {
         }
     });
 });
+
