@@ -30,7 +30,7 @@ app.use(compression());
 
 // ------------------------------- Rotas ---------------------------------------------
 
-app.get('/', gotoHome, (req, res) => {
+app.get('/', (req, res) => {
     res.sendFile(__dirname + "/public/login/index.html");
 })
 
@@ -467,11 +467,11 @@ app.post('/createNewIOP', autenticarToken, async (req, res) => {
            Resposta final
         ========================== */
 
-        if (res_id_backlog) {
+        if (res_id_backlog != "Não" && res_id_backlog) {
             console.log('✅ Atualizando backlog IOP FEITO com ID:', res_id_backlog);
 
             await atualizarDados('backlog_iop', { feito: 'sim' }, 'id', res_id_backlog);
-        }else{
+        } else {
             const iopbacklog = await buscarDados('backlog_iop', 'res_oc',  dadosIOP.res_oc, 1, true);
 
             if (iopbacklog.length > 0) {

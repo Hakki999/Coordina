@@ -5,7 +5,7 @@ let idBacklog = undefined;
 let uri = '/createNewIOP';
 
 if (role == 'STC') {
-    
+
     document.getElementById("notaGroup").remove();
     document.getElementById("obraGroup").remove();
     uri = '/create_backlog_iop';
@@ -31,10 +31,13 @@ const oc = document.querySelector('#oc');
 const pg = document.querySelector('#pg');
 
 function updateNomeObra() {
-     nome_obra.value = `NR-${oc.value}-${tipo.value}-PG-${pg.value}-${cidade.value}`;
+    oc.value = (oc.value || '').split('-');
+
+    payLoad.oc = oc.value[0] + "-" + oc.value[1];
+    nome_obra.value = `NR-${oc.value}-${tipo.value}-PG-${pg.value}-${cidade.value}`;
 }
 
-document.querySelector('#formAdd').addEventListener('change', function() {
+document.querySelector('#formAdd').addEventListener('change', function () {
     if (role != 'STC') updateNomeObra();
 });
 
@@ -48,23 +51,24 @@ document.querySelector('#formAdd').addEventListener('submit', function (evt) {
             cidade: cidade.value,
             dataExecucao: dataexe.value,
             tipo: tipo.value,
-            oc: oc.value,
+            oc: String(oc.value).split('-').slice(0, 2).join('-'),
             pg: pg.value,
             resp: localStorage.getItem('nome')
         });
-    }else{
+    } else {
         payLoad = JSON.stringify({
             nota: nota.value,
             nome_obra: nome_obra.value,
             cidade: cidade.value,
             dataExecucao: dataexe.value,
             tipo: tipo.value,
-            oc: oc.value,
+            oc: String(oc.value).split('-').slice(0, 2).join('-'),
             pg: pg.value,
             resp: localStorage.getItem('nome'),
             idback: idBacklog || "Não"
         })
     }
+
 
     console.warn('Payload a ser enviado:', payLoad);
 
@@ -76,7 +80,7 @@ document.querySelector('#formAdd').addEventListener('submit', function (evt) {
         },
         body: payLoad
     }).then(response => {
-        
+
         if (response.ok) {
             criarMensagem(true, 'Obra cadastrada com sucesso!',);
 
