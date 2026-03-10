@@ -31,9 +31,9 @@ const oc = document.querySelector('#oc');
 const pg = document.querySelector('#pg');
 
 function updateNomeObra() {
-    oc.value = (oc.value || '').split('-');
+    let x = (oc.value || '').split('-');
 
-    payLoad.oc = oc.value[0] + "-" + oc.value[1];
+    x = oc.value[0] + "-" + oc.value[1];
     nome_obra.value = `NR-${oc.value}-${tipo.value}-PG-${pg.value}-${cidade.value}`;
 }
 
