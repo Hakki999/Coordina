@@ -30,7 +30,7 @@ app.use(compression());
 
 // ------------------------------- Rotas ---------------------------------------------
 
-app.get('/', (req, res) => {
+app.get('/', gotoHome, (req, res) => {
     res.sendFile(__dirname + "/public/login/index.html");
 })
 
@@ -471,6 +471,13 @@ app.post('/createNewIOP', autenticarToken, async (req, res) => {
             console.log('✅ Atualizando backlog IOP FEITO com ID:', res_id_backlog);
 
             await atualizarDados('backlog_iop', { feito: 'sim' }, 'id', res_id_backlog);
+        }else{
+            const iopbacklog = await buscarDados('backlog_iop', 'res_oc',  dadosIOP.res_oc, 1, true);
+
+            if (iopbacklog.length > 0) {
+                console.log('✅ Atualizando backlog IOP com ID:', iopbacklog[0].id);
+                await atualizarDados('backlog_iop', { feito: 'sim' }, 'id', iopbacklog[0].id);
+            }
         }
 
         return res.status(201).json({
