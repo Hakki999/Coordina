@@ -1,9 +1,9 @@
 // ------------------------------- Requisição ----------------------------------------
 const express = require('express')
 const bodyParser = require('body-parser');
-const { jwt, autenticarToken, gotoHome,VerifyAcess } = require('./js/middleware/JWT_mid');
+const { jwt, autenticarToken, gotoHome, VerifyAcess } = require('./js/middleware/JWT_mid');
 const cookieParser = require('cookie-parser');
-const { validarLogin, buscarMateriais, enviarOrcamento, solicitacoesRecentes, filtroSolicitacoes, changeLibDev, getAcess, buscarDados, inserirNovo, atualizarDados} = require("./js/db/connect");
+const { validarLogin, buscarMateriais, enviarOrcamento, solicitacoesRecentes, filtroSolicitacoes, changeLibDev, getAcess, buscarDados, inserirNovo, atualizarDados } = require("./js/db/connect");
 const { sendMSG } = require(__dirname + '/js/WhatsAppSession/whatsAppRest');
 const { processDataMS } = require('./js/dataAnalytics/processMS');
 const { processMP } = require('./js/dataAnalytics/processMP');
@@ -86,11 +86,11 @@ app.post('/login', async (req, res) => {
         console.log(`Tentativa de login: ${user}`);
         console.log(`Tentativa de login: ${password}`);
         console.log(req.body);
-        
+
         if (!user || !password) {
             return res.status(400).json({ error: "Dados incompletos" });
         }
-        
+
         const resultado = (await validarLogin(user, password));
 
         console.log(resultado);
@@ -101,7 +101,7 @@ app.post('/login', async (req, res) => {
         }
 
         const token = jwt.sign(
-            { 
+            {
                 userId: resultado.data.user,
                 role: resultado.data.function
             },
@@ -437,9 +437,9 @@ app.post('/createNewIOP', autenticarToken, async (req, res) => {
 
         console.log('📋 Dados do IOP preparados:', dadosIOP);
 
-        let iopExistente = await buscarDados('table_iop', 'res_nota',  dadosIOP.res_nota, 1, true);
+        let iopExistente = await buscarDados('table_iop', 'res_nota', dadosIOP.res_nota, 1, true);
 
-        const iopPorOC = await buscarDados('table_iop', 'res_oc',  dadosIOP.res_oc, 1, true);
+        const iopPorOC = await buscarDados('table_iop', 'res_oc', dadosIOP.res_oc, 1, true);
 
         console.log("----------------------");
         if (iopExistente.length > 0 && iopPorOC.length > 0) {
@@ -467,18 +467,13 @@ app.post('/createNewIOP', autenticarToken, async (req, res) => {
            Resposta final
         ========================== */
 
-        if (res_id_backlog != "Não" && res_id_backlog) {
-            console.log('✅ Atualizando backlog IOP FEITO com ID:', res_id_backlog);
+        const iopbacklog = await buscarDados('backlog_iop', 'res_oc', dadosIOP.res_oc, 1, true);
 
-            await atualizarDados('backlog_iop', { feito: 'sim' }, 'id', res_id_backlog);
-        } else {
-            const iopbacklog = await buscarDados('backlog_iop', 'res_oc',  dadosIOP.res_oc, 1, true);
-
-            if (iopbacklog.length > 0) {
-                console.log('✅ Atualizando backlog IOP com ID:', iopbacklog[0].id);
-                await atualizarDados('backlog_iop', { feito: 'sim' }, 'id', iopbacklog[0].id);
-            }
+        if (iopbacklog.length > 0) {
+            console.log('✅ Atualizando backlog IOP com ID:', iopbacklog[0].id);
+            await atualizarDados('backlog_iop', { feito: 'sim' }, 'id', iopbacklog[0].id);
         }
+
 
         return res.status(201).json({
             status: 'success',
@@ -555,53 +550,53 @@ app.post('/atualizar_iop', autenticarToken, VerifyAcess('Alpha', 'Programação'
 
 app.post('/parcelaadd', autenticarToken, VerifyAcess('Alpha', 'Programação', 'Controle', 'Almoxarifado'), (req, res) => {
     const dados = req.body;
-    
+
     console.log('Dados recebidos:', dados);
-    
+
     // Se vier com array de parcelas
     if (dados.parcelas && Array.isArray(dados.parcelas)) {
         // Salva como JSON string na coluna parcelas_adicionais
         const updateData = {
             parcelas_adicionais: JSON.stringify(dados.parcelas)
         };
-        
+
         atualizarDados('table_iop', updateData, 'id', dados.id)
-        .then(() => {
-            res.json({
-                success: true,
-                message: `${dados.parcelas.length} parcela(s) salva(s) com sucesso`
+            .then(() => {
+                res.json({
+                    success: true,
+                    message: `${dados.parcelas.length} parcela(s) salva(s) com sucesso`
+                })
             })
-        })
-        .catch((error) => {
-            console.error('Erro:', error);
-            res.json({
-                success: false,
-                message: 'Erro ao salvar parcelas'
-            })
-        });
+            .catch((error) => {
+                console.error('Erro:', error);
+                res.json({
+                    success: false,
+                    message: 'Erro ao salvar parcelas'
+                })
+            });
     } else {
         // Mantém compatibilidade com o formato antigo
         atualizarDados('table_iop', dados, 'id', dados.id)
-        .then(() => {
-            res.json({
-                success: true,
-                message: 'Dados atualizados com sucesso'
+            .then(() => {
+                res.json({
+                    success: true,
+                    message: 'Dados atualizados com sucesso'
+                })
             })
-        })
-        .catch((error) => {
-            console.error('Erro:', error);
-            res.json({
-                success: false,
-                message: 'Erro ao atualizar dados'
-            })
-        });
+            .catch((error) => {
+                console.error('Erro:', error);
+                res.json({
+                    success: false,
+                    message: 'Erro ao atualizar dados'
+                })
+            });
     }
 });
 
 app.post('/createNewObras', autenticarToken, async (req, res) => {
     try {
         console.log('📝 Tentativa de criação de nova obra:', req.body);
-        
+
         // Log do usuário que está fazendo a requisição (se disponível)
         if (req.user) {
             console.log('👤 Usuário solicitante:', req.user.id || req.user.email);
@@ -637,7 +632,7 @@ app.post('/createNewObras', autenticarToken, async (req, res) => {
         // Verifica se a data_exe está no formato correto
         const dataExe = req.body.data_exe.trim();
         const dataExecucao = new Date(dataExe);
-        
+
         if (isNaN(dataExecucao.getTime())) {
             console.log('❌ Data de execução inválida:', dataExe);
             return res.status(400).json({
@@ -651,7 +646,7 @@ app.post('/createNewObras', autenticarToken, async (req, res) => {
         const hoje = new Date();
         hoje.setHours(0, 0, 0, 0);
         dataExecucao.setHours(0, 0, 0, 0);
-        
+
         if (dataExecucao > hoje) {
             console.log('⚠️ Data de execução é futura:', dataExe);
             // Retorne um erro se não permitir datas futuras
@@ -661,7 +656,7 @@ app.post('/createNewObras', autenticarToken, async (req, res) => {
             });
         }
 
-        const iopExistente = await buscarDados('table_obras', 'res_nota',  req.body.nota.trim(), 1, true);
+        const iopExistente = await buscarDados('table_obras', 'res_nota', req.body.nota.trim(), 1, true);
         console.log("----------------------");
         console.log("----------------------");
         if (iopExistente.length > 0) {
@@ -722,11 +717,11 @@ app.post('/createNewObras', autenticarToken, async (req, res) => {
 
     } catch (error) {
         console.error('🔥 Erro crítico ao criar obra:', error);
-        
+
         // Determinar código de status baseado no erro
         let statusCode = 500;
         let errorMessage = 'Erro interno do servidor ao criar obra';
-        
+
         if (error.code === 'ER_DUP_ENTRY') {
             statusCode = 409;
             errorMessage = 'Já existe um registro com esta nota';
@@ -759,7 +754,7 @@ app.post('/createNewObras', autenticarToken, async (req, res) => {
                 // Não incluir stack em produção
             } : undefined,
             timestamp: new Date().toISOString(),
-            sugestao: statusCode === 500 
+            sugestao: statusCode === 500
                 ? 'Tente novamente mais tarde ou contate o suporte'
                 : 'Verifique os dados enviados e tente novamente'
         });
@@ -808,13 +803,13 @@ app.post('/atualizar_obras', autenticarToken, (req, res) => {
 app.patch('/atualizarStatus', autenticarToken, (req, res) => {
     // Lógica para atualizar IOP
 
-let dados = {
-    id: req.body.id,
-    res_status: req.body.res_status,
-    res_sap: req.body.res_sap,
-    res_orcamento: req.body.res_orcamento,
-    res_baixa: req.body.res_baixa
-};
+    let dados = {
+        id: req.body.id,
+        res_status: req.body.res_status,
+        res_sap: req.body.res_sap,
+        res_orcamento: req.body.res_orcamento,
+        res_baixa: req.body.res_baixa
+    };
 
     atualizarDados(req.body.table, dados, 'id', dados.id)
         .then(() => {
@@ -894,7 +889,7 @@ app.post('/create_backlog_iop', autenticarToken, VerifyAcess('STC'), async (req,
 
         console.log('📋 Dados do IOP preparados:', dadosIOP);
 
-        const iopPorOC = await buscarDados('backlog_iop', 'res_oc',  dadosIOP.res_oc, 1, true);
+        const iopPorOC = await buscarDados('backlog_iop', 'res_oc', dadosIOP.res_oc, 1, true);
 
         console.log("----------------------");
         if (iopPorOC.length > 0) {
