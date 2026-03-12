@@ -4,6 +4,19 @@
 let parcelasAtuais = [];
 let iopIdAtual = null;
 
+const deParaVozPADD = [
+    { id: "1138.01", voz: "TURMA LINHA MORTA 5H CAM ATENDIMENTO EMERGENCIAL" },
+    { id: "1422.53", voz: "TURMA LINHA MORTA 5H CAM ATENDIMENTO EMERGENCIAL HORA EXTRA 25%" },
+    { id: "681.97", voz: "TURMA LV 3H CAM ATEND EMERGENCIAL" },
+    { id: "852.01", voz: "TURMA LV 4H CAM ATEND EMERGENCIAL" },
+    { id: "852.46", voz: "TURMA LV 3H CAM ATEND EMERGENCIAL HE25%" },
+    { id: "1065.01", voz: "TURMA LV 4H CAM ATEND EMERGENCIAL HE25%" },
+    { id: "266.85", voz: "TURMA LM 2H LEVE ATEND EMERGENCIAL HE25%" },
+    { id: "213.47", voz: "TURMA LM 2H LEVE ATEND EMERGENCIAL" },
+    { id: "339.56", voz: "TURMA LM 2H CEST ATEND EMERGENCIAL HE25%" },
+    { id: "271.65", voz: "TURMA LM 2H CESTO ATEND EMERGENCIAL" },
+]
+
 // Função para calcular uma parcela específica
 function calcularEstaParcela(elemento) {
     const parcelaItem = elemento.closest('.parcela-item');
@@ -525,7 +538,7 @@ function gerarRelatorioPADD() {
                         dataFormat(parcela.res_chegada) || '',
                         dataFormat(parcela.res_finalizacao) || '',
                         parcela.res_qtd_horas || 0,
-                        String(parcela.res_tipo_parcela).replace('.', '') || '',
+                        deParaVozPADD.find(voz => voz.id == parcela.res_tipo_parcela)?.voz || '',
                         formatarMoeda(parcela.res_valor_orcado) || '',
                         formatarMoeda(parcela.res_calculo) || 0,
                         parcela.res_qtd_voz || 0,

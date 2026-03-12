@@ -9,7 +9,8 @@ function atualizarDados(dados) {
                 id: dados.id,
                 res_status: dados.res_status,
                 res_sap: dados.res_sap,
-                res_orcamento: dados.res_orcamento
+                res_orcamento: dados.res_orcamento, 
+                res_pep: dados.res_pep || null
             }),
             credentials: 'include'
         })
