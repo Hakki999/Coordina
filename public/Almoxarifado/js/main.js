@@ -450,34 +450,81 @@ function handleBudgetError(error) {
 /** Atualiza os valores de liberado e devolvido no backend */
 
 async function changeLiberadoDevolvido(evt) {
-    // Força uma atualização síncrona dos valores antes de processar
-    await forceValueUpdate();
+    try {
+        // Força uma atualização síncrona dos valores antes de processar
+        await forceValueUpdate();
 
-    let dataTemp = [];
-    document.querySelectorAll('.changeLibDevAlmox').forEach(row => {
-        // Para inputs, pega o value diretamente
-        const children = row.children;
-        dataTemp.push({
-            item: getValue(children[0]),
-            qtd: getValue(children[1]),
-            lib: getValue(children[2]),
-            dev: getValue(children[3])
+        let dataTemp = [];
+        document.querySelectorAll('.changeLibDevAlmox').forEach(row => {
+            const children = row.children;
+            dataTemp.push({
+                item: getValue(children[0]),
+                qtd: getValue(children[1]),
+                lib: getValue(children[2]),
+                dev: getValue(children[3])
+            });
         });
-    });
 
-    fetch('/changeLibDev', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            dataTemp: dataTemp,
-            id: document.querySelector("#listamateriais").getAttribute('data-id')
-        }),
-        credentials: 'include'
-    });
+        const id = parseInt(document.querySelector("#listamateriais").getAttribute('data-id'));
+        
+        const response = await fetch('/changeLibDev', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                dataTemp: dataTemp,
+                id: id
+            }),
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            throw new Error(`Erro HTTP: ${response.status}`);
+        }
+
+        const result = await response.json();
+        
+        if (result.status == "Atualização realizada com sucesso!") {
+            criarMensagem(true, 'Valores de liberado e devolvido atualizados com sucesso!');
+
+            // Encontrar o índice do registro no dadosTable
+            const registroIndex = dadosTable.findIndex(row => row.id === id);
+            
+            if (registroIndex !== -1) {
+                // Atualizar cada material no registro existente
+                dataTemp.forEach(itemAtualizado => {
+                    const materialIndex = dadosTable[registroIndex].Materiais.findIndex(
+                        m => m.item === itemAtualizado.item
+                    );
+                    
+                    if (materialIndex !== -1) {
+                        dadosTable[registroIndex].Materiais[materialIndex].lib = itemAtualizado.lib;
+                        dadosTable[registroIndex].Materiais[materialIndex].dev = itemAtualizado.dev;
+                    }
+                });
+                
+                console.log('dadosTable atualizado:', dadosTable[registroIndex]);
+                
+                // Se você tiver uma função para atualizar a interface, chame-a aqui
+                if (typeof atualizarInterface === 'function') {
+                    atualizarInterface();
+                } else {
+                    // Alternativa: recarregar os dados da tabela se necessário
+                    // loadTableData(); // Descomente se tiver essa função
+                }
+            } else {
+                console.warn('Registro não encontrado no dadosTable com ID:', id);
+            }
+        } else {
+            criarMensagem(false, result.message || 'Erro ao atualizar valores');
+        }
+        
+    } catch (error) {
+        console.error('Erro em changeLiberadoDevolvido:', error);
+        criarMensagem(false, 'Erro ao processar atualização: ' + error.message);
+    }
 }
-
 // Função auxiliar para pegar valores de inputs ou textContent
 function getValue(element) {
     if (!element) return '';
