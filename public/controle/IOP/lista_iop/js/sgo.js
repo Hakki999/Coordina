@@ -1,6 +1,4 @@
-const { buscarDados } = require("../../../../../js/db/connect");
 
-// Configurações
 const CONFIG = {
     BATCH_SIZE: 10,
     DELAY_BETWEEN_REQUESTS: 50,
@@ -35,7 +33,11 @@ async function get_status(ids) {
     for (let i = 0; i < ids.length; i += CONFIG.BATCH_SIZE) {
         const batch = ids.slice(i, i + CONFIG.BATCH_SIZE);
         console.log(`📦 Processando lote ${Math.floor(i / CONFIG.BATCH_SIZE) + 1} com ${batch.length} notas`);
-        criarMensagem(true, `📦 Processando lote ${Math.floor(i / CONFIG.BATCH_SIZE) + 1}...`);
+        const loteAtual = Math.floor(i / CONFIG.BATCH_SIZE) + 1;
+        const totalLotes = Math.ceil(ids.length / CONFIG.BATCH_SIZE);
+        const porcentagem = ((loteAtual / totalLotes) * 100).toFixed(2);
+
+        criarMensagem(true, `📦 Processando lote ${porcentagem}%`);
 
         const batchPromises = batch.map(id => buscarStatusIndividual(id));
         const batchResults = await Promise.allSettled(batchPromises);
@@ -97,7 +99,6 @@ async function get_status(ids) {
         // Progresso
         const progresso = Math.min(i + CONFIG.BATCH_SIZE, ids.length);
         console.log(`📊 Progresso: ${progresso}/${ids.length} notas processadas`);
-        criarMensagem(true, `📊 Progresso: ${progresso}/${ids.length} notas processadas...`);
 
         // Delay entre lotes
         if (i + CONFIG.BATCH_SIZE < ids.length) {
@@ -218,7 +219,9 @@ async function get_orcamento(res_sap_ids) {
         // Progresso
         const progresso = Math.min(i + CONFIG.BATCH_SIZE, res_sap_ids.length);
         console.log(`📊 Orçamentos: ${progresso}/${res_sap_ids.length} processados`);
-        criarMensagem(true, `📊 Orçamentos: ${progresso}/${res_sap_ids.length} processados...`);
+        const porcentagem = ((progresso / res_sap_ids.length) * 100).toFixed(2);
+
+        criarMensagem(true, `📊 Orçamentos: ${porcentagem}% processados...`);
 
         if (i + CONFIG.BATCH_SIZE < res_sap_ids.length) {
             await new Promise(resolve => setTimeout(resolve, CONFIG.DELAY_BETWEEN_REQUESTS));
@@ -290,7 +293,7 @@ function main_status() {
         .filter(nota => nota && nota !== 'null' && nota !== 'undefined');
 
     console.log(`📋 Total de notas a processar: ${todasNotas.length}`);
-    console.log(`📋 Status ignorados durante processamento: ${CONFIG.IGNORE_STATUS.join(', ')}`);
+    console.log(`📋 Status ignorados durante processamento: ${CONFIG.IGNORE_STATUS}`);
     console.log('📋 NOTA: Todos os resultados serão SALVOS no banco!');
 
     // Chama a função get_status otimizada
@@ -340,23 +343,23 @@ async function buscarPEPIndividual(ids, tentativa = 1) {
     // Se for um array, processa em lote
     if (Array.isArray(ids)) {
         console.log(`🚀 Processando ${ids.length} notas em lote...`);
-        
+
         const resultados = [];
         const BATCH_SIZE = 10; // Processa 10 por vez
-        
+
         for (let i = 0; i < ids.length; i += BATCH_SIZE) {
             const batch = ids.slice(i, i + BATCH_SIZE);
-            console.log(`📦 Lote ${Math.floor(i/BATCH_SIZE) + 1}/${Math.ceil(ids.length/BATCH_SIZE)}`);
-            
+            console.log(`📦 Lote ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(ids.length / BATCH_SIZE)}`);
+
             // Processa todas as notas do lote em paralelo
             const batchPromises = batch.map(nota => processarNotaIndividual(nota));
             const batchResults = await Promise.allSettled(batchPromises);
-            
+
             // Coleta resultados
             batchResults.forEach(result => {
                 if (result.status === 'fulfilled' && result.value) {
                     resultados.push(result.value);
-                    
+
                     // Salva no banco imediatamente
                     if (typeof atualizarDados === 'function') {
                         try {
@@ -368,14 +371,14 @@ async function buscarPEPIndividual(ids, tentativa = 1) {
                     }
                 }
             });
-            
+
             console.log(`📊 Progresso: ${Math.min(i + BATCH_SIZE, ids.length)}/${ids.length}`);
         }
-        
+
         console.log(`✅ Processamento concluído! ${resultados.length} notas processadas`);
         return resultados;
     }
-    
+
     // Se for ID único, processa apenas um
     return processarNotaIndividual(ids, tentativa);
 }
@@ -386,7 +389,7 @@ async function buscarPEPIndividual(ids, tentativa = 1) {
 async function processarNotaIndividual(id, tentativa = 1) {
     try {
         console.log(`🔍 Buscando PEP para nota ${id}...`);
-        
+
         const response = await fetch("http://10.204.8.68:8083/Service/SolicitacaoInvestimentoService.svc/rest/carregarMaterialNota", {
             "headers": {
                 "accept": "application/json, text/plain, */*",
@@ -407,7 +410,7 @@ async function processarNotaIndividual(id, tentativa = 1) {
         // Encontra o ID correspondente no dadosTable
         const item = Array.isArray(dadosTable) ? dadosTable.find(item => item.res_nota === id) : null;
         console.warn(data);
-        
+
         const resultado = {
             id: item?.id || null,
             res_nota: id,
@@ -460,17 +463,17 @@ async function main_pep() {
     try {
         // Chama a função com array de notas
         const resultados = await buscarPEPIndividual(todasNotas);
-        
+
         const sucessos = resultados.filter(r => r.status === 'sucesso').length;
         const erros = resultados.filter(r => r.status === 'erro').length;
-        
+
         console.log('='.repeat(50));
         console.log(`✅ main_pep concluído!`);
         console.log(`📊 Total: ${resultados.length} notas`);
         console.log(`✅ Sucessos: ${sucessos}`);
         console.log(`❌ Erros: ${erros}`);
         console.log('='.repeat(50));
-        
+
         return resultados;
     } catch (error) {
         console.error('❌ Erro fatal em main_pep:', error);

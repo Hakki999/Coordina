@@ -1,4 +1,7 @@
 function atualizarDados(dados) {
+    dadosTable = dadosTable.map(item => item.id === dados.id ? { ...item, ...dados } : item);
+    render_dados();
+
     fetch('/atualizarStatus', {
             method: 'PATCH',
             headers: {
@@ -18,7 +21,7 @@ function atualizarDados(dados) {
         .then(data => {
             if (data.success) {
                 console.log(`✅ Dados atualizados com sucesso para ID ${dados.id}`);
-                criarMensagem(true, `Dados atualizados com sucesso para ID ${dados.id}`);
+                
             } else {
                 console.error('Erro ao atualizar dados:', data.error);
                 criarMensagem(false, `Erro ao atualizar dados para ID ${dados.id}: ${data.error}`);
