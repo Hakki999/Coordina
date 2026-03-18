@@ -377,11 +377,6 @@ app.post('/createNewIOP', autenticarToken, async (req, res) => {
         ========================== */
         const camposObrigatorios = [
             'nota',
-            'nome_obra',
-            'cidade',
-            'pg',
-            'tipo',
-            'oc',
             'dataExecucao'
         ];
 
