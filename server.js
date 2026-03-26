@@ -14,10 +14,10 @@ const http = require("http");
 const compression = require("compression");
 const { log } = require('console');
 
-
 console.log("🚀 Iniciando servidor...");
 
 // ------------------------------- Configuração --------------------------------------
+
 require('dotenv').config()
 const port = process.env.PORT;
 const app = express();

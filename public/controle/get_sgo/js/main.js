@@ -212,11 +212,17 @@ async function fazerRequisicaoComRetry(id, requestData, tentativa = 1) {
 
          console.log(`📤 Enviando requisição única para ${requestData.uri} com ID ${id}`);
 
+         let key = 'SjQwODIxNDQ5OjEwUDx5KWMiYlhUJncwXnQtU159';
+
+         if (localStorage.getItem('role') == "EQTL") {
+            key = 'pdsfisdoifhsdfohsd o';
+         }
+
          const response = await fetch(requestData.uri, {
             "headers": {
                "accept": "application/json, text/plain, */*",
                "accept-language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
-               "authorization": "Basic SjQwODIxNDQ5OjEwUDx5KWMiYlhUJncwXnQtU159",
+               "authorization": "Basic " + key,
                "content-type": "application/json;charset=UTF-8"
             },
             "body": body,
@@ -833,10 +839,6 @@ async function sendRequest() {
    let requestData = {};
 
    console.log(`   Tipo de Solicitação: ${typeSol}`);
-
-   if(localStorage.getItem('nome') == "Lorrayne") {
-      typeSol = "Verificacao"
-   }
 
    switch (typeSol) {
       case 'Notas':
