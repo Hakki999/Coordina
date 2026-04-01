@@ -888,6 +888,12 @@ async function sendRequest() {
             body: JSON.stringify({ solId: "{ID}" })
          };
          break;
+         case 'ObterNotaPorPEP':
+            requestData = {
+               uri: "http://10.204.8.68:8083/Service/SolicitacaoInvestimentoService.svc/rest/ListarSolicitacaoInvestimentoPorPEP",
+               body: JSON.stringify({ "PEP": "{ID}" })
+            };
+            break;
       default:
          criarMensagem(false, 'Tipo de solicitação inválido');
          return;
