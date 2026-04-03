@@ -214,10 +214,6 @@ async function fazerRequisicaoComRetry(id, requestData, tentativa = 1) {
 
          let key = 'SjQwODIxNDQ5OjEwUDx5KWMiYlhUJncwXnQtU159';
 
-         if (localStorage.getItem('role') == "EQTL") {
-            key = 'pdsfisdoifhsdfohsd o';
-         }
-
          const response = await fetch(requestData.uri, {
             "headers": {
                "accept": "application/json, text/plain, */*",
