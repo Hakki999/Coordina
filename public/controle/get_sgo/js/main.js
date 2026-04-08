@@ -961,3 +961,727 @@ async function sendRequest() {
 }
 
 // Expor funções para o onclick do botão
+// ==========================================
+// TIMELINE COM ANÁLISE DE GARGALOS - CORREÇÃO FINAL
+// ==========================================
+
+// 1. Aplicar tema personalizado
+const themeStyles = document.createElement('style');
+themeStyles.textContent = `
+    :root {
+        --primaryColor: #000814;
+        --secundaryColor: #002855;
+        --thirdColor: #1b263b;
+        --emphasisColor: #0888ff;
+        --fontColor: #f8f9fa;
+    }
+    
+    .timeline-container {
+        background: var(--primaryColor) !important;
+        color: var(--fontColor) !important;
+    }
+    
+    .timeline-header {
+        background: var(--secundaryColor) !important;
+        border-bottom: 2px solid var(--emphasisColor) !important;
+    }
+    
+    .timeline-card {
+        background: var(--thirdColor) !important;
+        border-left: 4px solid var(--emphasisColor) !important;
+    }
+    
+    .timeline-event {
+        background: var(--secundaryColor) !important;
+        border: 1px solid var(--emphasisColor) !important;
+    }
+    
+    .btn-primary {
+        background: var(--emphasisColor) !important;
+        color: white !important;
+    }
+    
+    .btn-secondary {
+        background: var(--secundaryColor) !important;
+        color: var(--fontColor) !important;
+        border: 1px solid var(--emphasisColor) !important;
+    }
+    
+    .metric-card {
+        background: var(--thirdColor) !important;
+        border: 1px solid var(--emphasisColor) !important;
+    }
+    
+    .gargalo-badge {
+        background: #ff4757 !important;
+        color: white !important;
+    }
+    
+    .eficiente-badge {
+        background: #00b894 !important;
+        color: white !important;
+    }
+`;
+document.head.appendChild(themeStyles);
+
+// 2. Adicionar botão de Análise
+function adicionarBotaoTimeline() {
+    if (document.querySelector('#btnGerarTimeline')) return;
+
+    const container = document.querySelector('.headInput');
+    const btnTimeline = document.createElement('button');
+    btnTimeline.id = 'btnGerarTimeline';
+    btnTimeline.innerHTML = '📊 Análise de Gargalos';
+    btnTimeline.style.cssText = `
+        margin-left: 10px;
+        padding: 8px 20px;
+        background: var(--emphasisColor);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s;
+    `;
+    
+    btnTimeline.onmouseover = () => btnTimeline.style.transform = 'scale(1.05)';
+    btnTimeline.onmouseout = () => btnTimeline.style.transform = 'scale(1)';
+    
+    btnTimeline.addEventListener('click', abrirAnaliseGargalos);
+    container.appendChild(btnTimeline);
+}
+
+// 3. Estrutura de dados
+let dadosAnaliseGlobal = {
+    fluxos: new Map(),
+    metricasGerais: {},
+    gargalos: [],
+    etapasCriticas: []
+};
+
+// 4. Função CORRIGIDA para parse de data
+function parseData(dataStr) {
+    if (!dataStr || dataStr === '-') return null;
+    
+    try {
+        const partes = dataStr.split(',');
+        if (partes.length !== 2) return null;
+        
+        const dataParte = partes[0].trim();
+        const horaParte = partes[1].trim();
+        
+        const dataSplit = dataParte.split('/');
+        const horaSplit = horaParte.split(':');
+        
+        if (dataSplit.length !== 3 || horaSplit.length !== 3) return null;
+        
+        const dia = parseInt(dataSplit[0]);
+        const mes = parseInt(dataSplit[1]) - 1;
+        const ano = parseInt(dataSplit[2]);
+        
+        const hora = parseInt(horaSplit[0]);
+        const minuto = parseInt(horaSplit[1]);
+        const segundo = parseInt(horaSplit[2]);
+        
+        const timestamp = new Date(ano, mes, dia, hora, minuto, segundo).getTime();
+        
+        if (isNaN(timestamp)) {
+            console.error('Data inválida após parse:', dataStr);
+            return null;
+        }
+        
+        return timestamp;
+    } catch (e) {
+        console.error('Erro ao processar data:', dataStr, e);
+        return null;
+    }
+}
+
+// 5. Abrir Dashboard de Análise
+function abrirAnaliseGargalos() {
+    const typeSol = document.querySelector('#typeSol').value;
+    
+    if (typeSol !== 'FluxoNota') {
+        alert('⚠️ A análise de gargalos está disponível apenas para "FluxoNota".');
+        return;
+    }
+
+    const csvData = resResponse.value;
+    if (!csvData || csvData.trim() === '') {
+        alert('⚠️ Execute a consulta primeiro.');
+        return;
+    }
+
+    const sucesso = processarDadosAnalise(csvData);
+    
+    if (!sucesso) {
+        alert('❌ Erro ao processar os dados. Verifique o console para mais detalhes.');
+        return;
+    }
+    
+    const overlay = document.createElement('div');
+    overlay.id = 'analiseGargalos';
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: var(--primaryColor);
+        z-index: 10000;
+        display: flex;
+        flex-direction: column;
+        color: var(--fontColor);
+        font-family: 'Segoe UI', Arial, sans-serif;
+        overflow: hidden;
+    `;
+    
+    overlay.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 30px; 
+                    background: var(--secundaryColor); border-bottom: 3px solid var(--emphasisColor);">
+            <div>
+                <h1 style="margin: 0; color: var(--fontColor); font-size: 1.8em;">
+                    📊 Análise de Gargalos do Fluxo
+                </h1>
+                <p style="margin: 5px 0 0; opacity: 0.8;">
+                    ${dadosAnaliseGlobal.metricasGerais.totalFluxos} solicitações analisadas
+                </p>
+            </div>
+            <div style="display: flex; gap: 15px;">
+                <button onclick="alternarVisualizacao('dashboard')" id="btnDashboard" 
+                        style="padding: 10px 20px; background: var(--emphasisColor); color: white; 
+                               border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                    📈 Dashboard
+                </button>
+                <button onclick="alternarVisualizacao('timeline')" id="btnTimeline"
+                        style="padding: 10px 20px; background: var(--thirdColor); color: var(--fontColor); 
+                               border: 1px solid var(--emphasisColor); border-radius: 6px; cursor: pointer;">
+                    ⏳ Timeline Detalhada
+                </button>
+                <button onclick="fecharAnalise()"
+                        style="padding: 10px 20px; background: #dc3545; color: white; 
+                               border: none; border-radius: 6px; cursor: pointer;">
+                    ✖ Fechar
+                </button>
+            </div>
+        </div>
+        
+        <div id="analiseContent" style="flex: 1; overflow-y: auto; padding: 30px;">
+            ${renderizarDashboard()}
+        </div>
+    `;
+    
+    document.body.appendChild(overlay);
+    document.body.style.overflow = 'hidden';
+    
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') fecharAnalise();
+    });
+}
+
+// 6. Processar dados - CORREÇÃO FINAL
+function processarDadosAnalise(csv) {
+    console.log('📊 Processando CSV...');
+    
+    const linhas = csv.split('\n');
+    if (linhas.length < 2) {
+        console.error('CSV vazio ou sem dados');
+        return false;
+    }
+    
+    const cabecalho = linhas[0].split(';');
+    
+    const idxId = cabecalho.indexOf('ID_Original');
+    const idxData = cabecalho.indexOf('Data');
+    const idxStatusDe = cabecalho.indexOf('StatusDe');
+    const idxStatusPara = cabecalho.indexOf('StatusPara');
+    const idxObservacao = cabecalho.indexOf('Observacao');
+    const idxRespInterno = cabecalho.indexOf('RespInternoId');
+    
+    const fluxos = new Map();
+    const temposPorEtapa = new Map();
+    let totalEventos = 0;
+    let eventosComData = 0;
+
+    for (let i = 1; i < linhas.length; i++) {
+        if (!linhas[i].trim()) continue;
+        
+        const valores = linhas[i].split(';');
+        const id = valores[idxId];
+        const dataStr = valores[idxData];
+        const statusDe = valores[idxStatusDe] || '';
+        const statusPara = valores[idxStatusPara] || '';
+        const obs = valores[idxObservacao] || '';
+        const resp = valores[idxRespInterno] || 'Sistema';
+
+        if (!id) continue;
+        
+        totalEventos++;
+        
+        const timestamp = parseData(dataStr);
+        
+        if (!timestamp) {
+            console.warn(`Linha ${i}: Data inválida - "${dataStr}"`);
+            continue;
+        }
+        
+        eventosComData++;
+
+        if (!fluxos.has(id)) {
+            fluxos.set(id, []);
+        }
+
+        fluxos.get(id).push({
+            data: dataStr,
+            timestamp,
+            statusDe: statusDe || 'Início',
+            statusPara: statusPara || 'Fim',
+            observacao: obs,
+            responsavel: resp
+        });
+    }
+
+    console.log(`✅ Processados: ${eventosComData}/${totalEventos} eventos com data válida`);
+    console.log(`📋 Total de fluxos: ${fluxos.size}`);
+
+    if (fluxos.size === 0) {
+        console.error('Nenhum fluxo válido encontrado');
+        return false;
+    }
+
+    const metricas = {
+        totalFluxos: fluxos.size,
+        tempoTotalMs: 0,
+        fluxoMaisLongo: { id: null, duracaoMs: 0 },
+        fluxoMaisCurto: { id: null, duracaoMs: Infinity }
+    };
+
+    for (let [id, eventos] of fluxos) {
+        eventos.sort((a, b) => a.timestamp - b.timestamp);
+        
+        console.log(`\n📌 Fluxo ${id}:`);
+        
+        // 🎯 CORREÇÃO: O tempo de espera é atribuído ao statusPara do evento
+        for (let i = 0; i < eventos.length - 1; i++) {
+            const eventoAtual = eventos[i];
+            const proximoEvento = eventos[i + 1];
+            
+            const duracaoMs = proximoEvento.timestamp - eventoAtual.timestamp;
+            
+            if (duracaoMs > 0) {
+                // 🎯 A ETAPA É O STATUS ONDE O PROCESSO FICOU (statusPara do próximo evento)
+                const etapa = proximoEvento.statusPara || 'Início';
+                
+                console.log(`   ⏱️ Aguardou ${formatarHoras(duracaoMs / (1000 * 60 * 60))} no status "${etapa}"`);
+                
+                if (!temposPorEtapa.has(etapa)) {
+                    temposPorEtapa.set(etapa, []);
+                }
+                
+                temposPorEtapa.get(etapa).push(duracaoMs);
+            }
+        }
+        
+        if (eventos.length >= 2) {
+            const primeiroEvento = eventos[0];
+            const ultimoEvento = eventos[eventos.length - 1];
+            
+            const duracaoTotalMs = ultimoEvento.timestamp - primeiroEvento.timestamp;
+            
+            if (duracaoTotalMs > 0) {
+                metricas.tempoTotalMs += duracaoTotalMs;
+                
+                if (duracaoTotalMs > metricas.fluxoMaisLongo.duracaoMs) {
+                    metricas.fluxoMaisLongo = { id, duracaoMs: duracaoTotalMs };
+                }
+                if (duracaoTotalMs < metricas.fluxoMaisCurto.duracaoMs) {
+                    metricas.fluxoMaisCurto = { id, duracaoMs: duracaoTotalMs };
+                }
+            }
+        }
+    }
+
+    const mediasEtapas = [];
+    
+    console.log('\n📊 Resumo por etapa:');
+    
+    for (let [etapa, duracoes] of temposPorEtapa) {
+        if (duracoes.length === 0) continue;
+        
+        const soma = duracoes.reduce((a, b) => a + b, 0);
+        const mediaMs = soma / duracoes.length;
+        const maximoMs = Math.max(...duracoes);
+        const minimoMs = Math.min(...duracoes);
+        
+        const mediaHoras = mediaMs / (1000 * 60 * 60);
+        
+        console.log(`   ${etapa}: média ${formatarHoras(mediaHoras)} (${duracoes.length} ocorrências)`);
+        
+        mediasEtapas.push({
+            etapa,
+            mediaHoras: mediaHoras,
+            maximoHoras: maximoMs / (1000 * 60 * 60),
+            minimoHoras: minimoMs / (1000 * 60 * 60),
+            ocorrencias: duracoes.length,
+            mediaMs,
+            maximoMs,
+            minimoMs
+        });
+    }
+
+    mediasEtapas.sort((a, b) => b.mediaHoras - a.mediaHoras);
+    
+    const gargalos = mediasEtapas.slice(0, Math.min(3, mediasEtapas.length));
+
+    const totalFluxosComDuracao = Array.from(fluxos.values())
+        .filter(e => e.length >= 2).length;
+    
+    const tempoMedioMs = totalFluxosComDuracao > 0 ? 
+        metricas.tempoTotalMs / totalFluxosComDuracao : 0;
+
+    dadosAnaliseGlobal = {
+        fluxos,
+        metricasGerais: {
+            ...metricas,
+            tempoMedioMs,
+            totalFluxosComDuracao
+        },
+        mediasEtapas,
+        gargalos,
+        temposPorEtapa
+    };
+    
+    console.log('\n✅ Análise concluída!');
+    console.log(`   Gargalos: ${gargalos.map(g => g.etapa).join(' → ')}`);
+    
+    return true;
+}
+
+// 7. Renderizar Dashboard
+function renderizarDashboard() {
+    const { metricasGerais, gargalos, mediasEtapas } = dadosAnaliseGlobal;
+    
+    const totalHoras = metricasGerais.tempoTotalMs / (1000 * 60 * 60);
+    const mediaHoras = metricasGerais.tempoMedioMs / (1000 * 60 * 60);
+    
+    return `
+        <div style="max-width: 1400px; margin: 0 auto;">
+            <!-- KPIs Principais -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px;">
+                <div class="metric-card" style="background: var(--thirdColor); padding: 25px; border-radius: 12px; 
+                            border: 2px solid var(--emphasisColor); box-shadow: 0 4px 15px rgba(8, 136, 255, 0.2);">
+                    <div style="font-size: 0.9em; opacity: 0.8; margin-bottom: 10px;">📋 Total de Fluxos</div>
+                    <div style="font-size: 2.5em; font-weight: bold; color: var(--emphasisColor);">
+                        ${metricasGerais.totalFluxos}
+                    </div>
+                    <div style="margin-top: 10px; font-size: 0.85em; opacity: 0.7;">
+                        ${metricasGerais.totalFluxosComDuracao || 0} com duração calculada
+                    </div>
+                </div>
+                
+                <div class="metric-card" style="background: var(--thirdColor); padding: 25px; border-radius: 12px; 
+                            border: 2px solid var(--emphasisColor);">
+                    <div style="font-size: 0.9em; opacity: 0.8; margin-bottom: 10px;">⏱️ Tempo Total Acumulado</div>
+                    <div style="font-size: 2.5em; font-weight: bold; color: var(--emphasisColor);">
+                        ${formatarHoras(totalHoras)}
+                    </div>
+                    <div style="margin-top: 10px; font-size: 0.85em; opacity: 0.7;">
+                        ${totalHoras > 0 ? Math.round(totalHoras / 24) : 0} dias
+                    </div>
+                </div>
+                
+                <div class="metric-card" style="background: var(--thirdColor); padding: 25px; border-radius: 12px; 
+                            border: 2px solid var(--emphasisColor);">
+                    <div style="font-size: 0.9em; opacity: 0.8; margin-bottom: 10px;">📊 Tempo Médio por Fluxo</div>
+                    <div style="font-size: 2.5em; font-weight: bold; color: var(--emphasisColor);">
+                        ${formatarHoras(mediaHoras)}
+                    </div>
+                    <div style="margin-top: 10px; font-size: 0.85em; opacity: 0.7;">
+                        ${mediaHoras > 24 ? '⚠️ Acima do ideal' : '✅ Dentro do esperado'}
+                    </div>
+                </div>
+                
+                <div class="metric-card" style="background: var(--thirdColor); padding: 25px; border-radius: 12px; 
+                            border: 2px solid var(--emphasisColor);">
+                    <div style="font-size: 0.9em; opacity: 0.8; margin-bottom: 10px;">🎯 Etapas Identificadas</div>
+                    <div style="font-size: 2.5em; font-weight: bold; color: var(--emphasisColor);">
+                        ${mediasEtapas.length}
+                    </div>
+                    <div style="margin-top: 10px; font-size: 0.85em; opacity: 0.7;">
+                        ${gargalos.length} gargalos críticos
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Seção de Gargalos -->
+            ${gargalos.length > 0 ? `
+                <div style="margin-bottom: 30px;">
+                    <h2 style="color: var(--fontColor); margin-bottom: 20px; display: flex; align-items: center;">
+                        <span style="background: #ff4757; width: 12px; height: 12px; border-radius: 50%; 
+                                     display: inline-block; margin-right: 10px;"></span>
+                        🚨 Gargalos Identificados (Status onde o processo mais aguardou)
+                    </h2>
+                    
+                    <div style="display: grid; gap: 15px;">
+                        ${gargalos.map((gargalo, index) => {
+                            const percentual = mediaHoras > 0 ? (gargalo.mediaHoras / mediaHoras) * 100 : 0;
+                            const severidade = gargalo.mediaHoras > 72 ? 'Crítico' : 
+                                              gargalo.mediaHoras > 48 ? 'Alto' : 'Moderado';
+                            
+                            return `
+                                <div style="background: var(--thirdColor); padding: 20px; border-radius: 10px; 
+                                            border-left: 5px solid ${index === 0 ? '#ff4757' : '#ffa502'};">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <div style="flex: 1;">
+                                            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+                                                <span style="font-size: 1.3em; font-weight: bold; color: var(--fontColor);">
+                                                    ${index + 1}. ${gargalo.etapa}
+                                                </span>
+                                                <span class="gargalo-badge" style="padding: 4px 12px; border-radius: 20px; 
+                                                                              font-size: 0.85em; font-weight: bold;">
+                                                    ${severidade}
+                                                </span>
+                                            </div>
+                                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 15px;">
+                                                <div>
+                                                    <div style="opacity: 0.7; font-size: 0.85em;">Tempo Médio de Espera</div>
+                                                    <div style="font-size: 1.5em; color: var(--emphasisColor);">
+                                                        ${formatarHoras(gargalo.mediaHoras)}
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div style="opacity: 0.7; font-size: 0.85em;">Maior Espera</div>
+                                                    <div style="font-size: 1.2em; color: #ffa502;">
+                                                        ${formatarHoras(gargalo.maximoHoras)}
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div style="opacity: 0.7; font-size: 0.85em;">Ocorrências</div>
+                                                    <div style="font-size: 1.2em; color: var(--fontColor);">
+                                                        ${gargalo.ocorrencias}x
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div style="text-align: center; min-width: 120px;">
+                                            <div style="font-size: 2em; font-weight: bold; color: var(--emphasisColor);">
+                                                ${Math.round(percentual)}%
+                                            </div>
+                                            <div style="opacity: 0.7; font-size: 0.85em;">do tempo médio</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="margin-top: 15px; height: 6px; background: var(--secundaryColor); 
+                                                border-radius: 3px; overflow: hidden;">
+                                        <div style="width: ${Math.min(percentual, 100)}%; height: 100%; 
+                                                    background: linear-gradient(90deg, #ff4757, #ffa502); 
+                                                    border-radius: 3px;"></div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            ` : '<p style="color: var(--fontColor);">Nenhum gargalo identificado.</p>'}
+            
+            <!-- Todas as Etapas (Tabela) -->
+            <div style="background: var(--thirdColor); padding: 25px; border-radius: 12px;">
+                <h3 style="color: var(--fontColor); margin-bottom: 20px;">📋 Detalhamento de Todos os Status de Espera</h3>
+                
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; color: var(--fontColor);">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--emphasisColor);">
+                                <th style="padding: 15px; text-align: left;">Status onde o processo aguardou</th>
+                                <th style="padding: 15px; text-align: center;">Tempo Médio</th>
+                                <th style="padding: 15px; text-align: center;">Máximo</th>
+                                <th style="padding: 15px; text-align: center;">Mínimo</th>
+                                <th style="padding: 15px; text-align: center;">Ocorrências</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${mediasEtapas.map(etapa => {
+                                const isGargalo = gargalos.includes(etapa);
+                                
+                                return `
+                                    <tr style="border-bottom: 1px solid var(--secundaryColor); 
+                                               ${isGargalo ? 'background: rgba(255, 71, 87, 0.1);' : ''}">
+                                        <td style="padding: 12px 15px;">
+                                            ${isGargalo ? '🚨' : '•'} ${etapa.etapa}
+                                        </td>
+                                        <td style="padding: 12px 15px; text-align: center; font-weight: bold;
+                                                   color: ${isGargalo ? '#ff4757' : 'var(--emphasisColor)'};">
+                                            ${formatarHoras(etapa.mediaHoras)}
+                                        </td>
+                                        <td style="padding: 12px 15px; text-align: center;">
+                                            ${formatarHoras(etapa.maximoHoras)}
+                                        </td>
+                                        <td style="padding: 12px 15px; text-align: center;">
+                                            ${formatarHoras(etapa.minimoHoras)}
+                                        </td>
+                                        <td style="padding: 12px 15px; text-align: center;">
+                                            ${etapa.ocorrencias}
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Recomendações -->
+            ${gargalos.length > 0 ? `
+                <div style="margin-top: 30px; padding: 20px; background: var(--secundaryColor); 
+                            border-radius: 10px; border-left: 4px solid #ffa502;">
+                    <h4 style="color: var(--fontColor); margin-bottom: 15px;">💡 Recomendações para Otimização</h4>
+                    <ul style="color: var(--fontColor); opacity: 0.9; line-height: 1.8;">
+                        ${gargalos.map(g => {
+                            if (g.mediaHoras > 72) {
+                                return `<li><strong>${g.etapa}:</strong> Status crítico - processo aguarda em média ${formatarHoras(g.mediaHoras)}. 
+                                        Recomenda-se revisão urgente do processo.</li>`;
+                            } else if (g.mediaHoras > 48) {
+                                return `<li><strong>${g.etapa}:</strong> Status com alto tempo de espera (${formatarHoras(g.mediaHoras)}). 
+                                        Considere implementar alertas automáticos.</li>`;
+                            } else {
+                                return `<li><strong>${g.etapa}:</strong> Ponto de atenção (${formatarHoras(g.mediaHoras)}). 
+                                        Monitore para evitar aumento do tempo.</li>`;
+                            }
+                        }).join('')}
+                    </ul>
+                </div>
+            ` : ''}
+        </div>
+    `;
+}
+
+// 8. Funções auxiliares
+function formatarHoras(horas) {
+    if (isNaN(horas) || horas === null || horas === undefined || horas < 0) {
+        return '0min';
+    }
+    
+    if (horas < 1) {
+        const minutos = Math.round(horas * 60);
+        return `${minutos}min`;
+    } else if (horas < 24) {
+        const horasInt = Math.floor(horas);
+        const minutos = Math.round((horas - horasInt) * 60);
+        return minutos > 0 ? `${horasInt}h ${minutos}min` : `${horasInt}h`;
+    } else {
+        const dias = Math.floor(horas / 24);
+        const horasRest = Math.round(horas % 24);
+        return horasRest > 0 ? `${dias}d ${horasRest}h` : `${dias}d`;
+    }
+}
+
+function alternarVisualizacao(modo) {
+    const content = document.querySelector('#analiseContent');
+    const btnDashboard = document.querySelector('#btnDashboard');
+    const btnTimeline = document.querySelector('#btnTimeline');
+    
+    if (modo === 'dashboard') {
+        content.innerHTML = renderizarDashboard();
+        btnDashboard.style.background = 'var(--emphasisColor)';
+        btnTimeline.style.background = 'var(--thirdColor)';
+    } else {
+        content.innerHTML = renderizarTimelineDetalhada();
+        btnTimeline.style.background = 'var(--emphasisColor)';
+        btnDashboard.style.background = 'var(--thirdColor)';
+    }
+}
+
+function renderizarTimelineDetalhada() {
+    const fluxos = Array.from(dadosAnaliseGlobal.fluxos.entries());
+    
+    return `
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <h3 style="color: var(--fontColor); margin-bottom: 20px;">⏳ Timeline Detalhada por Solicitação</h3>
+            
+            <div style="display: grid; gap: 20px;">
+                ${fluxos.map(([id, eventos]) => {
+                    const duracaoTotal = eventos.length >= 2 ? 
+                        eventos[eventos.length - 1].timestamp - eventos[0].timestamp : 0;
+                    const duracaoHoras = duracaoTotal / (1000 * 60 * 60);
+                    
+                    return `
+                        <div style="background: var(--thirdColor); padding: 20px; border-radius: 10px; 
+                                    border-left: 4px solid var(--emphasisColor);">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                                <h4 style="color: var(--emphasisColor); margin: 0;">Solicitação #${id}</h4>
+                                <span style="background: var(--secundaryColor); padding: 5px 12px; border-radius: 20px;">
+                                    ⏱️ Total: ${formatarHoras(duracaoHoras)}
+                                </span>
+                            </div>
+                            
+                            <div style="position: relative; padding-left: 20px;">
+                                ${eventos.map((evento, i) => {
+                                    const proximoEvento = eventos[i + 1];
+                                    const tempoEspera = proximoEvento ? 
+                                        (proximoEvento.timestamp - evento.timestamp) / (1000 * 60 * 60) : 0;
+                                    
+                                    return `
+                                        <div style="display: flex; margin-bottom: 15px; position: relative;">
+                                            ${i < eventos.length - 1 ? `
+                                                <div style="position: absolute; left: 5px; top: 20px; width: 2px; height: calc(100% + 5px); 
+                                                            background: var(--emphasisColor);"></div>
+                                            ` : ''}
+                                            <div style="min-width: 8px; height: 8px; background: ${i === eventos.length - 1 ? '#4CAF50' : 'var(--emphasisColor)'}; 
+                                                        border-radius: 50%; margin-right: 15px; margin-top: 6px;"></div>
+                                            <div style="flex: 1;">
+                                                <div style="color: var(--fontColor); opacity: 0.8; font-size: 0.85em;">
+                                                    ${evento.data}
+                                                </div>
+                                                <div style="color: var(--fontColor); margin-top: 5px;">
+                                                    ${evento.statusDe || 'Início'} → <strong style="color: #4CAF50;">${evento.statusPara || 'Fim'}</strong>
+                                                </div>
+                                                ${evento.observacao ? `
+                                                    <div style="margin-top: 5px; color: #aaa; font-style: italic; font-size: 0.9em;">
+                                                        "${evento.observacao}"
+                                                    </div>
+                                                ` : ''}
+                                                ${tempoEspera > 0 ? `
+                                                    <div style="margin-top: 8px; padding: 5px 10px; background: rgba(255, 165, 2, 0.15); 
+                                                                border-radius: 4px; border-left: 3px solid #ffa502;">
+                                                        <span style="color: #ffa502;">⏱️ Aguardou <strong>${formatarHoras(tempoEspera)}</strong></span>
+                                                        <span style="color: #aaa; margin-left: 10px;">
+                                                            no status "<strong style="color: #ff4757;">${evento.statusPara}</strong>"
+                                                        </span>
+                                                    </div>
+                                                ` : ''}
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        </div>
+    `;
+}
+
+function fecharAnalise() {
+    const overlay = document.querySelector('#analiseGargalos');
+    if (overlay) overlay.remove();
+    document.body.style.overflow = '';
+}
+
+// 9. Tornar funções globais
+window.alternarVisualizacao = alternarVisualizacao;
+window.fecharAnalise = fecharAnalise;
+
+// 10. Inicialização
+const originalSendRequest = sendRequest;
+sendRequest = async function() {
+    await originalSendRequest();
+    adicionarBotaoTimeline();
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    adicionarBotaoTimeline();
+});
+
+console.log('✅ Análise de Gargalos - CORREÇÃO FINAL carregada!');
+console.log('📌 Agora o tempo é atribuído ao status ONDE O PROCESSO AGUARDOU!');
