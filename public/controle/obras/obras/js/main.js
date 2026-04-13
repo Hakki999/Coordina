@@ -505,7 +505,10 @@ function exportTableToCSV() {
     item.res_resp_asbuilt  || "", // Responsável AsBuilt
     item.res_resp_add      || "", // Responsável por adicionar
     item.res_status_asbuilt|| "", // Status AsBuilt
-    String(item.res_vlr_obra).replace(/\./g, ',') || ""  // Valor da obra
+    String(item.res_vlr_obra).replace(/\./g, ',') || "",  // Valor da obra
+    item.res_last_updated ? formatarDataBR(item.res_last_updated.time.split('T')[0]) : "", // Ultima atualização
+    item.res_last_updated ? item.res_last_updated.status : "", // Status ultima atualização
+    item.res_last_updated ? item.res_last_updated.user : "" // Usuario ultima atualização
 ]);
 
         console.log(tempExport);
@@ -523,7 +526,10 @@ function exportTableToCSV() {
             "Responsável AsBuilt",
             "Responsável por Adicionar",
             "Status AsBuilt",
-            "Valor da Obra"
+            "Valor da Obra",
+            "Ultima atualização",
+            "Status ultima atualização",
+            "Usuario ultima atualização"
         ],
         body: tempExport
     }, 'Material x Programado');
