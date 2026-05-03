@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SGO</title>
+<link rel="shortcut icon" href="/controle/get_sgo/src/logoIcon.png" type="image/x-icon">
+<style>
+:root{
+    --c0:#000814;--c1:#002855;--c2:#1b263b;--c3:#0888ff;--c4:#f8f9fa;
+    --c5:#ff8a80;--c6:#3a1a1a;--c7:#4caf50;--c8:#ff9800;--c9:#2196f3;
+    --cb:#444;--bg0:#10151f;--bg1:#1e1e1e;--bg2:#2d2d2d;--bg3:#333;
+    --r:12px;--r2:16px;--sh:0 10px 28px rgba(0,0,0,.28);--n:250px;
+    --ff:Segoe UI,Arial,sans-serif
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;min-height:100%}
+body{
+    font-family:var(--ff);
+    background:var(--c0);
+    color:var(--c4);
+    overflow-x:hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#rootMain{
+    margin-left:0;
+    width:min(1600px,100%);
+    padding:20px;
+}
+.headInput,.inputContainer,.msg,.metric-card,.overlay-card{
+    background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01)),var(--c2);
+    border:1px solid rgba(255,255,255,.07);
+    box-shadow:var(--sh)
+}
+.headInput{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:end;
+    gap:12px;
+    padding:16px;
+    border-radius:var(--r);
+    margin-bottom:18px
+}
+.config{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 12px;
+    align-items:center
+}
+.config label{font-size:13px;opacity:.88}
+select,textarea,button{
+    font-family:inherit;
+    border-radius:10px
+}
+select,textarea{
+    background:var(--bg1);
+    color:var(--c4);
+    border:1px solid var(--cb);
+    outline:none;
+    padding:10px 12px
+}
+select:focus,textarea:focus{border-color:var(--c3);box-shadow:0 0 0 2px rgba(8,136,255,.18)}
+button{
+    border:none;
+    cursor:pointer;
+    padding:10px 16px;
+    color:#fff;
+    font-weight:700;
+    transition:.2s ease;
+    background:var(--c3)
+}
+button:hover{transform:translateY(-1px)}
+button:disabled{opacity:.6;pointer-events:none}
+#btnDownloadCSV{background:var(--c7)}
+#btnCopiarTabela{background:var(--c9)}
+.bodyReqRes{
+    display:grid;
+    grid-template-columns:minmax(280px,1fr) minmax(420px,1.4fr);
+    gap:16px;
+    align-items:stretch;
+    min-height:calc(100vh - 130px)
+}
+.inputContainer{
+    min-width:0;
+    min-height:0;
+    border-radius:var(--r);
+    padding:12px;
+    display:flex;
+    flex-direction:column
+}
+.inputContainer textarea{
+    width:100%;
+    height:100%;
+    min-height:460px;
+    resize:none
+}
+#tabelaResultados{
+    display:none;
+    flex:1;
+    min-height:460px;
+    max-height:calc(100vh - 185px);
+    width:100%;
+    overflow:auto;
+    background:var(--bg1);
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:10px;
+    padding:10px
+}
+.tb-tools{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:10px;
+    position:sticky;
+    top:0;
+    z-index:4;
+    background:linear-gradient(180deg,var(--bg1) 70%,rgba(30,30,30,.88));
+    padding-bottom:8px
+}
+.tb-wrap{
+    width:100%;
+    overflow:auto;
+    border:1px solid var(--cb);
+    border-radius:10px
+}
+.tb{
+    width:max-content;
+    min-width:100%;
+    border-collapse:collapse;
+    color:#e8e8e8;
+    background:var(--bg1)
+}
+.tb th,.tb td{
+    border:1px solid var(--cb);
+    padding:8px 10px;
+    white-space:nowrap;
+    vertical-align:top;
+    text-align:left;
+    max-width:380px;
+    overflow:hidden;
+    text-overflow:ellipsis
+}
+.tb th{
+    position:sticky;
+    top:0;
+    z-index:2;
+    background:var(--bg3);
+    color:#fff
+}
+.tb tr:nth-child(even) td{background:#202733}
+.tb tr.err td{background:var(--c6)!important;color:var(--c5)!important}
+.t{color:var(--c7)!important;font-weight:700}
+.f{color:#f44336!important}
+.leg{
+    margin-top:12px;
+    padding:14px;
+    border:1px solid var(--cb);
+    border-radius:10px;
+    background:var(--bg2)
+}
+.leg-r{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px 20px
+}
+.leg-h{margin-top:10px;font-size:12px;color:#aaa}
+.msg{
+    position:fixed;
+    top:24px;
+    left:50%;
+    transform:translateX(-50%);
+    width:min(420px,calc(100vw - 24px));
+    min-height:130px;
+    border-radius:var(--r2);
+    overflow:hidden;
+    z-index:9999
+}
+.msg-h{
+    height:48px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:var(--c0);
+    text-transform:uppercase;
+    font-weight:800
+}
+.msg-b{
+    min-height:82px;
+    padding:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center
+}
+.msg.ok .msg-h{color:var(--c7)}
+.msg.er .msg-h{color:#ff4d4d}
+.msg::after{
+    content:"";
+    position:absolute;
+    left:0;bottom:0;height:4px;width:0;
+    background:var(--c3);
+    animation:x 3s linear forwards
+}
+@keyframes x{to{width:100%}}
+.loading-message,.erro-mensagem,.sem-dados{
+    padding:20px;
+    text-align:center;
+    border-radius:10px
+}
+.erro-mensagem{background:var(--c6);color:var(--c5)}
+.metric-grid{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(180px,1fr));
+    gap:18px;
+    margin-bottom:24px
+}
+.metric-card{padding:22px;border-radius:14px}
+.metric-card small{display:block;opacity:.82;margin-bottom:10px}
+.metric-card strong{font-size:2rem;color:var(--c3)}
+.garg{
+    display:grid;
+    gap:14px
+}
+.garg-it{
+    background:var(--c2);
+    border-left:5px solid #ff4757;
+    border-radius:10px;
+    padding:18px
+}
+.badge{
+    display:inline-flex;
+    align-items:center;
+    padding:4px 10px;
+    border-radius:999px;
+    font-size:.84rem;
+    font-weight:700;
+    color:#fff;
+    background:#ff4757
+}
+.ov{
+    position:fixed;
+    inset:0;
+    background:var(--c0);
+    color:var(--c4);
+    z-index:10000;
+    display:flex;
+    flex-direction:column
+}
+.ov-h{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+    padding:18px 26px;
+    background:var(--c1);
+    border-bottom:3px solid var(--c3)
+}
+.ov-c{
+    padding:24px;
+    overflow:auto
+}
+@media (max-width:1100px){
+    .bodyReqRes{grid-template-columns:1fr;min-height:auto}
+    #tabelaResultados{max-height:70vh}
+    .metric-grid{grid-template-columns:repeat(2,minmax(180px,1fr))}
+}
+@media (max-width:720px){
+    .headInput{align-items:stretch}
+    .metric-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<main id="rootMain">
+    <div class="headInput">
+        <select id="typeSol">
+            <option value="Notas">Obter Notas</option>
+            <option value="NomeObra">Obter Notas por nome de obra</option>
+            <option value="NPEP">Obter Numero PEP</option>
+            <option value="FluxoNota">Obter Fluxo do projeto</option>
+            <option value="OrcamentoNota">Obter Orçamento Projeto</option>
+            <option value="ObterFluxoArquivos">Obter Fluxo de Arquivos</option>
+            <option value="assinaturas">Obter Assinaturas</option>
+            <option value="ObterNotaPorPEP">Obter Nota por PEP</option>
+        </select>
+
+        <div class="config">
+            <label for="tmLote">Tamanho do lote:</label>
+            <select id="tmLote"><option value="10" selected>10</option><option value="5">5</option><option value="20">20</option></select>
+
+            <label for="tmDelay">Delay:</label>
+            <select id="tmDelay"><option value="500" selected>500ms</option><option value="1000">1000ms</option><option value="2000">2000ms</option></select>
+
+            <label for="tmMaxTentativas">Máx. Tentativas:</label>
+            <select id="tmMaxTentativas"><option value="1">1</option><option value="2">2</option><option value="3" selected>3</option></select>
+
+            <label for="tmTimeout">Timeout:</label>
+            <select id="tmTimeout"><option value="10000" selected>10s</option><option value="20000">20s</option><option value="30000">30s</option></select>
+        </div>
+
+        <button id="sendReq" type="button">Enviar</button>
+        <button id="btnGerarTimeline" type="button">📊 Análise de Gargalos</button>
+    </div>
+
+    <div class="bodyReqRes">
+        <div class="inputContainer">
+            <textarea id="resRequest" placeholder="Cole os IDs nesse lugar..."></textarea>
+        </div>
+        <div class="inputContainer">
+            <textarea id="resResponse" placeholder="Aguarde a resposta..." hidden></textarea>
+            <div id="tabelaResultados"></div>
+        </div>
+    </div>
+</main>
+
+<script>
+(()=>{"use strict";
+const D=document,W=window,
+$=s=>D.querySelector(s),
+N={
+    t:$("#typeSol"),l:$("#tmLote"),d:$("#tmDelay"),r:$("#tmMaxTentativas"),o:$("#tmTimeout"),
+    q:$("#resRequest"),p:$("#resResponse"),b:$("#sendReq"),g:$("#btnGerarTimeline"),x:$("#tabelaResultados")
+},
+S={
+    TL:10,DL:500,TO:30000,MR:3,RD:1000,
+    A:{f:new Map(),m:{},g:[],e:[]}
+},
+K="SjQwODIxNDQ5OjEwUDx5KWMiYlhUJncwXnQtU159",
+H={
+    "accept":"application/json, text/plain, */*",
+    "accept-language":"pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
+    "authorization":"Basic "+K,
+    "content-type":"application/json;charset=UTF-8"
+},
+R={
+    Notas:()=>({u:"http://10.204.8.68:8083/Service/SolicitacaoInvestimentoService.svc/rest/ListarSolicitacaoInvestimentoPorNota",b:JSON.stringify({Nota:"{ID}"})}),
+    NomeObra:()=>({u:"http://10.204.8.68:8083/Service/SolicitacaoInvestimentoService.svc/rest/ListarSolicitacaoInvestimentoPorNomeProjeto",b:JSON.stringify({NomeProjeto:"{ID}"})}),
+    NPEP:()=>({u:"http://10.204.8.68:8083/Service/SolicitacaoInvestimentoService.svc/rest/carregarMaterialNota",b:JSON.stringify({notaSAP:"{ID}",usuarioLogado:"J40821449"})}),
+    FluxoNota:()=>({u:"http://10.204.8.68:8083/Service/LogFluxo.svc/rest/GetListLogFluxoBySliId",b:JSON.stringify({soliciatacaoid:"{ID}"})}),
+    OrcamentoNota:()=>({u:"http://10.204.8.68:8083/Service/OrcamentoSap.svc/rest/GetOrcamentoSapBySolicitacaoId",b:"{ID}"}),
+    ObterFluxoArquivos:()=>({u:"http://10.204.8.68:8083/Service/FileUploadServ.svc/rest/GetArquivoFluxoSol",b:JSON.stringify({solId:"{ID}",status:"CONS"})}),
+    assinaturas:()=>({u:[
+        "http://10.204.8.68:8083/Service/DocumentoObra.svc/rest/AEOAssinadoCompanhia",
+        "http://10.204.8.68:8083/Service/DocumentoObra.svc/rest/AEOAssinadoParceira",
+        "http://10.204.8.68:8083/Service/DocumentoObra.svc/rest/ACOSAssinadoCompanhia",
+        "http://10.204.8.68:8083/Service/DocumentoObra.svc/rest/ACOSAssinadoParceira"
+    ],b:JSON.stringify({solId:"{ID}"})}),
+    ObterNotaPorPEP:()=>({u:"http://10.204.8.68:8083/Service/SolicitacaoInvestimentoService.svc/rest/ListarSolicitacaoInvestimentoPorPEP",b:JSON.stringify({PEP:"{ID}"})})
+};
+const U={
+    msg:(ok,txt)=>{
+        D.querySelector(".msg")?.remove();
+        D.body.insertAdjacentHTML("beforeend",`<div class="msg ${ok?"ok":"er"}"><div class="msg-h">${ok?"sucesso":"erro"}</div><div class="msg-b">${txt}</div></div>`);
+        setTimeout(()=>D.querySelector(".msg")?.remove(),3000)
+    },
+    csv:v=>{
+        const b=new Blob(["\uFEFF"+v],{type:"text/csv;charset=utf-8;"}),a=D.createElement("a"),u=URL.createObjectURL(b);
+        a.href=u;a.download=`resultados_${N.t.value}_${new Date().toISOString().slice(0,19).replace(/:/g,"-")}.csv`;
+        D.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(u)
+    },
+    h:s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])),
+    ids:t=>t.split("\n").map(v=>v.trim()).filter(Boolean),
+    nd:v=>{
+        if(typeof v!=="string")return null;
+        const m=v.match(/\/Date\((\d+)/);if(!m)return null;
+        const n=parseInt(m[1],10);return Number.isNaN(n)?null:new Date(n)
+    },
+    pd:v=>typeof v==="string"&&v.startsWith("/Date(")?(U.nd(v)?.toLocaleString("pt-BR")||v):v,
+    tm:h=>{
+        if(!Number.isFinite(h)||h<0)return"0min";
+        if(h<1)return`${Math.round(h*60)}min`;
+        if(h<24){const a=Math.floor(h),b=Math.round((h-a)*60);return b?`${a}h ${b}min`:`${a}h`}
+        const d=Math.floor(h/24),r=Math.round(h%24);return r?`${d}d ${r}h`:`${d}d`
+    },
+    dt:s=>{
+        if(!s||s==="-"||!s.includes(","))return null;
+        try{
+            const [d,t]=s.split(",").map(v=>v.trim()),[da,mo,ye]=d.split("/").map(Number),[h,m,se]=t.split(":").map(Number);
+            const z=new Date(ye,mo-1,da,h,m,se).getTime();return Number.isNaN(z)?null:z
+        }catch{return null}
+    }
+};
+const Q=()=>{
+    S.TL=parseInt(N.l.value)||10;
+    S.DL=parseInt(N.d.value)||500;
+    S.TO=parseInt(N.o.value)||30000;
+    S.MR=parseInt(N.r.value)||3
+};
+const M=v=>Array.isArray(v)?Promise.allSettled(v.map(async(u,i)=>{try{
+    const c=new AbortController(),t=setTimeout(()=>c.abort(),S.TO),r=await fetch(u.href,{headers:H,body:u.body,method:"POST",signal:c.signal});
+    clearTimeout(t);if(!r.ok)throw new Error(`HTTP error! status: ${r.status}`);const d=await r.json();
+    return{id:u.id,endpoint:u.ep||u.href.split("/").pop()||`Endpoint_${i+1}`,uri:u.href,data:d,valor:d,status:"sucesso",timestamp:new Date().toISOString(),tipoResposta:typeof d,endpointIndex:i}
+}catch(e){return{id:u.id,endpoint:u.ep||`Endpoint_${i+1}`,uri:u.href,error:e.message,status:"erro",timestamp:new Date().toISOString(),endpointIndex:i}}})).then(r=>r.map(z=>z.status==="fulfilled"?z.value:{id:v[0]?.id,endpoint:"Erro",error:z.reason?.message||"Erro desconhecido",status:"erro",timestamp:new Date().toISOString()})):Promise.resolve([]);
+const F=async(id,req,k=1)=>{
+    try{
+        if(Array.isArray(req.u)){
+            return await M(req.u.map((href,i)=>({href,id,ep:`Endpoint_${i+1}`,body:String(req.b).replaceAll("{ID}",id)})))
+        }
+        const c=new AbortController(),t=setTimeout(()=>c.abort(),S.TO),body=String(req.b).replaceAll("{ID}",id),
+        r=await fetch(req.u,{headers:H,body,method:"POST",signal:c.signal});
+        clearTimeout(t);if(!r.ok)throw new Error(`HTTP error! status: ${r.status}`);
+        const d=await r.json();
+        if(Array.isArray(d)&&d.length){
+            return d.map((it,i)=>({id,endpoint:"Único",itemData:it,data:d,status:"sucesso",timestamp:new Date().toISOString(),isMultiple:true,itemCount:d.length,itemIndex:i}))
+        }
+        return [{id,endpoint:"Único",itemData:d||{},data:d||{},status:"sucesso",timestamp:new Date().toISOString(),isMultiple:false,itemCount:1,itemIndex:0,tipoResposta:typeof d,valor:typeof d!=="object"?d:void 0}]
+    }catch(e){
+        if(k<S.MR){await new Promise(r=>setTimeout(r,S.RD));return F(id,req,k+1)}
+        return Array.isArray(req.u)?req.u.map((u,i)=>({id,endpoint:`Endpoint_${i+1}`,uri:u,error:e.message,status:"erro",timestamp:new Date().toISOString(),endpointIndex:i})):[{id,endpoint:"Único",error:e.message,status:"erro",timestamp:new Date().toISOString()}]
+    }
+};
+const L=async(ids,req,i)=>{
+    const a=ids.slice(i,Math.min(i+S.TL,ids.length)),p=await Promise.allSettled(a.map(id=>F(id,req)));
+    const out=[];
+    p.forEach((r,n)=>{
+        const id=a[n];
+        if(r.status==="fulfilled"&&Array.isArray(r.value))out.push(...r.value);
+        else out.push({id,endpoint:"Único",error:r.reason?.message||"Erro desconhecido",status:"erro",timestamp:new Date().toISOString()})
+    });
+    return out
+};
+const C=arr=>{
+    const b=["ID_Original","Endpoint","Status","DataConsulta","Valor_Retornado","Tipo_Resposta","Erro"],s=new Set();
+    arr.forEach(o=>{
+        if(o.status!=="sucesso")return;
+        if(o.data&&typeof o.data==="object"&&!Array.isArray(o.data)){
+            Object.keys(o.data).forEach(k=>typeof o.data[k]!=="object"&&s.add(k))
+        }else if(Array.isArray(o.data)&&o.data.length&&typeof o.data[0]==="object"){
+            Object.keys(o.data[0]).forEach(k=>typeof o.data[0][k]!=="object"&&s.add(k))
+        }else if(o.valor!==void 0)s.add("Valor")
+    });
+    return [...b,...[...s].sort()]
+};
+const G=(o,cols)=>cols.map(k=>{
+    let v="";
+    switch(k){
+        case"ID_Original":v=o.id||"";break;
+        case"Endpoint":v=o.endpoint||"N/A";break;
+        case"Status":v=o.status||"N/A";break;
+        case"DataConsulta":v=o.timestamp?new Date(o.timestamp).toLocaleString("pt-BR"):"";break;
+        case"Valor_Retornado":
+        case"Valor":if(o.valor!==void 0)v=String(o.valor);break;
+        case"Tipo_Resposta":v=o.tipoResposta||(o.data?typeof o.data:"desconhecido");break;
+        case"Erro":v=o.error||"";break;
+        default:
+            if(o.data){
+                if(Array.isArray(o.data)&&o.data.length){
+                    v=o.itemIndex!==void 0&&o.data[o.itemIndex]?o.data[o.itemIndex][k]||"":o.data[0]?.[k]||""
+                }else if(typeof o.data==="object")v=o.data[k]||""
+            }
+    }
+    if(v&&typeof v==="object"){try{v=JSON.stringify(v)}catch{v=""}}
+    v=U.pd(v);
+    return String(v??"").replace(/\r\n|\n|\r|\t/g," ").replace(/"/g,"'").trim()
+}).join(";");
+const V=arr=>{if(!arr?.length)return"";const c=C(arr);return[c.join(";"),...arr.map(o=>G(o,c))].join("\n")};
+const T=csv=>{
+    if(!csv?.trim())return'<p class="sem-dados">Nenhum dado disponível</p>';
+    const l=csv.split("\n");if(l.length<2)return'<p class="sem-dados">Nenhum dado disponível</p>';
+    const h=l[0].split(";"),d=l.slice(1).filter(Boolean);
+    return `<div class="tb-wrap"><table class="tb"><thead><tr>${h.map(v=>`<th title="${U.h(v)}">${U.h(v)}</th>`).join("")}</tr></thead><tbody>${
+        d.map(r=>{
+            const c=r.split(";"),e=c[2]==="erro";
+            return `<tr class="${e?"err":""}">${
+                c.map(v=>`<td class="${v==="true"?"t":v==="false"?"f":""}" title="${U.h(v||"-")}">${U.h(v||"-")}</td>`).join("")
+            }</tr>`
+        }).join("")
+    }</tbody></table></div>`
+};
+const Y=arr=>{
+    const csv=V(arr);N.p.value=csv;
+    const ok=arr.filter(r=>r.status==="sucesso").length,
+    er=arr.filter(r=>r.status==="erro").length,
+    bo=arr.filter(r=>r.tipoResposta==="boolean"||typeof r.valor==="boolean").length,
+    ob=arr.filter(r=>r.tipoResposta==="object"&&r.valor===void 0).length;
+    N.x.innerHTML=`<div class="tb-tools">
+        <button id="btnCopiarTabela" type="button">📋 Copiar Tabela</button>
+        <button id="btnDownloadCSV" type="button">⬇️ Download CSV</button>
+    </div>
+    ${T(csv)}
+    <div class="leg">
+        <div class="leg-r">
+            <div><strong>📊 Resumo:</strong></div>
+            <div style="color:#4caf50">✅ Sucessos: ${ok}</div>
+            <div style="color:#f44336">❌ Erros: ${er}</div>
+            <div style="color:#ff9800">🔵 Booleanos: ${bo}</div>
+            <div style="color:#2196F3">📦 Objetos: ${ob}</div>
+            <div>📋 Total: ${arr.length}</div>
+        </div>
+        <div class="leg-h">💡 Valores booleanos (true/false) aparecem em destaque na tabela</div>
+    </div>`;
+    N.x.style.display="block";
+    $("#btnCopiarTabela")?.addEventListener("click",async()=>{
+        const tb=D.querySelector(".tb");
+        if(!tb)return alert("Nenhuma tabela disponível para copiar");
+        try{
+            const rg=D.createRange();rg.selectNode(tb);W.getSelection().removeAllRanges();W.getSelection().addRange(rg);
+            D.execCommand("copy");W.getSelection().removeAllRanges();
+            const b=$("#btnCopiarTabela"),t=b.textContent;b.textContent="✅ Copiado!";setTimeout(()=>b.textContent=t,1800)
+        }catch{
+            try{await navigator.clipboard.writeText(N.p.value);alert("Tabela copiada como CSV")}catch{alert("Não foi possível copiar a tabela")}
+        }
+    },{once:true});
+    $("#btnDownloadCSV")?.addEventListener("click",()=>N.p.value&&U.csv(N.p.value),{once:true})
+};
+const P=csv=>{
+    const l=csv.split("\n");if(l.length<2)return false;
+    const h=l[0].split(";"),iId=h.indexOf("ID_Original"),iDt=h.indexOf("Data"),iSp=h.indexOf("StatusPara"),
+    f=new Map(),m=new Map();let tt=0,lg={id:null,duracaoMs:0},sm={id:null,duracaoMs:Infinity};
+    for(let i=1;i<l.length;i++){
+        if(!l[i].trim())continue;
+        const v=l[i].split(";"),id=v[iId],ds=v[iDt],sp=v[iSp]||"Sem status",ts=U.dt(ds);
+        if(!id||!ts)continue;
+        if(!f.has(id))f.set(id,[]);
+        f.get(id).push({data:ds,timestamp:ts,statusPara:sp})
+    }
+    for(const [id,ev] of f.entries()){
+        ev.sort((a,b)=>a.timestamp-b.timestamp);
+        for(let i=0;i<ev.length-1;i++){
+            const du=ev[i+1].timestamp-ev[i].timestamp;
+            if(du>0){
+                const et=ev[i+1].statusPara||"Sem status";
+                if(!m.has(et))m.set(et,[]);
+                m.get(et).push(du)
+            }
+        }
+        if(ev.length>=2){
+            const du=ev.at(-1).timestamp-ev[0].timestamp;
+            if(du>0){
+                tt+=du;
+                if(du>lg.duracaoMs)lg={id,duracaoMs:du};
+                if(du<sm.duracaoMs)sm={id,duracaoMs:du}
+            }
+        }
+    }
+    const e=[...m.entries()].map(([et,ds])=>{
+        const s=ds.reduce((a,b)=>a+b,0),md=s/ds.length;
+        return{etapa:et,mediaHoras:md/36e5,maximoHoras:Math.max(...ds)/36e5,minimoHoras:Math.min(...ds)/36e5,ocorrencias:ds.length,mediaMs:md}
+    }).sort((a,b)=>b.mediaHoras-a.mediaHoras);
+    const qtd=[...f.values()].filter(v=>v.length>=2).length;
+    S.A={f,m:{totalFluxos:f.size,tempoTotalMs:tt,fluxoMaisLongo:lg,fluxoMaisCurto:sm,totalFluxosComDuracao:qtd,tempoMedioMs:qtd?tt/qtd:0},g:e.slice(0,3),e};
+    return true
+};
+const J=()=>{
+    const {m,g,e}=S.A,tt=m.tempoTotalMs/36e5,md=m.tempoMedioMs/36e5;
+    return `<div style="max-width:1400px;margin:0 auto">
+        <div class="metric-grid">
+            <div class="metric-card"><small>📋 Total de Fluxos</small><strong>${m.totalFluxos}</strong><div style="margin-top:10px;font-size:.85rem;opacity:.75">${m.totalFluxosComDuracao} com duração calculada</div></div>
+            <div class="metric-card"><small>⏱️ Tempo Total Acumulado</small><strong>${U.tm(tt)}</strong><div style="margin-top:10px;font-size:.85rem;opacity:.75">${Math.round(tt/24)} dias</div></div>
+            <div class="metric-card"><small>📊 Tempo Médio por Fluxo</small><strong>${U.tm(md)}</strong><div style="margin-top:10px;font-size:.85rem;opacity:.75">${md>24?"⚠️ Acima do ideal":"✅ Dentro do esperado"}</div></div>
+            <div class="metric-card"><small>🎯 Etapas Identificadas</small><strong>${e.length}</strong><div style="margin-top:10px;font-size:.85rem;opacity:.75">${g.length} gargalos críticos</div></div>
+        </div>
+        <div style="margin-bottom:26px">
+            <h2 style="margin-bottom:18px">🚨 Gargalos Identificados</h2>
+            <div class="garg">${
+                g.map((z,i)=>`<div class="garg-it" style="border-left-color:${i===0?"#ff4757":"#ffa502"}">
+                    <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">
+                        <span style="font-size:1.2rem;font-weight:800">${i+1}. ${U.h(z.etapa)}</span>
+                        <span class="badge">${z.mediaHoras>72?"Crítico":z.mediaHoras>48?"Alto":"Moderado"}</span>
+                    </div>
+                    <div>Tempo médio: <strong>${U.tm(z.mediaHoras)}</strong></div>
+                    <div>Maior espera: <strong>${U.tm(z.maximoHoras)}</strong></div>
+                    <div>Ocorrências: <strong>${z.ocorrencias}</strong></div>
+                </div>`).join("")
+            }</div>
+        </div>
+    </div>`
+};
+W.fecharAnalise=()=>{D.querySelector("#analiseGargalos")?.remove();D.body.style.overflow=""};
+const O=()=>{
+    if(N.t.value!=="FluxoNota")return alert('A análise de gargalos está disponível apenas para "FluxoNota".');
+    if(!N.p.value?.trim())return alert("Execute a consulta primeiro.");
+    if(!P(N.p.value))return alert("Erro ao processar os dados.");
+    const o=D.createElement("div");
+    o.id="analiseGargalos";o.className="ov";
+    o.innerHTML=`<div class="ov-h"><div><h1 style="margin-bottom:6px">📊 Análise de Gargalos do Fluxo</h1><p>${S.A.m.totalFluxos} solicitações analisadas</p></div><button type="button" onclick="fecharAnalise()" style="background:#dc3545">✖ Fechar</button></div><div class="ov-c">${J()}</div>`;
+    D.body.appendChild(o);D.body.style.overflow="hidden"
+};
+const E=async()=>{
+    Q();
+    const ids=U.ids(N.q.value);if(!ids.length)return U.msg(false,"Por favor, insira pelo menos um ID.");
+    const f=R[N.t.value];if(!f)return U.msg(false,"Tipo de solicitação inválido");
+    const req=f();
+    N.b.disabled=true;
+    N.x.innerHTML='<div class="loading-message">Processando... Aguarde.</div>';
+    N.x.style.display="block";
+    const all=[];
+    try{
+        for(let i=0;i<ids.length;i+=S.TL){
+            all.push(...await L(ids,req,i));
+            Y(all);
+            if(i+S.TL<ids.length)await new Promise(r=>setTimeout(r,S.DL))
+        }
+        const ok=all.filter(v=>v.status==="sucesso").length,er=all.filter(v=>v.status==="erro").length;
+        Y(all);U.msg(true,`Processamento concluído! ${ok} sucessos, ${er} erros.`)
+    }catch(e){
+        U.msg(false,"Erro durante o processamento: "+e.message);
+        N.x.innerHTML=`<div class="erro-mensagem">Erro: ${U.h(e.message)}</div>`
+    }finally{N.b.disabled=false}
+};
+N.b.addEventListener("click",E);
+N.g.addEventListener("click",O);
+})();
+</script>
+</body>
+</html>

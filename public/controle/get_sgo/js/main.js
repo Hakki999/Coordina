@@ -851,7 +851,7 @@ async function sendRequest() {
          break;
       case 'NPEP':
          requestData = {
-            uri: "http://10.204.8.68:8083/Service/SolicitacaoInvestimentoService.svc/rest/carregarMaterialNota",
+            uri: "http://10.204.8.68:8083/Service/SolicitacaoInvestimentoService.svc/rest/VerificarStatusNotaSap",
             body: JSON.stringify({ "notaSAP": "{ID}", "usuarioLogado": "J40821449" })
          };
          break;
