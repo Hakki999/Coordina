@@ -1,3 +1,4 @@
+
 const DEFAULT_TIMEOUT = 8000;
 const DEFAULT_INTERVAL = 300;
 
@@ -189,6 +190,21 @@ async function runFlow(nota) {
             });
         });
 
+        // pega a mensagem de erro
+        await validarEtapa(nota, "Verificar mensagem de erro", async () => {
+            const mensagemErro = document.querySelector("#toast-container .toast-message");
+
+            if (mensagemErro) {
+                const textoErro = mensagemErro.textContent.trim();
+                console.error("Mensagem de erro encontrada:", textoErro);
+
+                throw new Error(textoErro);
+            }
+
+            console.log("Não foi encontrada mensagem de erro, continuando com o fluxo.");
+            return "sem_erro";
+        });
+
         await validarEtapa(nota, "Esperar botão Comissionar aparecer", async () => {
             return await waitForElement({
                 object: "#btnComissionaObra",
@@ -203,6 +219,59 @@ async function runFlow(nota) {
                 timeout: 150000,
                 checkTime: 300
             });
+        });
+
+        //Verifica se o campo de data real e data inicio estão preenchidas
+        await validarEtapa(nota, "Data real inicio e fim", async () => {
+
+            // Garante que os inputs existem antes de usar
+            const inicio = await waitForElement({
+                object: "#txtDataRealInicio",
+                timeout: 8000,
+                visible: true
+            });
+
+            const fim = await waitForElement({
+                object: "#txtDataRealTermino",
+                timeout: 8000,
+                visible: true
+            });
+
+            if (!inicio || !fim) {
+                throw new Error("Campos de data não encontrados");
+            }
+
+            const txtDataRealInicio = document.querySelector("#txtDataRealInicio");
+            const txtDataRealFim = document.querySelector("#txtDataRealTermino");
+
+            // 🔥 Só preenche se estiver vazio
+            if (!txtDataRealInicio.value || !txtDataRealFim.value) {
+
+                const hoje = new Date();
+                const ano = hoje.getFullYear();
+                const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+                const dia = String(hoje.getDate()).padStart(2, '0');
+
+                const dataFormatada = `${ano}-${mes}-${dia}`;
+
+                await autoType({
+                    object: "#txtDataRealInicio",
+                    text: dataFormatada,
+                    timeout: 8000,
+                    eventTime: 300
+                });
+
+                await autoType({
+                    object: "#txtDataRealTermino",
+                    text: dataFormatada,
+                    timeout: 8000,
+                    eventTime: 300
+                });
+
+                return "datas_preenchidas";
+            }
+
+            return "datas_ja_existem";
         });
 
         await validarEtapa(nota, "Clicar em Comissionar", async () => {
@@ -237,6 +306,25 @@ async function runFlow(nota) {
             });
         });
 
+        await validarEtapa(nota, "Verificar mensagem de erro", async () => {
+            const mensagemErro = document.querySelector(".sweet-alert.showSweetAlert.visible p");
+
+            if (mensagemErro) {
+                const textoErro = mensagemErro.textContent.trim();
+                console.error("Mensagem de erro encontrada:", textoErro);
+                await autoClick({
+                    object: ".confirm",
+                    timeout: 10000,
+                    eventTime: 300
+                });
+                throw new Error(textoErro);
+            }
+
+            console.log("Não foi encontrada mensagem de erro, fluxo finalizado.");
+            return "sem_erro";
+        });
+
+
         console.error("Nota comissionada:", nota);
 
         relatorio.push({
@@ -256,26 +344,100 @@ async function runFlow(nota) {
     }
 }
 
-const notas = prompt("Insira as notas separadas por vírgula:")
+function criarInputNotas() {
+    // evita duplicar
+    if (document.getElementById("boxNotas")) return;
 
-const notasArray = notas
-    .trim()
-    .split("\n")
-    .map(nota => nota.trim())
-    .filter(nota => nota !== "");
+    const box = document.createElement("div");
+    box.id = "boxNotas";
 
-for (const nota of notasArray) {
-    await runFlow(nota);
+    box.innerHTML = `
+        <div style="
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1e1e1e;
+            color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            z-index: 999999;
+            width: 300px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            font-family: Arial;
+        " draggable="true">
+            <h4 style="margin: 0 0 10px 0;">Inserir Notas</h4>
+
+            <textarea id="notasInput" placeholder="Uma nota por linha..."
+                style="width: 100%; height: 120px; margin-bottom: 10px;"></textarea>
+
+            <button id="btnIniciarNotas" style="
+                width: 100%;
+                padding: 8px;
+                background: #28a745;
+                border: none;
+                color: #fff;
+                cursor: pointer;
+                border-radius: 5px;
+                margin-bottom: 5px;
+            ">Iniciar</button>
+
+            <button id="btnFecharNotas" style="
+                width: 100%;
+                padding: 6px;
+                background: #dc3545;
+                border: none;
+                color: #fff;
+                cursor: pointer;
+                border-radius: 5px;
+            ">Fechar</button>
+        </div>
+    `;
+
+    document.body.appendChild(box);
+
+    document.getElementById("btnIniciarNotas").onclick = async () => {
+        const input = document.getElementById("notasInput").value;
+
+        const notasArray = input
+            .trim()
+            .split("\n")
+            .map(n => n.trim())
+            .filter(n => n !== "");
+
+        if (notasArray.length === 0) {
+            alert("Digite pelo menos uma nota!");
+            return;
+        }
+
+        console.warn("Notas capturadas:", notasArray);
+
+        for (const nota of notasArray) {
+            await runFlow(nota);
+
+            // 🔥 evita quebrar o sistema (dojo/angular lento)
+            await new Promise(r => setTimeout(r, 2000));
+        }
+
+        console.warn("Processo finalizado.");
+
+        console.warn("========== RESUMO FINAL ==========");
+
+        console.table(relatorio);
+
+        const total = relatorio.length;
+        const sucesso = relatorio.filter(item => item.status === "OK").length;
+        const puladas = relatorio.filter(item => item.status === "PULADA").length;
+
+        console.warn(`Total de notas: ${total}`);
+        console.warn(`Comissionadas com sucesso: ${sucesso}`);
+        console.warn(`Puladas por erro/timeout: ${puladas}`);
+
+    };
+
+    document.getElementById("btnFecharNotas").onclick = () => {
+        box.remove();
+    };
 }
 
-console.warn("========== RESUMO FINAL ==========");
-
-console.table(relatorio);
-
-const total = relatorio.length;
-const sucesso = relatorio.filter(item => item.status === "OK").length;
-const puladas = relatorio.filter(item => item.status === "PULADA").length;
-
-console.warn(`Total de notas: ${total}`);
-console.warn(`Comissionadas com sucesso: ${sucesso}`);
-console.warn(`Puladas por erro/timeout: ${puladas}`);
+// executa
+criarInputNotas();

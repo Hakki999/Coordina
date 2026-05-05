@@ -852,7 +852,7 @@ async function sendRequest() {
       case 'NPEP':
          requestData = {
             uri: "http://10.204.8.68:8083/Service/SolicitacaoInvestimentoService.svc/rest/VerificarStatusNotaSap",
-            body: JSON.stringify({ "notaSAP": "{ID}", "usuarioLogado": "J40821449" })
+            body: JSON.stringify({ "sNota": "{ID}"})
          };
          break;
       case 'FluxoNota':
