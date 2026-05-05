@@ -117,7 +117,7 @@ async function fazerRequisicaoComRetry(id, requestData, tentativa = 1) {
                }
 
                console.log(`📤 Enviando requisição para ${uri} com ID ${id}`);
-               
+
                const response = await fetch(uri, {
                   "headers": {
                      "accept": "application/json, text/plain, */*",
@@ -137,7 +137,7 @@ async function fazerRequisicaoComRetry(id, requestData, tentativa = 1) {
                }
 
                const data = await response.json();
-               
+
                // Extrair o nome do endpoint da URI para identificar
                const uriParts = uri.split('/');
                const endpointName = uriParts[uriParts.length - 1] || `Endpoint_${index + 1}`;
@@ -178,7 +178,7 @@ async function fazerRequisicaoComRetry(id, requestData, tentativa = 1) {
 
          // Aguardar todas as requisições múltiplas
          const resultadosMultiplos = await Promise.allSettled(promessasMultiplas);
-         
+
          // Processar resultados - achatar a estrutura
          const resultadosProcessados = [];
          resultadosMultiplos.forEach((resultado) => {
@@ -198,7 +198,7 @@ async function fazerRequisicaoComRetry(id, requestData, tentativa = 1) {
          });
 
          return resultadosProcessados;
-      } 
+      }
       // Requisição única (comportamento original)
       else {
          const controller = new AbortController();
@@ -218,9 +218,10 @@ async function fazerRequisicaoComRetry(id, requestData, tentativa = 1) {
             "headers": {
                "accept": "application/json, text/plain, */*",
                "accept-language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
-               "authorization": "Basic " + key,
+               "authorization": "Basic SjQwODIxNDQ5OjEwUDx5KWMiYlhUJncwXnQtU159",
                "content-type": "application/json;charset=UTF-8"
             },
+            "referrer": "http://10.204.8.68:8083/",
             "body": body,
             "method": "POST",
             "signal": controller.signal
@@ -324,20 +325,20 @@ async function processarLote(ids, requestData, inicio) {
 
       if (resultado.status === 'fulfilled') {
          const dados = resultado.value;
-         
+
          // Garantir que dados é um array
          if (Array.isArray(dados)) {
             // Adicionar todos os resultados diretamente
             dados.forEach(item => {
                resultadosProcessados.push(item);
             });
-            
+
             // Logging
             if (Array.isArray(requestData.uri)) {
                const sucessos = dados.filter(r => r && r.status === 'sucesso').length;
                const erros = dados.filter(r => r && r.status === 'erro').length;
                console.log(`   📍 ${id}: ${sucessos} sucessos, ${erros} erros`);
-               
+
                // Mostrar valores booleanos no log
                dados.filter(r => r && r.status === 'sucesso').forEach(r => {
                   console.log(`      ${r.endpoint}: ${r.valor}`);
@@ -351,7 +352,7 @@ async function processarLote(ids, requestData, inicio) {
          }
       } else {
          console.log(`   ❌ ${id}: Falha na promessa`);
-         
+
          if (Array.isArray(requestData.uri)) {
             requestData.uri.forEach((uri, idx) => {
                resultadosProcessados.push({
@@ -494,7 +495,7 @@ function converterItemParaLinhaCSV(item, campos) {
       }
 
       valor = processarValorDate(valor);
-      
+
       // Limpar para CSV
       if (typeof valor === 'string') {
          valor = valor
@@ -565,9 +566,9 @@ function criarTabelaHTML(csv) {
          const isErro = index === 2 && valor === 'erro'; // Status está no índice 2
          // Verificar se é valor booleano (true/false)
          const isBooleano = valor === 'true' || valor === 'false';
-         
+
          let estilo = 'padding: 8px; text-align: left; border: 1px solid #444;';
-         
+
          if (isErro) {
             estilo += ' background-color: #3a1a1a; color: #ff8a80;';
          } else if (isBooleano) {
@@ -579,7 +580,7 @@ function criarTabelaHTML(csv) {
          } else {
             estilo += ' color: #e0e0e0;';
          }
-         
+
          html += `<td style="${estilo}">${valor || '-'}</td>`;
       });
       html += '</tr>';
@@ -606,27 +607,27 @@ async function copiarTabela() {
       range.selectNode(tabela);
       window.getSelection().removeAllRanges();
       window.getSelection().addRange(range);
-      
+
       // Tentar copiar com formatação HTML
       document.execCommand('copy');
-      
+
       // Limpar seleção
       window.getSelection().removeAllRanges();
-      
+
       // Feedback visual
       const btnCopiar = document.querySelector('#btnCopiarTabela');
       const textoOriginal = btnCopiar.innerHTML;
       btnCopiar.innerHTML = '✅ Copiado!';
       btnCopiar.style.backgroundColor = '#2e7d32';
-      
+
       setTimeout(() => {
          btnCopiar.innerHTML = textoOriginal;
          btnCopiar.style.backgroundColor = '#2196F3';
       }, 2000);
-      
+
    } catch (err) {
       console.error('Erro ao copiar:', err);
-      
+
       // Fallback: copiar como texto
       try {
          const csv = resResponse.value;
@@ -643,27 +644,27 @@ async function copiarTabela() {
 // Função para atualizar tabela HTML (CORRIGIDA)
 function atualizarTabelaHTML(resultados) {
    console.log('📊 Atualizando tabela com', resultados.length, 'resultados');
-   
+
    // Filtrar resultados para mostrar apenas os que têm dados relevantes
    const resultadosVisiveis = resultados.filter(r => {
       // Mostrar sempre sucessos e erros
       return true;
    });
-   
+
    const csv = gerarCSV(resultadosVisiveis);
    resResponse.value = csv; // Manter o CSV no textarea oculto
-   
+
    const tabelaHTML = criarTabelaHTML(csv);
    tabelaContainer.innerHTML = tabelaHTML;
    tabelaContainer.style.display = 'block';
-   
+
    // Adicionar container para botões e legenda
    const botoesContainer = document.createElement('div');
    botoesContainer.style.display = 'flex';
    botoesContainer.style.gap = '10px';
    botoesContainer.style.marginBottom = '10px';
    botoesContainer.style.flexWrap = 'wrap';
-   
+
    // Verificar se os botões já existem
    if (!document.querySelector('#btnCopiarTabela')) {
       // Botão para copiar tabela
@@ -678,21 +679,21 @@ function atualizarTabelaHTML(resultados) {
       btnCopiar.style.cursor = 'pointer';
       btnCopiar.style.fontSize = '14px';
       btnCopiar.style.transition = 'all 0.3s';
-      
+
       btnCopiar.addEventListener('mouseenter', () => {
          btnCopiar.style.backgroundColor = '#1976D2';
          btnCopiar.style.transform = 'translateY(-2px)';
       });
-      
+
       btnCopiar.addEventListener('mouseleave', () => {
          btnCopiar.style.backgroundColor = '#2196F3';
          btnCopiar.style.transform = 'translateY(0)';
       });
-      
+
       btnCopiar.addEventListener('click', copiarTabela);
       botoesContainer.appendChild(btnCopiar);
    }
-   
+
    // Legenda melhorada
    const legenda = document.createElement('div');
    legenda.className = 'tabela-legenda';
@@ -702,12 +703,12 @@ function atualizarTabelaHTML(resultados) {
    legenda.style.border = '1px solid #444';
    legenda.style.color = '#e0e0e0';
    legenda.style.flex = '1';
-   
+
    const sucessos = resultados.filter(r => r.status === 'sucesso').length;
    const erros = resultados.filter(r => r.status === 'erro').length;
    const booleanos = resultados.filter(r => r.tipoResposta === 'boolean' || (r.valor !== undefined && typeof r.valor === 'boolean')).length;
    const objetos = resultados.filter(r => r.tipoResposta === 'object' && r.valor === undefined).length;
-   
+
    legenda.innerHTML = `
        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
            <div><strong>📊 Resumo:</strong></div>
@@ -721,7 +722,7 @@ function atualizarTabelaHTML(resultados) {
            💡 Valores booleanos (true/false) aparecem em destaque na tabela
        </div>
    `;
-   
+
    // Botão de download se não existir no headInput
    if (!document.querySelector('#btnDownloadCSV')) {
       const btnDownload = document.createElement('button');
@@ -735,17 +736,17 @@ function atualizarTabelaHTML(resultados) {
       btnDownload.style.cursor = 'pointer';
       btnDownload.style.fontSize = '14px';
       btnDownload.style.transition = 'all 0.3s';
-      
+
       btnDownload.addEventListener('mouseenter', () => {
          btnDownload.style.backgroundColor = '#45a049';
          btnDownload.style.transform = 'translateY(-2px)';
       });
-      
+
       btnDownload.addEventListener('mouseleave', () => {
          btnDownload.style.backgroundColor = '#4CAF50';
          btnDownload.style.transform = 'translateY(0)';
       });
-      
+
       btnDownload.addEventListener('click', () => {
          if (resResponse.value) {
             const typeSol = document.querySelector('#typeSol').value;
@@ -755,10 +756,10 @@ function atualizarTabelaHTML(resultados) {
             alert('Nenhum dado disponível para download');
          }
       });
-      
+
       botoesContainer.appendChild(btnDownload);
    }
-   
+
    // Limpar container e adicionar novos elementos
    tabelaContainer.innerHTML = tabelaHTML;
    tabelaContainer.insertBefore(botoesContainer, tabelaContainer.firstChild);
@@ -852,7 +853,7 @@ async function sendRequest() {
       case 'NPEP':
          requestData = {
             uri: "http://10.204.8.68:8083/Service/SolicitacaoInvestimentoService.svc/rest/VerificarStatusNotaSap",
-            body: JSON.stringify({ "sNota": "{ID}"})
+            body: JSON.stringify({ "sNota": "000{ID}" })
          };
          break;
       case 'FluxoNota':
@@ -884,12 +885,12 @@ async function sendRequest() {
             body: JSON.stringify({ solId: "{ID}" })
          };
          break;
-         case 'ObterNotaPorPEP':
-            requestData = {
-               uri: "http://10.204.8.68:8083/Service/SolicitacaoInvestimentoService.svc/rest/ListarSolicitacaoInvestimentoPorPEP",
-               body: JSON.stringify({ "PEP": "{ID}" })
-            };
-            break;
+      case 'ObterNotaPorPEP':
+         requestData = {
+            uri: "http://10.204.8.68:8083/Service/SolicitacaoInvestimentoService.svc/rest/ListarSolicitacaoInvestimentoPorPEP",
+            body: JSON.stringify({ "PEP": "{ID}" })
+         };
+         break;
       default:
          criarMensagem(false, 'Tipo de solicitação inválido');
          return;
@@ -1026,13 +1027,13 @@ document.head.appendChild(themeStyles);
 
 // 2. Adicionar botão de Análise
 function adicionarBotaoTimeline() {
-    if (document.querySelector('#btnGerarTimeline')) return;
+   if (document.querySelector('#btnGerarTimeline')) return;
 
-    const container = document.querySelector('.headInput');
-    const btnTimeline = document.createElement('button');
-    btnTimeline.id = 'btnGerarTimeline';
-    btnTimeline.innerHTML = '📊 Análise de Gargalos';
-    btnTimeline.style.cssText = `
+   const container = document.querySelector('.headInput');
+   const btnTimeline = document.createElement('button');
+   btnTimeline.id = 'btnGerarTimeline';
+   btnTimeline.innerHTML = '📊 Análise de Gargalos';
+   btnTimeline.style.cssText = `
         margin-left: 10px;
         padding: 8px 20px;
         background: var(--emphasisColor);
@@ -1043,85 +1044,85 @@ function adicionarBotaoTimeline() {
         font-weight: bold;
         transition: all 0.3s;
     `;
-    
-    btnTimeline.onmouseover = () => btnTimeline.style.transform = 'scale(1.05)';
-    btnTimeline.onmouseout = () => btnTimeline.style.transform = 'scale(1)';
-    
-    btnTimeline.addEventListener('click', abrirAnaliseGargalos);
-    container.appendChild(btnTimeline);
+
+   btnTimeline.onmouseover = () => btnTimeline.style.transform = 'scale(1.05)';
+   btnTimeline.onmouseout = () => btnTimeline.style.transform = 'scale(1)';
+
+   btnTimeline.addEventListener('click', abrirAnaliseGargalos);
+   container.appendChild(btnTimeline);
 }
 
 // 3. Estrutura de dados
 let dadosAnaliseGlobal = {
-    fluxos: new Map(),
-    metricasGerais: {},
-    gargalos: [],
-    etapasCriticas: []
+   fluxos: new Map(),
+   metricasGerais: {},
+   gargalos: [],
+   etapasCriticas: []
 };
 
 // 4. Função CORRIGIDA para parse de data
 function parseData(dataStr) {
-    if (!dataStr || dataStr === '-') return null;
-    
-    try {
-        const partes = dataStr.split(',');
-        if (partes.length !== 2) return null;
-        
-        const dataParte = partes[0].trim();
-        const horaParte = partes[1].trim();
-        
-        const dataSplit = dataParte.split('/');
-        const horaSplit = horaParte.split(':');
-        
-        if (dataSplit.length !== 3 || horaSplit.length !== 3) return null;
-        
-        const dia = parseInt(dataSplit[0]);
-        const mes = parseInt(dataSplit[1]) - 1;
-        const ano = parseInt(dataSplit[2]);
-        
-        const hora = parseInt(horaSplit[0]);
-        const minuto = parseInt(horaSplit[1]);
-        const segundo = parseInt(horaSplit[2]);
-        
-        const timestamp = new Date(ano, mes, dia, hora, minuto, segundo).getTime();
-        
-        if (isNaN(timestamp)) {
-            console.error('Data inválida após parse:', dataStr);
-            return null;
-        }
-        
-        return timestamp;
-    } catch (e) {
-        console.error('Erro ao processar data:', dataStr, e);
-        return null;
-    }
+   if (!dataStr || dataStr === '-') return null;
+
+   try {
+      const partes = dataStr.split(',');
+      if (partes.length !== 2) return null;
+
+      const dataParte = partes[0].trim();
+      const horaParte = partes[1].trim();
+
+      const dataSplit = dataParte.split('/');
+      const horaSplit = horaParte.split(':');
+
+      if (dataSplit.length !== 3 || horaSplit.length !== 3) return null;
+
+      const dia = parseInt(dataSplit[0]);
+      const mes = parseInt(dataSplit[1]) - 1;
+      const ano = parseInt(dataSplit[2]);
+
+      const hora = parseInt(horaSplit[0]);
+      const minuto = parseInt(horaSplit[1]);
+      const segundo = parseInt(horaSplit[2]);
+
+      const timestamp = new Date(ano, mes, dia, hora, minuto, segundo).getTime();
+
+      if (isNaN(timestamp)) {
+         console.error('Data inválida após parse:', dataStr);
+         return null;
+      }
+
+      return timestamp;
+   } catch (e) {
+      console.error('Erro ao processar data:', dataStr, e);
+      return null;
+   }
 }
 
 // 5. Abrir Dashboard de Análise
 function abrirAnaliseGargalos() {
-    const typeSol = document.querySelector('#typeSol').value;
-    
-    if (typeSol !== 'FluxoNota') {
-        alert('⚠️ A análise de gargalos está disponível apenas para "FluxoNota".');
-        return;
-    }
+   const typeSol = document.querySelector('#typeSol').value;
 
-    const csvData = resResponse.value;
-    if (!csvData || csvData.trim() === '') {
-        alert('⚠️ Execute a consulta primeiro.');
-        return;
-    }
+   if (typeSol !== 'FluxoNota') {
+      alert('⚠️ A análise de gargalos está disponível apenas para "FluxoNota".');
+      return;
+   }
 
-    const sucesso = processarDadosAnalise(csvData);
-    
-    if (!sucesso) {
-        alert('❌ Erro ao processar os dados. Verifique o console para mais detalhes.');
-        return;
-    }
-    
-    const overlay = document.createElement('div');
-    overlay.id = 'analiseGargalos';
-    overlay.style.cssText = `
+   const csvData = resResponse.value;
+   if (!csvData || csvData.trim() === '') {
+      alert('⚠️ Execute a consulta primeiro.');
+      return;
+   }
+
+   const sucesso = processarDadosAnalise(csvData);
+
+   if (!sucesso) {
+      alert('❌ Erro ao processar os dados. Verifique o console para mais detalhes.');
+      return;
+   }
+
+   const overlay = document.createElement('div');
+   overlay.id = 'analiseGargalos';
+   overlay.style.cssText = `
         position: fixed;
         top: 0;
         left: 0;
@@ -1135,8 +1136,8 @@ function abrirAnaliseGargalos() {
         font-family: 'Segoe UI', Arial, sans-serif;
         overflow: hidden;
     `;
-    
-    overlay.innerHTML = `
+
+   overlay.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 30px; 
                     background: var(--secundaryColor); border-bottom: 3px solid var(--emphasisColor);">
             <div>
@@ -1170,201 +1171,201 @@ function abrirAnaliseGargalos() {
             ${renderizarDashboard()}
         </div>
     `;
-    
-    document.body.appendChild(overlay);
-    document.body.style.overflow = 'hidden';
-    
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') fecharAnalise();
-    });
+
+   document.body.appendChild(overlay);
+   document.body.style.overflow = 'hidden';
+
+   document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') fecharAnalise();
+   });
 }
 
 // 6. Processar dados - CORREÇÃO FINAL
 function processarDadosAnalise(csv) {
-    console.log('📊 Processando CSV...');
-    
-    const linhas = csv.split('\n');
-    if (linhas.length < 2) {
-        console.error('CSV vazio ou sem dados');
-        return false;
-    }
-    
-    const cabecalho = linhas[0].split(';');
-    
-    const idxId = cabecalho.indexOf('ID_Original');
-    const idxData = cabecalho.indexOf('Data');
-    const idxStatusDe = cabecalho.indexOf('StatusDe');
-    const idxStatusPara = cabecalho.indexOf('StatusPara');
-    const idxObservacao = cabecalho.indexOf('Observacao');
-    const idxRespInterno = cabecalho.indexOf('RespInternoId');
-    
-    const fluxos = new Map();
-    const temposPorEtapa = new Map();
-    let totalEventos = 0;
-    let eventosComData = 0;
+   console.log('📊 Processando CSV...');
 
-    for (let i = 1; i < linhas.length; i++) {
-        if (!linhas[i].trim()) continue;
-        
-        const valores = linhas[i].split(';');
-        const id = valores[idxId];
-        const dataStr = valores[idxData];
-        const statusDe = valores[idxStatusDe] || '';
-        const statusPara = valores[idxStatusPara] || '';
-        const obs = valores[idxObservacao] || '';
-        const resp = valores[idxRespInterno] || 'Sistema';
+   const linhas = csv.split('\n');
+   if (linhas.length < 2) {
+      console.error('CSV vazio ou sem dados');
+      return false;
+   }
 
-        if (!id) continue;
-        
-        totalEventos++;
-        
-        const timestamp = parseData(dataStr);
-        
-        if (!timestamp) {
-            console.warn(`Linha ${i}: Data inválida - "${dataStr}"`);
-            continue;
-        }
-        
-        eventosComData++;
+   const cabecalho = linhas[0].split(';');
 
-        if (!fluxos.has(id)) {
-            fluxos.set(id, []);
-        }
+   const idxId = cabecalho.indexOf('ID_Original');
+   const idxData = cabecalho.indexOf('Data');
+   const idxStatusDe = cabecalho.indexOf('StatusDe');
+   const idxStatusPara = cabecalho.indexOf('StatusPara');
+   const idxObservacao = cabecalho.indexOf('Observacao');
+   const idxRespInterno = cabecalho.indexOf('RespInternoId');
 
-        fluxos.get(id).push({
-            data: dataStr,
-            timestamp,
-            statusDe: statusDe || 'Início',
-            statusPara: statusPara || 'Fim',
-            observacao: obs,
-            responsavel: resp
-        });
-    }
+   const fluxos = new Map();
+   const temposPorEtapa = new Map();
+   let totalEventos = 0;
+   let eventosComData = 0;
 
-    console.log(`✅ Processados: ${eventosComData}/${totalEventos} eventos com data válida`);
-    console.log(`📋 Total de fluxos: ${fluxos.size}`);
+   for (let i = 1; i < linhas.length; i++) {
+      if (!linhas[i].trim()) continue;
 
-    if (fluxos.size === 0) {
-        console.error('Nenhum fluxo válido encontrado');
-        return false;
-    }
+      const valores = linhas[i].split(';');
+      const id = valores[idxId];
+      const dataStr = valores[idxData];
+      const statusDe = valores[idxStatusDe] || '';
+      const statusPara = valores[idxStatusPara] || '';
+      const obs = valores[idxObservacao] || '';
+      const resp = valores[idxRespInterno] || 'Sistema';
 
-    const metricas = {
-        totalFluxos: fluxos.size,
-        tempoTotalMs: 0,
-        fluxoMaisLongo: { id: null, duracaoMs: 0 },
-        fluxoMaisCurto: { id: null, duracaoMs: Infinity }
-    };
+      if (!id) continue;
 
-    for (let [id, eventos] of fluxos) {
-        eventos.sort((a, b) => a.timestamp - b.timestamp);
-        
-        console.log(`\n📌 Fluxo ${id}:`);
-        
-        // 🎯 CORREÇÃO: O tempo de espera é atribuído ao statusPara do evento
-        for (let i = 0; i < eventos.length - 1; i++) {
-            const eventoAtual = eventos[i];
-            const proximoEvento = eventos[i + 1];
-            
-            const duracaoMs = proximoEvento.timestamp - eventoAtual.timestamp;
-            
-            if (duracaoMs > 0) {
-                // 🎯 A ETAPA É O STATUS ONDE O PROCESSO FICOU (statusPara do próximo evento)
-                const etapa = proximoEvento.statusPara || 'Início';
-                
-                console.log(`   ⏱️ Aguardou ${formatarHoras(duracaoMs / (1000 * 60 * 60))} no status "${etapa}"`);
-                
-                if (!temposPorEtapa.has(etapa)) {
-                    temposPorEtapa.set(etapa, []);
-                }
-                
-                temposPorEtapa.get(etapa).push(duracaoMs);
+      totalEventos++;
+
+      const timestamp = parseData(dataStr);
+
+      if (!timestamp) {
+         console.warn(`Linha ${i}: Data inválida - "${dataStr}"`);
+         continue;
+      }
+
+      eventosComData++;
+
+      if (!fluxos.has(id)) {
+         fluxos.set(id, []);
+      }
+
+      fluxos.get(id).push({
+         data: dataStr,
+         timestamp,
+         statusDe: statusDe || 'Início',
+         statusPara: statusPara || 'Fim',
+         observacao: obs,
+         responsavel: resp
+      });
+   }
+
+   console.log(`✅ Processados: ${eventosComData}/${totalEventos} eventos com data válida`);
+   console.log(`📋 Total de fluxos: ${fluxos.size}`);
+
+   if (fluxos.size === 0) {
+      console.error('Nenhum fluxo válido encontrado');
+      return false;
+   }
+
+   const metricas = {
+      totalFluxos: fluxos.size,
+      tempoTotalMs: 0,
+      fluxoMaisLongo: { id: null, duracaoMs: 0 },
+      fluxoMaisCurto: { id: null, duracaoMs: Infinity }
+   };
+
+   for (let [id, eventos] of fluxos) {
+      eventos.sort((a, b) => a.timestamp - b.timestamp);
+
+      console.log(`\n📌 Fluxo ${id}:`);
+
+      // 🎯 CORREÇÃO: O tempo de espera é atribuído ao statusPara do evento
+      for (let i = 0; i < eventos.length - 1; i++) {
+         const eventoAtual = eventos[i];
+         const proximoEvento = eventos[i + 1];
+
+         const duracaoMs = proximoEvento.timestamp - eventoAtual.timestamp;
+
+         if (duracaoMs > 0) {
+            // 🎯 A ETAPA É O STATUS ONDE O PROCESSO FICOU (statusPara do próximo evento)
+            const etapa = proximoEvento.statusPara || 'Início';
+
+            console.log(`   ⏱️ Aguardou ${formatarHoras(duracaoMs / (1000 * 60 * 60))} no status "${etapa}"`);
+
+            if (!temposPorEtapa.has(etapa)) {
+               temposPorEtapa.set(etapa, []);
             }
-        }
-        
-        if (eventos.length >= 2) {
-            const primeiroEvento = eventos[0];
-            const ultimoEvento = eventos[eventos.length - 1];
-            
-            const duracaoTotalMs = ultimoEvento.timestamp - primeiroEvento.timestamp;
-            
-            if (duracaoTotalMs > 0) {
-                metricas.tempoTotalMs += duracaoTotalMs;
-                
-                if (duracaoTotalMs > metricas.fluxoMaisLongo.duracaoMs) {
-                    metricas.fluxoMaisLongo = { id, duracaoMs: duracaoTotalMs };
-                }
-                if (duracaoTotalMs < metricas.fluxoMaisCurto.duracaoMs) {
-                    metricas.fluxoMaisCurto = { id, duracaoMs: duracaoTotalMs };
-                }
+
+            temposPorEtapa.get(etapa).push(duracaoMs);
+         }
+      }
+
+      if (eventos.length >= 2) {
+         const primeiroEvento = eventos[0];
+         const ultimoEvento = eventos[eventos.length - 1];
+
+         const duracaoTotalMs = ultimoEvento.timestamp - primeiroEvento.timestamp;
+
+         if (duracaoTotalMs > 0) {
+            metricas.tempoTotalMs += duracaoTotalMs;
+
+            if (duracaoTotalMs > metricas.fluxoMaisLongo.duracaoMs) {
+               metricas.fluxoMaisLongo = { id, duracaoMs: duracaoTotalMs };
             }
-        }
-    }
+            if (duracaoTotalMs < metricas.fluxoMaisCurto.duracaoMs) {
+               metricas.fluxoMaisCurto = { id, duracaoMs: duracaoTotalMs };
+            }
+         }
+      }
+   }
 
-    const mediasEtapas = [];
-    
-    console.log('\n📊 Resumo por etapa:');
-    
-    for (let [etapa, duracoes] of temposPorEtapa) {
-        if (duracoes.length === 0) continue;
-        
-        const soma = duracoes.reduce((a, b) => a + b, 0);
-        const mediaMs = soma / duracoes.length;
-        const maximoMs = Math.max(...duracoes);
-        const minimoMs = Math.min(...duracoes);
-        
-        const mediaHoras = mediaMs / (1000 * 60 * 60);
-        
-        console.log(`   ${etapa}: média ${formatarHoras(mediaHoras)} (${duracoes.length} ocorrências)`);
-        
-        mediasEtapas.push({
-            etapa,
-            mediaHoras: mediaHoras,
-            maximoHoras: maximoMs / (1000 * 60 * 60),
-            minimoHoras: minimoMs / (1000 * 60 * 60),
-            ocorrencias: duracoes.length,
-            mediaMs,
-            maximoMs,
-            minimoMs
-        });
-    }
+   const mediasEtapas = [];
 
-    mediasEtapas.sort((a, b) => b.mediaHoras - a.mediaHoras);
-    
-    const gargalos = mediasEtapas.slice(0, Math.min(3, mediasEtapas.length));
+   console.log('\n📊 Resumo por etapa:');
 
-    const totalFluxosComDuracao = Array.from(fluxos.values())
-        .filter(e => e.length >= 2).length;
-    
-    const tempoMedioMs = totalFluxosComDuracao > 0 ? 
-        metricas.tempoTotalMs / totalFluxosComDuracao : 0;
+   for (let [etapa, duracoes] of temposPorEtapa) {
+      if (duracoes.length === 0) continue;
 
-    dadosAnaliseGlobal = {
-        fluxos,
-        metricasGerais: {
-            ...metricas,
-            tempoMedioMs,
-            totalFluxosComDuracao
-        },
-        mediasEtapas,
-        gargalos,
-        temposPorEtapa
-    };
-    
-    console.log('\n✅ Análise concluída!');
-    console.log(`   Gargalos: ${gargalos.map(g => g.etapa).join(' → ')}`);
-    
-    return true;
+      const soma = duracoes.reduce((a, b) => a + b, 0);
+      const mediaMs = soma / duracoes.length;
+      const maximoMs = Math.max(...duracoes);
+      const minimoMs = Math.min(...duracoes);
+
+      const mediaHoras = mediaMs / (1000 * 60 * 60);
+
+      console.log(`   ${etapa}: média ${formatarHoras(mediaHoras)} (${duracoes.length} ocorrências)`);
+
+      mediasEtapas.push({
+         etapa,
+         mediaHoras: mediaHoras,
+         maximoHoras: maximoMs / (1000 * 60 * 60),
+         minimoHoras: minimoMs / (1000 * 60 * 60),
+         ocorrencias: duracoes.length,
+         mediaMs,
+         maximoMs,
+         minimoMs
+      });
+   }
+
+   mediasEtapas.sort((a, b) => b.mediaHoras - a.mediaHoras);
+
+   const gargalos = mediasEtapas.slice(0, Math.min(3, mediasEtapas.length));
+
+   const totalFluxosComDuracao = Array.from(fluxos.values())
+      .filter(e => e.length >= 2).length;
+
+   const tempoMedioMs = totalFluxosComDuracao > 0 ?
+      metricas.tempoTotalMs / totalFluxosComDuracao : 0;
+
+   dadosAnaliseGlobal = {
+      fluxos,
+      metricasGerais: {
+         ...metricas,
+         tempoMedioMs,
+         totalFluxosComDuracao
+      },
+      mediasEtapas,
+      gargalos,
+      temposPorEtapa
+   };
+
+   console.log('\n✅ Análise concluída!');
+   console.log(`   Gargalos: ${gargalos.map(g => g.etapa).join(' → ')}`);
+
+   return true;
 }
 
 // 7. Renderizar Dashboard
 function renderizarDashboard() {
-    const { metricasGerais, gargalos, mediasEtapas } = dadosAnaliseGlobal;
-    
-    const totalHoras = metricasGerais.tempoTotalMs / (1000 * 60 * 60);
-    const mediaHoras = metricasGerais.tempoMedioMs / (1000 * 60 * 60);
-    
-    return `
+   const { metricasGerais, gargalos, mediasEtapas } = dadosAnaliseGlobal;
+
+   const totalHoras = metricasGerais.tempoTotalMs / (1000 * 60 * 60);
+   const mediaHoras = metricasGerais.tempoMedioMs / (1000 * 60 * 60);
+
+   return `
         <div style="max-width: 1400px; margin: 0 auto;">
             <!-- KPIs Principais -->
             <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px;">
@@ -1424,11 +1425,11 @@ function renderizarDashboard() {
                     
                     <div style="display: grid; gap: 15px;">
                         ${gargalos.map((gargalo, index) => {
-                            const percentual = mediaHoras > 0 ? (gargalo.mediaHoras / mediaHoras) * 100 : 0;
-                            const severidade = gargalo.mediaHoras > 72 ? 'Crítico' : 
-                                              gargalo.mediaHoras > 48 ? 'Alto' : 'Moderado';
-                            
-                            return `
+      const percentual = mediaHoras > 0 ? (gargalo.mediaHoras / mediaHoras) * 100 : 0;
+      const severidade = gargalo.mediaHoras > 72 ? 'Crítico' :
+         gargalo.mediaHoras > 48 ? 'Alto' : 'Moderado';
+
+      return `
                                 <div style="background: var(--thirdColor); padding: 20px; border-radius: 10px; 
                                             border-left: 5px solid ${index === 0 ? '#ff4757' : '#ffa502'};">
                                     <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -1479,7 +1480,7 @@ function renderizarDashboard() {
                                     </div>
                                 </div>
                             `;
-                        }).join('')}
+   }).join('')}
                     </div>
                 </div>
             ` : '<p style="color: var(--fontColor);">Nenhum gargalo identificado.</p>'}
@@ -1501,9 +1502,9 @@ function renderizarDashboard() {
                         </thead>
                         <tbody>
                             ${mediasEtapas.map(etapa => {
-                                const isGargalo = gargalos.includes(etapa);
-                                
-                                return `
+      const isGargalo = gargalos.includes(etapa);
+
+      return `
                                     <tr style="border-bottom: 1px solid var(--secundaryColor); 
                                                ${isGargalo ? 'background: rgba(255, 71, 87, 0.1);' : ''}">
                                         <td style="padding: 12px 15px;">
@@ -1524,7 +1525,7 @@ function renderizarDashboard() {
                                         </td>
                                     </tr>
                                 `;
-                            }).join('')}
+   }).join('')}
                         </tbody>
                     </table>
                 </div>
@@ -1537,17 +1538,17 @@ function renderizarDashboard() {
                     <h4 style="color: var(--fontColor); margin-bottom: 15px;">💡 Recomendações para Otimização</h4>
                     <ul style="color: var(--fontColor); opacity: 0.9; line-height: 1.8;">
                         ${gargalos.map(g => {
-                            if (g.mediaHoras > 72) {
-                                return `<li><strong>${g.etapa}:</strong> Status crítico - processo aguarda em média ${formatarHoras(g.mediaHoras)}. 
+      if (g.mediaHoras > 72) {
+         return `<li><strong>${g.etapa}:</strong> Status crítico - processo aguarda em média ${formatarHoras(g.mediaHoras)}. 
                                         Recomenda-se revisão urgente do processo.</li>`;
-                            } else if (g.mediaHoras > 48) {
-                                return `<li><strong>${g.etapa}:</strong> Status com alto tempo de espera (${formatarHoras(g.mediaHoras)}). 
+      } else if (g.mediaHoras > 48) {
+         return `<li><strong>${g.etapa}:</strong> Status com alto tempo de espera (${formatarHoras(g.mediaHoras)}). 
                                         Considere implementar alertas automáticos.</li>`;
-                            } else {
-                                return `<li><strong>${g.etapa}:</strong> Ponto de atenção (${formatarHoras(g.mediaHoras)}). 
+      } else {
+         return `<li><strong>${g.etapa}:</strong> Ponto de atenção (${formatarHoras(g.mediaHoras)}). 
                                         Monitore para evitar aumento do tempo.</li>`;
-                            }
-                        }).join('')}
+      }
+   }).join('')}
                     </ul>
                 </div>
             ` : ''}
@@ -1557,54 +1558,54 @@ function renderizarDashboard() {
 
 // 8. Funções auxiliares
 function formatarHoras(horas) {
-    if (isNaN(horas) || horas === null || horas === undefined || horas < 0) {
-        return '0min';
-    }
-    
-    if (horas < 1) {
-        const minutos = Math.round(horas * 60);
-        return `${minutos}min`;
-    } else if (horas < 24) {
-        const horasInt = Math.floor(horas);
-        const minutos = Math.round((horas - horasInt) * 60);
-        return minutos > 0 ? `${horasInt}h ${minutos}min` : `${horasInt}h`;
-    } else {
-        const dias = Math.floor(horas / 24);
-        const horasRest = Math.round(horas % 24);
-        return horasRest > 0 ? `${dias}d ${horasRest}h` : `${dias}d`;
-    }
+   if (isNaN(horas) || horas === null || horas === undefined || horas < 0) {
+      return '0min';
+   }
+
+   if (horas < 1) {
+      const minutos = Math.round(horas * 60);
+      return `${minutos}min`;
+   } else if (horas < 24) {
+      const horasInt = Math.floor(horas);
+      const minutos = Math.round((horas - horasInt) * 60);
+      return minutos > 0 ? `${horasInt}h ${minutos}min` : `${horasInt}h`;
+   } else {
+      const dias = Math.floor(horas / 24);
+      const horasRest = Math.round(horas % 24);
+      return horasRest > 0 ? `${dias}d ${horasRest}h` : `${dias}d`;
+   }
 }
 
 function alternarVisualizacao(modo) {
-    const content = document.querySelector('#analiseContent');
-    const btnDashboard = document.querySelector('#btnDashboard');
-    const btnTimeline = document.querySelector('#btnTimeline');
-    
-    if (modo === 'dashboard') {
-        content.innerHTML = renderizarDashboard();
-        btnDashboard.style.background = 'var(--emphasisColor)';
-        btnTimeline.style.background = 'var(--thirdColor)';
-    } else {
-        content.innerHTML = renderizarTimelineDetalhada();
-        btnTimeline.style.background = 'var(--emphasisColor)';
-        btnDashboard.style.background = 'var(--thirdColor)';
-    }
+   const content = document.querySelector('#analiseContent');
+   const btnDashboard = document.querySelector('#btnDashboard');
+   const btnTimeline = document.querySelector('#btnTimeline');
+
+   if (modo === 'dashboard') {
+      content.innerHTML = renderizarDashboard();
+      btnDashboard.style.background = 'var(--emphasisColor)';
+      btnTimeline.style.background = 'var(--thirdColor)';
+   } else {
+      content.innerHTML = renderizarTimelineDetalhada();
+      btnTimeline.style.background = 'var(--emphasisColor)';
+      btnDashboard.style.background = 'var(--thirdColor)';
+   }
 }
 
 function renderizarTimelineDetalhada() {
-    const fluxos = Array.from(dadosAnaliseGlobal.fluxos.entries());
-    
-    return `
+   const fluxos = Array.from(dadosAnaliseGlobal.fluxos.entries());
+
+   return `
         <div style="max-width: 1200px; margin: 0 auto;">
             <h3 style="color: var(--fontColor); margin-bottom: 20px;">⏳ Timeline Detalhada por Solicitação</h3>
             
             <div style="display: grid; gap: 20px;">
                 ${fluxos.map(([id, eventos]) => {
-                    const duracaoTotal = eventos.length >= 2 ? 
-                        eventos[eventos.length - 1].timestamp - eventos[0].timestamp : 0;
-                    const duracaoHoras = duracaoTotal / (1000 * 60 * 60);
-                    
-                    return `
+      const duracaoTotal = eventos.length >= 2 ?
+         eventos[eventos.length - 1].timestamp - eventos[0].timestamp : 0;
+      const duracaoHoras = duracaoTotal / (1000 * 60 * 60);
+
+      return `
                         <div style="background: var(--thirdColor); padding: 20px; border-radius: 10px; 
                                     border-left: 4px solid var(--emphasisColor);">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
@@ -1616,11 +1617,11 @@ function renderizarTimelineDetalhada() {
                             
                             <div style="position: relative; padding-left: 20px;">
                                 ${eventos.map((evento, i) => {
-                                    const proximoEvento = eventos[i + 1];
-                                    const tempoEspera = proximoEvento ? 
-                                        (proximoEvento.timestamp - evento.timestamp) / (1000 * 60 * 60) : 0;
-                                    
-                                    return `
+         const proximoEvento = eventos[i + 1];
+         const tempoEspera = proximoEvento ?
+            (proximoEvento.timestamp - evento.timestamp) / (1000 * 60 * 60) : 0;
+
+         return `
                                         <div style="display: flex; margin-bottom: 15px; position: relative;">
                                             ${i < eventos.length - 1 ? `
                                                 <div style="position: absolute; left: 5px; top: 20px; width: 2px; height: calc(100% + 5px); 
@@ -1652,20 +1653,20 @@ function renderizarTimelineDetalhada() {
                                             </div>
                                         </div>
                                     `;
-                                }).join('')}
+      }).join('')}
                             </div>
                         </div>
                     `;
-                }).join('')}
+   }).join('')}
             </div>
         </div>
     `;
 }
 
 function fecharAnalise() {
-    const overlay = document.querySelector('#analiseGargalos');
-    if (overlay) overlay.remove();
-    document.body.style.overflow = '';
+   const overlay = document.querySelector('#analiseGargalos');
+   if (overlay) overlay.remove();
+   document.body.style.overflow = '';
 }
 
 // 9. Tornar funções globais
@@ -1674,13 +1675,13 @@ window.fecharAnalise = fecharAnalise;
 
 // 10. Inicialização
 const originalSendRequest = sendRequest;
-sendRequest = async function() {
-    await originalSendRequest();
-    adicionarBotaoTimeline();
+sendRequest = async function () {
+   await originalSendRequest();
+   adicionarBotaoTimeline();
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-    adicionarBotaoTimeline();
+   adicionarBotaoTimeline();
 });
 
 console.log('✅ Análise de Gargalos - CORREÇÃO FINAL carregada!');
