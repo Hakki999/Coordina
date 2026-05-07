@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BI Produção | TV</title>
+
+  <link rel="stylesheet" href="/BI/execucao/style.css">
+  <link rel="shortcut icon" href="../src/logoIcon.png" type="image/x-icon">
+
+
+</head>
+
+<body>
+  <div class="background-grid"></div>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loader-card">
+      <div class="loader"></div>
+      <strong>Carregando BI de Produção</strong>
+      <span>Buscando dados no backend...</span>
+    </div>
+  </div>
+
+  <main class="dashboard">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-icon">⚡</div>
+        <div>
+          <h1>BI de Produção</h1>
+          <p id="subtitulo">Resumo mensal de equipes, serviços e produção</p>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <div class="status-pill">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusSistema">Online</span>
+        </div>
+
+        <div class="clock-pill" id="relogio">--:--:--</div>
+
+        <select id="filtroMes" title="Selecionar mês">
+          <option value="">Carregando...</option>
+        </select>
+      </div>
+    </header>
+
+    <section class="ticker-wrap" aria-label="Resumo em movimento">
+      <div class="ticker" id="ticker">
+        <div class="ticker-item">
+          <span class="ticker-label">Aguardando dados...</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="cards">
+      <div class="card">
+        <span>Produção Total</span>
+        <div class="card-icon">💰</div>
+        <strong id="producaoTotal">R$ 0,00</strong>
+        <small id="deltaProducao">Comparativo mensal indisponível</small>
+      </div>
+
+      <div class="card">
+        <span>Média por Projeto</span>
+        <div class="card-icon">📁</div>
+        <strong id="mediaProjeto">R$ 0,00</strong>
+        <small>Valor médio por projeto</small>
+      </div>
+
+      <div class="card">
+        <span>Média por Serviço</span>
+        <div class="card-icon">🧰</div>
+        <strong id="mediaServico">R$ 0,00</strong>
+        <small>Valor médio por serviço</small>
+      </div>
+
+      <div class="card">
+        <span>Qtd. Serviços</span>
+        <div class="card-icon">✅</div>
+        <strong id="qtdServicos">0</strong>
+        <small>Total executado no mês</small>
+      </div>
+
+      <div class="card">
+        <span>Qtd. Projetos</span>
+        <div class="card-icon">🧾</div>
+        <strong id="qtdProjetos">0</strong>
+        <small>Projetos com produção</small>
+      </div>
+
+      <div class="card">
+        <span>Qtd. Equipes</span>
+        <div class="card-icon">👷</div>
+        <strong id="qtdEquipes">0</strong>
+        <small>Equipes classificadas</small>
+      </div>
+    </section>
+
+    <section class="board">
+      <article class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>Evolução mensal</h2>
+            <p class="hint">Produção total por mês</p>
+          </div>
+          <span class="badge" id="badgeEvolucao">Últimos meses</span>
+        </div>
+        <div class="chart-area" id="chartEvolucao"></div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>Produção por tipo</h2>
+            <p class="hint">Pesada, leve e linha viva</p>
+          </div>
+          <span class="badge" id="badgeTipo">0%</span>
+        </div>
+        <div class="donut-layout">
+          <div class="donut" id="donutChart">
+            <div class="donut-center" id="donutCenter">0%<small>maior fatia</small></div>
+          </div>
+          <div class="legend" id="legendTipos"></div>
+        </div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-header">
+          <div>
+            <h2 id="tituloTopEquipes">Top equipes</h2>
+            <p class="hint" id="hintTopEquipes">Maiores produções do mês</p>
+          </div>
+          <span class="badge" id="badgeTop">Top 5</span>
+        </div>
+        <div class="ranking-list" id="topEquipes"></div>
+      </article>
+
+      <article class="panel type-panel">
+        <div class="panel-header">
+          <div>
+            <h2 id="tituloRankingTipo">Ranking por classificação</h2>
+            <p class="hint" id="hintRankingTipo">Alternando entre maiores e menores equipes por tipo</p>
+          </div>
+          <span class="badge" id="badgeRankingTipo">Modo TV</span>
+        </div>
+
+        <div class="type-grid" id="rankingPorTipo"></div>
+      </article>
+    </section>
+  </main>
+
+  <script src="/BI/execucao//main.js"></script>
+</body>
+
+</html>

@@ -12,7 +12,7 @@ const { processVP } = require('./js/dataAnalytics/processVP');
 const { handleValidationErrors, validationSchemas } = require('./js/middleware/express_mid');
 const http = require("http");
 const compression = require("compression");
-const { log } = require('console');
+const { redshift, gerarResumoBI } = require("././js/db/redshift");
 
 console.log("🚀 Iniciando servidor...");
 
@@ -76,6 +76,10 @@ app.get('/controle/producao/', autenticarToken, VerifyAcess('Alpha'), (req, res)
 
 app.get('/controle/get_sgo/', autenticarToken, VerifyAcess('Alpha', 'Programação', 'Controle', 'Almoxarifado', 'EQTL'), (req, res) => {
     res.sendFile(__dirname + "/public/controle/get_sgo/index.html");
+});
+
+app.get("/bi-execucao", autenticarToken, async (req, res) => {
+  res.sendFile(__dirname + "/public/BI/execucao/index.html");
 });
 
 // ------------------------------- Solicitações ---------------------------------------
@@ -523,6 +527,49 @@ app.post('/getIOP', autenticarToken, async (req, res) => {
             error: 'Erro ao buscar dados IOP'
         });
     }
+});
+
+app.post("/resumo", autenticarToken, async (req, res) => {
+  try {
+    console.log("Entrou na rota /resumo");
+
+    const sql = `
+      SELECT
+        num_nota_rcb,
+        cod_serv_rcb,
+        des_equipe_rcb,
+        des_tip_eqp_rcb,
+        vlr_total_serv_rcb,
+        dta_exec_rcb
+      FROM res_cubo_servico
+      WHERE dta_exec_rcb IS NOT NULL
+        AND num_cont_rcb = $1
+    `;
+
+    const result = await redshift.query(sql, [
+      "ANCORA TÉCNICO - MONTES BELOS"
+    ]);
+
+    console.log("Query finalizada:", result.rows.length);
+
+    const resumo = gerarResumoBI(result.rows);
+
+    res.json({
+      sucesso: true,
+      usuario: req.usuario,
+      totalRegistros: result.rows.length,
+      dados: resumo
+    });
+
+  } catch (error) {
+    console.error("ERRO BACKEND:", error);
+
+    res.status(500).json({
+      sucesso: false,
+      erro: "Erro interno ao gerar resumo",
+      code: error.code
+    });
+  }
 });
 
 app.post('/atualizar_iop', autenticarToken, VerifyAcess('Alpha', 'Programação', 'Controle', 'Almoxarifado'), (req, res) => {

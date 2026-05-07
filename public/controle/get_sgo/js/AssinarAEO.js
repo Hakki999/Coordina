@@ -126,9 +126,52 @@ async function validarEtapa(nota, descricao, funcao) {
 }
 
 async function runFlow(nota) {
-    console.warn("Iniciando fluxo da nota:", nota);
+
+    const logEtapa = (etapa, tipo = "info") => {
+        const estilo = `
+            background: #111827;
+            color: #00ff88;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 13px;
+            border-left: 5px solid #00ff88;
+        `;
+
+        const estiloErro = `
+            background: #3b0a0a;
+            color: #ff4d4d;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 13px;
+            border-left: 5px solid #ff0000;
+        `;
+
+        const estiloSucesso = `
+            background: #052e16;
+            color: #4ade80;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 13px;
+            border-left: 5px solid #22c55e;
+        `;
+
+        if (tipo === "erro") {
+            console.log(`%c❌ [${nota}] ${etapa}`, estiloErro);
+        } else if (tipo === "success") {
+            console.log(`%c✅ [${nota}] ${etapa}`, estiloSucesso);
+        } else {
+            console.log(`%c🚀 [${nota}] ${etapa}`, estilo);
+        }
+    };
+
+    logEtapa("INICIANDO FLUXO");
 
     try {
+
+        logEtapa("Voltando para o início");
         await validarEtapa(nota, "Voltando para o inicio", async () => {
             return await autoClick({
                 object: "#tabPesquisar a[href='#tabContPesquisar']",
@@ -138,6 +181,7 @@ async function runFlow(nota) {
             });
         });
 
+        logEtapa("Inserindo número da nota");
         await validarEtapa(nota, "Inserir número da nota", async () => {
             return await autoType({
                 object: "#txtNotaPesq",
@@ -147,6 +191,7 @@ async function runFlow(nota) {
             });
         });
 
+        logEtapa("Clicando no botão de pesquisa");
         await validarEtapa(nota, "Clicar no botão de pesquisa", async () => {
             return await autoClick({
                 object: "#btnPesqSolInvest",
@@ -156,6 +201,7 @@ async function runFlow(nota) {
             });
         });
 
+        logEtapa("Aguardando modal da pesquisa sumir");
         await validarEtapa(nota, "Aguardar modal de pesquisa sumir", async () => {
             return await waitForElementNotExist({
                 object: "div[class='modal fade bd-example-modal-lg in']",
@@ -164,6 +210,7 @@ async function runFlow(nota) {
             });
         });
 
+        logEtapa("Abrindo fluxo");
         await validarEtapa(nota, "Clicar no botão de abrir fluxo", async () => {
             return await autoClick({
                 object: ".btn-minier",
@@ -173,6 +220,7 @@ async function runFlow(nota) {
             });
         });
 
+        logEtapa("Abrindo aba fluxo");
         await validarEtapa(nota, "Abrir aba Fluxo", async () => {
             return await autoClick({
                 object: 'a[ng-click="habilitaDesabilitaAbaFluxo(sol);"]',
@@ -182,6 +230,7 @@ async function runFlow(nota) {
             });
         });
 
+        logEtapa("Aguardando modal do fluxo sumir");
         await validarEtapa(nota, "Aguardar modal do fluxo sumir", async () => {
             return await waitForElementNotExist({
                 object: "div[class='modal fade bd-example-modal-lg in']",
@@ -190,99 +239,37 @@ async function runFlow(nota) {
             });
         });
 
-        // pega a mensagem de erro
+        logEtapa("Verificando mensagens de erro");
         await validarEtapa(nota, "Verificar mensagem de erro", async () => {
+
             const mensagemErro = document.querySelector("#toast-container .toast-message");
 
             if (mensagemErro) {
                 const textoErro = mensagemErro.textContent.trim();
-                console.error("Mensagem de erro encontrada:", textoErro);
+
+                logEtapa(`ERRO ENCONTRADO -> ${textoErro}`, "erro");
 
                 throw new Error(textoErro);
             }
 
-            console.log("Não foi encontrada mensagem de erro, continuando com o fluxo.");
+            logEtapa("Nenhum erro encontrado");
             return "sem_erro";
         });
 
-        await validarEtapa(nota, "Esperar botão Comissionar aparecer", async () => {
-            return await waitForElement({
-                object: "#btnComissionaObra",
-                timeout: 10000,
-                visible: true
-            });
-        });
+        // --------------------------------------------
 
-        await validarEtapa(nota, "Aguardar modal antes de comissionar sumir", async () => {
-            return await waitForElementNotExist({
-                object: "div[class='modal fade bd-example-modal-lg in']",
-                timeout: 150000,
-                checkTime: 300
-            });
-        });
-
-        //Verifica se o campo de data real e data inicio estão preenchidas
-        await validarEtapa(nota, "Data real inicio e fim", async () => {
-
-            // Garante que os inputs existem antes de usar
-            const inicio = await waitForElement({
-                object: "#txtDataRealInicio",
-                timeout: 8000,
-                visible: true
-            });
-
-            const fim = await waitForElement({
-                object: "#txtDataRealTermino",
-                timeout: 8000,
-                visible: true
-            });
-
-            if (!inicio || !fim) {
-                throw new Error("Campos de data não encontrados");
-            }
-
-            const txtDataRealInicio = document.querySelector("#txtDataRealInicio");
-            const txtDataRealFim = document.querySelector("#txtDataRealTermino");
-
-            // 🔥 Só preenche se estiver vazio
-            if (!txtDataRealInicio.value || !txtDataRealFim.value) {
-
-                const hoje = new Date();
-                const ano = hoje.getFullYear();
-                const mes = String(hoje.getMonth() + 1).padStart(2, '0');
-                const dia = String(hoje.getDate()).padStart(2, '0');
-
-                const dataFormatada = `${ano}-${mes}-${dia}`;
-
-                await autoType({
-                    object: "#txtDataRealInicio",
-                    text: dataFormatada,
-                    timeout: 8000,
-                    eventTime: 300
-                });
-
-                await autoType({
-                    object: "#txtDataRealTermino",
-                    text: dataFormatada,
-                    timeout: 8000,
-                    eventTime: 300
-                });
-
-                return "datas_preenchidas";
-            }
-
-            return "datas_ja_existem";
-        });
-
-        await validarEtapa(nota, "Clicar em Comissionar", async () => {
+        logEtapa("Clicando em assinar AEO");
+        await validarEtapa(nota, "clica no botão de assinar AEO", async () => {
             return await autoClick({
-                object: "#btnComissionaObra",
+                object: "#btnAssinarAEO",
                 timeout: 10000,
-                eventTime: 300
+                eventTime: 300,
+                delayAfterClick: 1000
             });
         });
 
-        await validarEtapa(nota, "Aguardar modal após comissionar sumir", async () => {
+        logEtapa("Aguardando modal do fluxo sumir");
+        await validarEtapa(nota, "Aguardar modal do fluxo sumir", async () => {
             return await waitForElementNotExist({
                 object: "div[class='modal fade bd-example-modal-lg in']",
                 timeout: 150000,
@@ -290,51 +277,72 @@ async function runFlow(nota) {
             });
         });
 
-        await validarEtapa(nota, "Confirmar comissionamento", async () => {
+        logEtapa("Clica em Assinar AEO");
+        await validarEtapa(nota, "clica no botão de assinar AEO", async () => {
+            return await autoClick({
+                object: "#btnAssinarAEO",
+                timeout: 10000,
+                eventTime: 300,
+                delayAfterClick: 5000
+            });
+        });
+
+        logEtapa("Aguardando modal do fluxo sumir");
+        await validarEtapa(nota, "Aguardar modal do fluxo sumir", async () => {
+            return await waitForElementNotExist({
+                object: "div[class='modal fade bd-example-modal-lg in']",
+                timeout: 150000,
+                checkTime: 300
+            });
+        });
+
+        logEtapa("Clica em Assinar AEO");
+        await validarEtapa(nota, "clica no botão de assinar AEO", async () => {
             return await autoClick({
                 object: ".confirm",
                 timeout: 10000,
-                eventTime: 300
+                eventTime: 300,
+                delayAfterClick: 1000
             });
         });
-
-        await validarEtapa(nota, "Aguardar modal final sumir", async () => {
-            return await waitForElementNotExist({
-                object: "div[class='modal fade bd-example-modal-lg in']",
-                timeout: 150000,
-                checkTime: 300
-            });
-        });
-
+      
+        //------------------------------------------
+        logEtapa("Verificando erros finais");
         await validarEtapa(nota, "Verificar mensagem de erro", async () => {
+
             const mensagemErro = document.querySelector(".sweet-alert.showSweetAlert.visible p");
 
             if (mensagemErro) {
+
                 const textoErro = mensagemErro.textContent.trim();
-                console.error("Mensagem de erro encontrada:", textoErro);
+
+                logEtapa(`ERRO FINAL -> ${textoErro}`, "erro");
+
                 await autoClick({
                     object: ".confirm",
                     timeout: 10000,
                     eventTime: 300
                 });
+
                 throw new Error(textoErro);
             }
 
-            console.log("Não foi encontrada mensagem de erro, fluxo finalizado.");
+            logEtapa("Fluxo finalizado sem erros", "success");
+
             return "sem_erro";
         });
 
-
-        console.error("Nota comissionada:", nota);
+        logEtapa("NOTA ASSINADA COM SUCESSO", "success");
 
         relatorio.push({
             nota,
             status: "OK",
-            obs: "Nota comissionada com sucesso"
+            obs: "Nota Assinada com sucesso"
         });
 
     } catch (erro) {
-        console.error("Nota pulada:", nota, erro.message);
+
+        logEtapa(`NOTA PULADA -> ${erro.message}`, "erro");
 
         relatorio.push({
             nota,
@@ -441,18 +449,3 @@ function criarInputNotas() {
 
 // executa
 criarInputNotas();
-
-
-fetch("http://10.204.8.68:8083/Service/SolicitacaoInvestimentoService.svc/rest/VerificarStatusNotaSap", {
-  "headers": {
-    "accept": "application/json, text/plain, */*",
-    "accept-language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
-    "authorization": "Basic SjQwODIxNDQ5OjEwUDx5KWMiYlhUJncwXnQtU159",
-    "content-type": "application/json;charset=UTF-8"
-  },
-  "referrer": "http://10.204.8.68:8083/",
-  "body": "{\"sNota\":\"000420186499\"}",
-  "method": "POST",
-  "mode": "cors",
-  "credentials": "include"
-});
