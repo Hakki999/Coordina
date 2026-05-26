@@ -442,17 +442,3 @@ function criarInputNotas() {
 // executa
 criarInputNotas();
 
-
-fetch("http://10.204.8.68:8083/Service/SolicitacaoInvestimentoService.svc/rest/VerificarStatusNotaSap", {
-  "headers": {
-    "accept": "application/json, text/plain, */*",
-    "accept-language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
-    "authorization": "Basic SjQwODIxNDQ5OjEwUDx5KWMiYlhUJncwXnQtU159",
-    "content-type": "application/json;charset=UTF-8"
-  },
-  "referrer": "http://10.204.8.68:8083/",
-  "body": "{\"sNota\":\"000420186499\"}",
-  "method": "POST",
-  "mode": "cors",
-  "credentials": "include"
-});

@@ -277,11 +277,25 @@
       min-width: 0;
     }
 
-    .card:nth-child(2) { animation-delay: 0.04s; }
-    .card:nth-child(3) { animation-delay: 0.08s; }
-    .card:nth-child(4) { animation-delay: 0.12s; }
-    .card:nth-child(5) { animation-delay: 0.16s; }
-    .card:nth-child(6) { animation-delay: 0.2s; }
+    .card:nth-child(2) {
+      animation-delay: 0.04s;
+    }
+
+    .card:nth-child(3) {
+      animation-delay: 0.08s;
+    }
+
+    .card:nth-child(4) {
+      animation-delay: 0.12s;
+    }
+
+    .card:nth-child(5) {
+      animation-delay: 0.16s;
+    }
+
+    .card:nth-child(6) {
+      animation-delay: 0.2s;
+    }
 
     .card::after {
       content: "";
@@ -892,7 +906,8 @@
       font-size: 13px;
     }
 
-    @media (max-width: 1400px), (max-height: 820px) {
+    @media (max-width: 1400px),
+    (max-height: 820px) {
       .dashboard {
         grid-template-rows: 58px 32px 76px minmax(0, 1fr);
         gap: 7px;
@@ -957,8 +972,13 @@
     }
 
     @keyframes ticker {
-      from { transform: translateX(0); }
-      to { transform: translateX(-50%); }
+      from {
+        transform: translateX(0);
+      }
+
+      to {
+        transform: translateX(-50%);
+      }
     }
 
     @keyframes subir {
@@ -974,17 +994,29 @@
     }
 
     @keyframes preencher {
-      from { width: 0; }
-      to { width: var(--w, 0%); }
+      from {
+        width: 0;
+      }
+
+      to {
+        width: var(--w, 0%);
+      }
     }
 
     @keyframes desenhar {
-      to { stroke-dashoffset: 0; }
+      to {
+        stroke-dashoffset: 0;
+      }
     }
 
     @keyframes aparecer {
-      from { opacity: 0; }
-      to { opacity: 0.86; }
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 0.86;
+      }
     }
 
     @keyframes girarEntrada {
@@ -1000,20 +1032,111 @@
     }
 
     @keyframes brilho {
-      0%, 45% { transform: translateX(-100%); }
-      100% { transform: translateX(100%); }
+
+      0%,
+      45% {
+        transform: translateX(-100%);
+      }
+
+      100% {
+        transform: translateX(100%);
+      }
     }
 
     @keyframes flutuar {
-      from { transform: translate3d(0, 0, 0) scale(1); }
-      to { transform: translate3d(4vw, 3vh, 0) scale(1.08); }
+      from {
+        transform: translate3d(0, 0, 0) scale(1);
+      }
+
+      to {
+        transform: translate3d(4vw, 3vh, 0) scale(1.08);
+      }
     }
 
     @keyframes trocarBloco {
-      0% { opacity: 0; transform: translateY(10px) scale(0.985); filter: blur(4px); }
-      100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+      0% {
+        opacity: 0;
+        transform: translateY(10px) scale(0.985);
+        filter: blur(4px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
     }
 
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .button-back {
+      height: 42px;
+      padding: 0 18px;
+
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+
+      border-radius: 999px;
+      border: 1px solid var(--border-strong);
+      background:
+        linear-gradient(135deg, rgba(56, 189, 248, 0.18), rgba(167, 139, 250, 0.12)),
+        rgba(15, 23, 42, 0.78);
+
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+
+      cursor: pointer;
+      user-select: none;
+
+      box-shadow:
+        0 12px 34px rgba(0, 0, 0, 0.28),
+        0 0 24px rgba(56, 189, 248, 0.12);
+
+      backdrop-filter: blur(10px);
+      transition:
+        transform 0.22s ease,
+        box-shadow 0.22s ease,
+        border-color 0.22s ease,
+        background 0.22s ease;
+    }
+
+    .button-back::before {
+      content: "←";
+      font-size: 17px;
+      font-weight: 900;
+      color: var(--blue);
+      transition: transform 0.22s ease;
+    }
+
+    .button-back:hover {
+      transform: translateY(-2px);
+      border-color: rgba(56, 189, 248, 0.58);
+      background:
+        linear-gradient(135deg, rgba(56, 189, 248, 0.26), rgba(167, 139, 250, 0.18)),
+        rgba(15, 23, 42, 0.9);
+
+      box-shadow:
+        0 16px 42px rgba(0, 0, 0, 0.36),
+        0 0 34px rgba(56, 189, 248, 0.2);
+    }
+
+    .button-back:hover::before {
+      transform: translateX(-3px);
+    }
+
+    .button-back:active {
+      transform: translateY(0) scale(0.97);
+    }
+
+    .button-back:focus-visible {
+      outline: 3px solid rgba(56, 189, 248, 0.32);
+      outline-offset: 3px;
     }

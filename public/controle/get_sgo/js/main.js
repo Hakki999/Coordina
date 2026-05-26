@@ -122,7 +122,7 @@ async function fazerRequisicaoComRetry(id, requestData, tentativa = 1) {
                   "headers": {
                      "accept": "application/json, text/plain, */*",
                      "accept-language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
-                     "authorization": "Basic SjQwODIxNDQ5OjEwUDx5KWMiYlhUJncwXnQtU159",
+                     "authorization": "Basic SjQwODIxNDQ5OjEwOTFabl8kKnBgIy1TQVA",
                      "content-type": "application/json;charset=UTF-8"
                   },
                   "body": body,
@@ -218,7 +218,7 @@ async function fazerRequisicaoComRetry(id, requestData, tentativa = 1) {
             "headers": {
                "accept": "application/json, text/plain, */*",
                "accept-language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
-               "authorization": "Basic SjQwODIxNDQ5OjEwUDx5KWMiYlhUJncwXnQtU159",
+               "authorization": "Basic SjQwODIxNDQ5OjEwOTFabl8kKnBgIy1TQVA",
                "content-type": "application/json;charset=UTF-8"
             },
             "referrer": "http://10.204.8.68:8083/",

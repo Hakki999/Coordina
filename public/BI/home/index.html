@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="/home/css/style.css">
+    <link rel="stylesheet" href="/home/css/home.css">
+    <link rel="shortcut icon" href="../src/logoIcon.png" type="image/x-icon">
+
+    <title>Coordina</title>
+</head>
+
+<body>
+    <nav id="navBar">
+        <div id="thead">
+            <img src="../src/logoIcon.png" alt="Coordina">
+        </div>
+        <ul class="menu">
+            <ul>
+                <li class="optionNav openOption">Home
+                    <ul>
+                        <li class="menuSelect menuSelected">Home</li>
+                    </ul>
+                </li>
+                <li class="optionNav closeOption">Almoxarifado
+                    <ul>
+                        <li class="menuSelect" onclick="window.location.href = '/controle_almoxarifado';">Solicitação
+                        </li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle_almoxarifado';">Recebidos</li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle_almoxarifado';">Config</li>
+                        <li class="menuSelect" onclick="window.location.href = '/lista_materiais';">Lista de Materiais
+                        </li>
+                    </ul>
+                </li>
+                <li class="optionNav closeOption">Controle
+                    <ul>
+                        <li class="menuSelect" onclick="window.location.href = '/controle/iop/add';">Cadastrar IOP</li>
+                        <li class="menuSelect " onclick="window.location.href = '/controle/iop/lista_iop';">IOP</li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle/obras/add';">Cadastrar Obra
+                        </li>
+                        <li class="menuSelect " onclick="window.location.href = '/controle/obras/obras';">Obras</li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle/producao';">Produção</li>
+                        <li class="menuSelect" onclick="window.location.href = '/controle/get_sgo';">Get SGO</li>
+                    </ul>
+                </li>
+                <li class="optionNav closeOption">Programação
+                    <ul>
+                        <li class="menuSelect" onclick="window.location.href = '/programacao';">Materiais x Programado
+                        </li>
+                    </ul>
+                </li>
+                <li class="optionNav closeOption">Dashboard
+                    <ul>
+                        <li class="menuSelect" onclick="window.location.href = '/dashboard/equipes';">Dashboard Equipes
+                        </li>
+                    </ul>
+                </li>
+                <li class="optionNav closeOption">BI
+                    <ul>
+                        <li class="menuSelect" onclick="window.location.href = '/bi/execucao';">Execução</li>
+                        <li class="menuSelect" onclick="window.location.href = '/bi/execucao';">Segurança</li>
+                    </ul>
+                </li>
+            </ul>
+        </ul>
+    </nav>
+
+    <main id="rootMain">
+        <section class="card_grid card_execucao" aria-labelledby="titulo-execucao">
+            <div class="card_header">
+                <div class="card_title_group">
+                    <span class="card_label">Módulo</span>
+                    <h1 id="titulo-execucao">Execução</h1>
+                </div>
+
+                <div class="card_icon" aria-hidden="true">
+                    🚀
+                </div>
+            </div>
+
+            <div class="card_content">
+                <p>
+                    Acompanhe a execução dos processos dentro do sistema Coordina, com uma visão clara das etapas,
+                    status e andamento operacional.
+                </p>
+            </div>
+
+            <div class="card_footer">
+                <span class="card_status">Disponível</span>
+            </div>
+        </section>
+
+        <section class="card_grid card_seguranca" aria-labelledby="titulo-seguranca">
+            <div class="card_header">
+                <div class="card_title_group">
+                    <span class="card_label">Módulo</span>
+                    <h1 id="titulo-seguranca">Segurança</h1>
+                </div>
+
+                <div class="card_icon" aria-hidden="true">
+                    🔒
+                </div>
+            </div>
+
+            <div class="card_content">
+                <p>
+                    Acompanhe a segurança dos processos dentro do sistema Coordina, com uma visão clara das etapas,
+                    status e andamento operacional.
+                </p>
+            </div>
+
+            <div class="card_footer">
+                <span class="card_status">Disponível</span>
+            </div>
+        </section>
+    </main>
+
+    <script src="/home/js/main.js"></script>
+</body>
+
+</html>

@@ -78,8 +78,12 @@ app.get('/controle/get_sgo/', autenticarToken, VerifyAcess('Alpha', 'Programaç�
     res.sendFile(__dirname + "/public/controle/get_sgo/index.html");
 });
 
-app.get("/bi-execucao", autenticarToken, async (req, res) => {
+app.get("/bi/execucao", autenticarToken, async (req, res) => {
   res.sendFile(__dirname + "/public/BI/execucao/index.html");
+});
+
+app.get("/bi/home", autenticarToken, async (req, res) => {
+  res.sendFile(__dirname + "/public/BI/home/index.html");
 });
 
 // ------------------------------- Solicitações ---------------------------------------

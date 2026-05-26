@@ -3,13 +3,11 @@ const { Pool } = require("pg");
 
 const redshift = new Pool({
   host: process.env.REDSHIFT_HOST,
-  port: 5439,
+  port: Number(process.env.REDSHIFT_PORT || 5439),
   database: process.env.REDSHIFT_DATABASE,
   user: process.env.REDSHIFT_USER,
   password: process.env.REDSHIFT_PASSWORD,
-  ssl: {
-    rejectUnauthorized: false
-  },
+  ssl: { rejectUnauthorized: false },
   max: 3,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 30000,
