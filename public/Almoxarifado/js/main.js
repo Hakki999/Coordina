@@ -1222,12 +1222,12 @@ function exportTab() {
         let devDist = [];
         let libDist = [];
 
-        item.lista_nomes.forEach(material => {
+        item.Materiais.forEach(material => {
             console.warn(material);
 
-            materiaisDist.push(material || "err");
-            libDist.push(material.lib || 0);
-            qtdDist.push(material.qtd || 0);
+            materiaisDist.push(material.item || "err");
+            libDist.push(material.lib  || 0);
+            qtdDist.push(material.qtd || material[1] || 0);
             devDist.push(material.dev || 0);
         })
 
